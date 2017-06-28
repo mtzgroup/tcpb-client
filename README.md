@@ -2,9 +2,18 @@
 
 A Python client for communicating directly with a TeraChem Protocol Buffer (TCPB) server.
 
-## Getting Started ##
+## Installation ##
+Download the repo and install the TCPB Python client into a local Conda environment:
+
+1. `git clone git@bitbucket.org:mtzcloud/tcpb-client.git`
+2. `cd tcpb-client`
+3. `source activate <target environment>`
+4. `python setup.py install`
 
 ## Example Client ##
+Assuming there is a TCPB server running on port 54321 on localhost (see TCPB Server section below),
+you can run the example Python script with `python tcpb-example.py`.
+
 
 ## Contents ##
 * `tcpb.py`: Contains TCProtobufClient class, wrapping the generated Protocol Buffer code
@@ -16,10 +25,5 @@ Protocol Buffer code (terachem_server_pb2.py)
 
 ## TCPB Server ##
 TCPB servers are run using the --server/-s flag (and often using the --gpus/-g flag).
-For example,
-
-'''
-terachem -s 54321 -g 01
-'''
-
-starts a TCPB server listening on port 54321 and 2 GPUs (numbered 0 and 1 as per `nvidia-smi`)
+For example, `terachem -s 54321 -g 01` starts a TCPB server listening on port 54321
+with 2 GPUs (numbered 0 and 1 as per `nvidia-smi`)
