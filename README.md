@@ -7,9 +7,12 @@ A Python client for communicating directly with a TeraChem Protocol Buffer (TCPB
 ## Example Client ##
 
 ## Contents ##
-* `tcpb.py`:
+* `tcpb.py`: Contains TCProtobufClient class, wrapping the generated Protocol Buffer code
+into a more user-friendly client
 
-* `protobuf/`:
+* `protobuf/`: Contains the definition of the Protocol Buffer (terachem_server.proto) and the generated
+Protocol Buffer code (terachem_server_pb2.py)
+ * Compile terachem_server.proto into the generated code with: `protoc terachem_server.proto --python_out=.`
 
 ## TCPB Server ##
 TCPB servers are run using the --server/-s flag (and often using the --gpus/-g flag).
