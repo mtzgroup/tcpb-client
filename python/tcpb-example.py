@@ -2,8 +2,8 @@
 # Simple example of how to use python and protobuf to interface with a terachem instance, not for general use, too brittle.
 #
 
-from tcpb import TCProtobufClient
-from protobuf.terachem_server_pb2 import JobInput, Mol  # For JobType and UnitType enumerations
+from tcpb.tcpb import TCProtobufClient
+from tcpb.terachem_server_pb2 import JobInput, Mol  # For JobType and UnitType enumerations
 
 # Water system
 atoms = ['O', 'H', 'H']

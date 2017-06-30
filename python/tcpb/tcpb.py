@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-"""Class structures for communicating with TeraChem over sockets
-"""
-
 # Simple Python socket client class
 # Used for communicating with TeraChem over protocol buffers
 
@@ -16,7 +12,7 @@ import logging
 # ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
 # First 4 bytes: int32 of protocol buffer message type (check the MessageType enum in the protobuf file)
 # Second 4 bytes: int32 of packet size (not including the header)
-from protobuf import terachem_server_pb2 as pb
+from . import terachem_server_pb2 as pb
 
 
 class TCProtobufClient(object):
