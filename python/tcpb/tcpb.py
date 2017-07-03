@@ -70,6 +70,22 @@ class TCProtobufClient(object):
 
         self.prev_results = None
 
+    def __enter__(self):
+        """
+        Allow automatic context management using 'with' statement
+
+        >>> with TCProtobufClient(host, port, **options) as TC:
+        >>>     E = TC.compute_energy(geom)
+        """
+        self.connect()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """
+        Disconnect in automatic context management.
+        """
+        self.disconnect() 
+
     def setup(self, mol, closed=None, restricted=None):
         """Convenience routine to setup molecular parameters using a molecule object.
 
@@ -443,7 +459,7 @@ class TCProtobufClient(object):
 
         # Parse output into normal python dictionary
         results = {
-            'atoms'         : output.mol.atoms,
+            'atoms'         : np.array(output.mol.atoms, dtype='S2'),
             'geom'          : np.array(output.mol.xyz).reshape(-1, 3),
             'energy'        : output.energy,
             'gradient'      : np.array(output.gradient).reshape(-1, 3),
