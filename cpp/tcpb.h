@@ -11,38 +11,137 @@
 
 #include "terachem_server.pb.h"
 
-// Handles communicating with a TeraChem server through sockets and protocol buffers
-// Based on protobufserver.cpp/.h in the TeraChem source code and the Python tcpb (that came first)
-// One major difference is that I do not need to use select logic on the sockets (also simplifies threading)
-// This is since we are only talking to ONE server
+#ifndef MAX_STR_LEN
+#define MAX_STR_LEN 1024
+#endif
+
+/**
+ * \brief TeraChem Protocol Buffer (TCPB) Client class
+ * Handles communicating with a TeraChem server through sockets and protocol buffers
+ * Based on protobufserver.cpp/.h in the TeraChem source code and tcpb.py (that came first)
+ * Direct control of the asynchronous server communication is possible,
+ * but the typical use would be the convenience functions like ComputeEnergy()
+ *
+ * One major difference to the TCPB server code is that the client only needs one active connection
+ * This removes most threading and select logic (but limits communication to one server)
+ * However, timeouts do need to be explicitly set on the socket
+ **/
 class TCPBClient {
   public:
     //Constructor/Destructor
-    TCPBClient(int port);
+    TCPBClient(const char* host, int port);
     ~TCPBClient();
 
     // Job Settings
+    void SetJobInput(); //STUB
 
     // Server Communication
+    bool IsAvailable(); //STUB
+    bool SendJobAsync(); //STUB
+    bool CheckJobAsync(); //STUB
+    bool RecvJobAsync(); //STUB
 
     // Convenience Functions
+    void ComputeJobSync(); //STUB
+    void ComputeEnergy(double& energy); //STUB
+    void ComputeGradient(double& energy, double* gradient); //STUB
 
   private:
+    char host[MAX_STR_LEN];
     int port_;
     int server_;
     FILE* clientLogFile_;
+    // Protocol buffer variables
+    terachem_server::JobInput jobInput_;
+    terachem_server::Mol mol_;
+    terachem_server::JobOutput jobOutput_;
 
-    // Socket helper functions
-    // These first two are higher level, have error checking and will clean up broken connections
+    // Send/Recv for Protobuf packets
+    void SendHeader(); //STUB
+    void SendMessage(); //STUB
+    void RecvHeader(); //STUB
+
+    /******************************************
+     * PROTOBUF SERIALIZATION/DESERIALIZATION *
+     ******************************************/
+
+    /**
+     * Serialize the jobInput_ Protocol Buffer into a binary message
+     *
+     * @param msgStr Storage container for serialized binary message
+     * @param msgSize Byte size of serialized binary message
+     **/
+    void PackJobInput(std::string& msgStr, int& msgSize); //STUB
+
+    /**
+     * Deserialize a binary message into the jobOutput_ Protocol Buffer
+     *
+     * @param msgStr Storage container for serialized binary message
+     **/
+    void UnpackJobOutput(const std::string& msgStr); //STUB
+
+    /***************************
+     * SOCKET HELPER FUNCTIONS *
+     ***************************/
+    // TODO: These should probably be split out, pretty independent
+
+    /**
+     * Initialize the server_ socket and connect to the given host (host_) and port (port_)
+     **/
+    void Connect();
+
+    /**
+     * Disconnect and discard the server_ socket
+     **/
+    void Disconnect();
+
+    /**
+     * A high-level socket recv with error checking and clean up for broken connections
+     *
+     * @param buf Buffer for incoming packet
+     * @param len Byte size of incoming packet
+     * @param log String message to be printed out as part of SocketLog messages (easier debugging)
+     * @return status True if recv'd full packet, False otherwise (indicating server_ socket is now closed)
+     **/
     bool HandleRecv(char* buf, int len, const char* log);
-    bool HandleSend(const char* buf, int len, const char* log);
-    // These next two are low level, have no error checking built in
-    int RecvN(char* buf, int len);
-    int SendN(const char* buf, int len);
-    // Wrapper for shutdown & close 
-    void CloseSock();
 
-    void VerboseLog(const char* format, ...);
+    /**
+     * A high-level socket send with error checking and clean up for broken connections
+     *
+     * @param buf Buffer for outgoing packet
+     * @param len Byte size of outgoing packet
+     * @param log String message to be printed out as part of SocketLog messages (easier debugging)
+     * @return status True if sent full packet, False otherwise (indicating server_ socket is now closed)
+     **/
+    bool HandleSend(const char* buf, int len, const char* log);
+
+    /**
+     * A low-level socket recv wrapper to ensure full packet recv
+     *
+     * @param buf Buffer for incoming packet
+     * @param len Byte size of incoming packet
+     * @return nsent Number of bytes recv'd
+     **/
+    int RecvN(char* buf, int len);
+
+    /**
+     * A low-level socket send wrapper to ensure full packet send
+     *
+     * @param buf Buffer for outgoing packet
+     * @param len Byte size of outgoing packet
+     * @return nsent Number of bytes sent
+     **/
+    int SendN(const char* buf, int len);
+
+    /**
+     * Verbose logging with timestamps for the client socket into "client.log"
+     * This function is similar to fprintf(clientLogFile_, format, ...) with SOCKETLOGS defined
+     * This function does nothing without SOCKETLOGS defined
+     *
+     * @param format Format string for vfprintf
+     * @param va_args Variable arguments for vfprintf
+     **/
+    void SocketLog(const char* format, ...);
 }
 
 #endif
