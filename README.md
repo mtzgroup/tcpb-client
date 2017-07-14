@@ -9,6 +9,7 @@ Protocol Buffer code (`terachem_server.pb.cc/.h`)
 
 * `proto/`: Contains the .proto file that defines the TeraChem Protocol Buffer.
 Compile with `protoc terachem_server.proto --python_out=../python/tcpb/ --cpp_out=../cpp/`
+I typically change the .cc to .cpp for consistency: `mv ../cpp/terachem_server.pb.cc ../cpp/terachem_server.pb.cpp`
 
 * `python/`: `tcpb.py` contains the TCProtobufClient class, wrapping the generated
 Protocol Buffer code (`terachem_server_pb2.py`)
