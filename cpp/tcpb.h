@@ -35,7 +35,13 @@ class TCPBClient {
     // Job Settings
     void SetJobInput(); //STUB
 
-    // Server Communication
+    /************************
+     * Server Communication *
+     ************************/
+    /**
+     * Checks whether the server is available
+     *
+     **/
     bool IsAvailable(); //STUB
     bool SendJobAsync(); //STUB
     bool CheckJobAsync(); //STUB
@@ -56,34 +62,11 @@ class TCPBClient {
     terachem_server::Mol mol_;
     terachem_server::JobOutput jobOutput_;
 
-    // Send/Recv for Protobuf packets
-    void SendHeader(); //STUB
-    void SendMessage(); //STUB
-    void RecvHeader(); //STUB
-
-    /******************************************
-     * PROTOBUF SERIALIZATION/DESERIALIZATION *
-     ******************************************/
-
-    /**
-     * Serialize the jobInput_ Protocol Buffer into a binary message
-     *
-     * @param msgStr Storage container for serialized binary message
-     * @param msgSize Byte size of serialized binary message
-     **/
-    void PackJobInput(std::string& msgStr, int& msgSize); //STUB
-
-    /**
-     * Deserialize a binary message into the jobOutput_ Protocol Buffer
-     *
-     * @param msgStr Storage container for serialized binary message
-     **/
-    void UnpackJobOutput(const std::string& msgStr); //STUB
-
     /***************************
      * SOCKET HELPER FUNCTIONS *
      ***************************/
     // TODO: These should probably be split out, pretty independent
+    // TODO: These functions will not work on Windows at the moment
 
     /**
      * Initialize the server_ socket and connect to the given host (host_) and port (port_)

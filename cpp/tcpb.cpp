@@ -15,7 +15,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-// No sys/time.h needed because we do not use select() and timeouts
+#include <sys/time.h>
 
 #include "tcpb.h"
 #include "terachem_server.pb.h"
@@ -44,12 +44,6 @@ TCPBClient::TCPBClient() {
 #endif
 }
 
-/******************************************
- * PROTOBUF SERIALIZATION/DESERIALIZATION *
- ******************************************/
-
-
-
 /***************************
  * SOCKET HELPER FUNCTIONS *
  ***************************/
@@ -57,20 +51,34 @@ TCPBClient::TCPBClient() {
 void TCPBClient::Connect() {
   struct hostent* serverinfo;
   struct sockaddr_in serveraddr;
+  struct timeval tv;
 
   server_ = socket(AF_INET, SOCK_STREAM, 0);
 
+  // Set timeout to 15 seconds
+  memset(&tv, 0, sizeof(timeval));
+  tv.tv_sec = 15;
+  if (setsockopt(server_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+    SocketLog("Could not set recv timeout to %d seconds", tv.tv_sec);
+    exit(1);
+  }
+  if (setsockopt(server_, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
+    SocketLog("Could not set send timeout to %d seconds", tv.tv_sec);
+    exit(1);
+  }
+
+  // Set up connection
   serverinfo = gethostbyname(host_);
   if (serverinfo == NULL) {
     SocketLog("Could not lookup hostname %s", host_);
     exit(1);
   }
-
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, server->h_length);
   serveraddr.sin_port = htons(port_);
 
+  // Connect
   if (connect(server_, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) < 0) {
     SocketLog("Could not connect to host %s, port %d on socket %d", host_, port_, server_);
     exit(1);
