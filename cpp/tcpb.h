@@ -36,13 +36,15 @@ class TCPBClient {
     void SetJobInput(); //STUB
 
     /************************
-     * Server Communication *
+     * SERVER COMMUNICATION *
      ************************/
     /**
-     * Checks whether the server is available
+     * Checks whether the server is available (does not reserve server)
      *
+     * @return True if server has no running job, False otherwise
      **/
     bool IsAvailable(); //STUB
+
     bool SendJobAsync(); //STUB
     bool CheckJobAsync(); //STUB
     bool RecvJobAsync(); //STUB

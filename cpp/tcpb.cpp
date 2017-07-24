@@ -44,6 +44,23 @@ TCPBClient::TCPBClient() {
 #endif
 }
 
+/************************
+ * SERVER COMMUNICATION *
+ ************************/
+
+bool TCPBClient::IsAvailable() {
+  uint32_t header[2];
+  bool sendSuccess;
+
+  header[0] = htonl((uint32_t)terachem_server::STATUS);
+  header[1] = htonl((uint32_t)0);
+  try {
+    sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
+  } catch (const std::exception& e) {
+    SocketLog("Problem sending
+  }
+}
+
 /***************************
  * SOCKET HELPER FUNCTIONS *
  ***************************/
