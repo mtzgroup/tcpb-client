@@ -14,12 +14,15 @@ import logging
 # Second 4 bytes: int32 of packet size (not including the header)
 from . import terachem_server_pb2 as pb
 
+# Helper functions, mainly used to facilitate testing
+from .pbhelper import save_pb
+
 
 class TCProtobufClient(object):
     """Connect and communicate with a TeraChem instance running in Protocol Buffer server mode
     (i.e. TeraChem was started with the -s|--server flag)
     """
-    def __init__(self, host, port, debug=False,
+    def __init__(self, host, port, debug=False, trace=False,
                  atoms=None, charge=0, spinmult=1, closed=None, restricted=None,
                  method=None, basis=None, **kwargs):
         """Initialize a TCProtobufClient object.
@@ -27,6 +30,8 @@ class TCProtobufClient(object):
         Args:
             host: String of hostname
             port: Integer of port number (must be above 1023)
+            debug: If True, assumes connections work (used for testing with no server)
+            trace: If True, pbhelper.save_pb() is used to save a full Protobuf trace for testing
             atoms: List of atoms types as strings
             charge: Total charge (int)
             spinmult: Spin multiplicity (int)
@@ -37,6 +42,7 @@ class TCProtobufClient(object):
             **kwargs: Additional TeraChem keywords (dict of key-value pairs as strings)
         """
         self.debug = debug
+        self.trace = trace
 
         # Sanity checks
         if method is None:
@@ -264,6 +270,8 @@ class TCProtobufClient(object):
 
         # Send Status header
         self._send_header(pb.STATUS, 0)
+        if self.trace:
+            save_pb(pb.STATUS, None, "sent_pb.dat", True)
 
         # Receive Status header
         try:
@@ -283,6 +291,9 @@ class TCProtobufClient(object):
 
         status = pb.Status()
         status.ParseFromString(msgStr)
+
+        if self.trace:
+            save_pb(pb.STATUS, status, "recv_pb.dat", True)
 
         return not status.busy
 
@@ -354,6 +365,9 @@ class TCProtobufClient(object):
         msgStr = job_options.SerializeToString()
         self.tcsock.sendall(msgStr)
 
+        if self.trace:
+            save_pb(pb.JOBINPUT, job_options, "sent_pb.dat", True)
+
         # Handle response
         try:
             header = self._recv_header()
@@ -372,6 +386,9 @@ class TCProtobufClient(object):
 
         status = pb.Status()
         status.ParseFromString(msgStr)
+
+        if self.trace:
+            save_pb(pb.STATUS, status, "recv_pb.dat", True)
 
         if status.WhichOneof("job_status") == "accepted":
             return True
@@ -392,6 +409,9 @@ class TCProtobufClient(object):
 
         # Send Status header
         self._send_header(pb.STATUS, 0)
+
+        if self.trace:
+            save_pb(pb.STATUS, None, "sent_pb.dat", True)
 
         # Receive Status header
         try:
@@ -414,6 +434,9 @@ class TCProtobufClient(object):
 
         status = pb.Status()
         status.ParseFromString(msgStr)
+
+        if self.trace:
+            save_pb(pb.STATUS, status, "recv_pb.dat", True)
 
         if status.WhichOneof("job_status") == "completed":
             return True
@@ -450,6 +473,9 @@ class TCProtobufClient(object):
 
         output = pb.JobOutput()
         output.ParseFromString(msgStr)
+
+        if self.trace:
+            save_pb(pb.JOBOUTPUT, output, "recv_pb.dat", True)
 
         # Set MOs for next job
         del self.tc_options.guess_mo_coeffs_a[:]

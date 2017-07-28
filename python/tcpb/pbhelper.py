@@ -4,14 +4,14 @@
 #
 # Protobuf helper functions for testing
 
-from tcpb import terachem_server_pb2 as pb
+from . import terachem_server_pb2 as pb
 
 def save_pb(msgType, msgPB, outfile="pb.dat", append=False):
     """Save a Protocol Buffer message (with header) to file
     
     Args:
         msgType: Message type (defined as enum in protocol buffer)
-        msgPB: Protocol Buffer to save
+        msgPB: Protocol Buffer to save (if None, only write msgType (used for empty Status messages))
         outfile: File to save the protocol buffer (1 line per message, space separated)
         append: If True, append to outfile. If False, overwrite outfile.
     """
@@ -20,7 +20,11 @@ def save_pb(msgType, msgPB, outfile="pb.dat", append=False):
     else:
         mode = "w"
     with f as open(outfile, mode):
-        f.write("{} {}\n".format(msgType, msgPB.SerializeToString()))
+        if msgPB is None:
+            f.write("{}\n".format(msgType))
+        else:
+            f.write("{} {}\n".format(msgType, msgPB.SerializeToString()))
+            
 
 def compare_pb(pb1, pb2):
     """Compare two Protocol Buffers for 'equality'

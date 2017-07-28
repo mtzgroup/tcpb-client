@@ -17,5 +17,5 @@ setup(name="tcpb",
       packages=["tcpb"],
       test_suite="tcpb",
       long_description="""This is still very much a work in progress.""",
-      install_requires=['protobuf>=3.2.0','numpy>=1.13']
+      install_requires=['google>=1.9.3','protobuf>=3.2.0','numpy>=1.13']
       )
