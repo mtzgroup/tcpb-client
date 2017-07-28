@@ -12,6 +12,9 @@ import struct
 from threading import Thread
 from Queue import Queue
 
+from tcpb import terachem_server_pb2 as pb
+from . import pbhelper
+
 
 class MockServer(object):
     """Mock server for TCPB client testing
@@ -67,17 +70,6 @@ class MockServer(object):
         for m in msgs:
             self.response_queue.put(m)
 
-    def set_response_msg(self, msgType, msgPB):
-        """Set the response for the mock server
-
-        Args:
-            msgType: Integer type of Protocol Buffer
-            msgPB: Response Protocol Buffer
-        """
-        # TODO: Look up actual 
-        self.response_header = struct.pack('>II', msgType, msgPB.byteSize())
-        self.response_msg = msgPB.ToString()
-
     def listen(self):
         self.sock.listen(5)
         while self.activeListening:
@@ -88,6 +80,9 @@ class MockServer(object):
             self.clientThreads += [t]
 
     def testClient(self, client, address):    
+        if self.expected_queue.qsize() != self.response_queue.qsize():
+            raise RuntimeError("Expected and response queues are not the same size")
+
         # Handle getting message from client
         # Slightly brittle because I only wait one minute, but should be fine for testing
         try:
@@ -109,6 +104,19 @@ class MockServer(object):
             raise RuntimeError("MockServer: Problem receiving message from client. Error: {}".format(msg))
 
         # TODO: Test protobuf is the same
+        if expected_msg[0] == pb.STATUS:
+            recvd_pb = pb.Status()
+        elif expected_msg[0] == pb.MOL:
+            recvd_pb = pb.Mol()
+        elif expected_msg[0] == pb.JOBINPUT:
+            recvd_pb = pb.JobInput()
+        elif expected_msg[0] == pb.JOBOUTPUT:
+            recvd_pb = pb.JobOutput()
+        else:
+            raise RuntimeError("MockServer: Unknown protobuf type")
+
+        recvd_pb.ParseFromString(expected_msg[1])
+        pbhelper.compare_pb(expected_msg
 
         # Send response
         try:
