@@ -19,11 +19,13 @@ def save_pb(msgType, msgPB, outfile="pb.dat", append=False):
         mode = "a"
     else:
         mode = "w"
-    with f as open(outfile, mode):
+    with open(outfile, mode) as f:
         if msgPB is None:
-            f.write("{}\n".format(msgType))
+            f.write(msgType)
         else:
-            f.write("{} {}\n".format(msgType, msgPB.SerializeToString()))
+            f.write(msgType)
+            f.write(msgPB.SerializeToString())
+        f.write("\n")
             
 
 def compare_pb(pb1, pb2):
