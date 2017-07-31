@@ -25,11 +25,13 @@ class MockServer(object):
     - Response is sent back to client over socket (on listening thread)
     - Output of client function is tested for correctness
     """
-    def __init__(self, port):
+    def __init__(self, port, intracefile, outtracefile):
         """Initialize the MockServer object.
 
         Args:
             port: Integer of port number
+            intracefile: Binary file containing packets recv'd by client
+            outtracefile: Binary file containing packets sent by client
         """
         # Sanity checks
         if not isinstance(port, int):
@@ -37,47 +39,49 @@ class MockServer(object):
         if port < 1023:
             raise ValueError("Port number is not allowed to below 1023 (system reserved ports)")
 
-        self.headerSize = 8 #Expect exactly 2 ints of 4 bytes each
+        self.header_size = 8 #Expect exactly 2 ints of 4 bytes each
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('localhost', port))
-        self.activeListening = True
-        self.clientThreads = []
+        self.active_listening = True
+        self.client_threads = []
 
-        # Expected messages from client
-        # Passed as (msgType, msgPB)
+        # Expected messages from client (out for client, in for server)
         self.expected_queue = Queue()
+        self.set_expected_messages(outtracefile)
 
-        # Response message for client
-        # Passed as (msgType, msgPB)
+        # Response message for client (in for client, out for server)
         self.response_queue = Queue()
+        self.set_response_messages(intracefile)
 
-    def add_expected_messages(self, msgs):
+    def set_expected_messages(self, tracefile):
         """Add messages to the expected messages queue
 
         Args:
-            msgs: List of (msgType, msgPB) tuples
+            tracefile: Binary file containing packets sent by client (and therefore recv'd by server)
         """
+        msgs = pbhelper.load_trace(tracefile)
         for m in msgs:
             self.expected_queue.put(m)
 
-    def add_response_messages(self, msgs):
+    def set_response_messages(self, tracefile):
         """Add messages to the response messages queue
 
         Args:
-            msgs: List of (msgType, msgPB) tuples
+            tracefile: Binary file containing packets recv'd by client (and therefore sent by server)
         """
+        msgs = pbhelper.load_trace(tracefile)
         for m in msgs:
             self.response_queue.put(m)
 
     def listen(self):
         self.sock.listen(5)
-        while self.activeListening:
+        while self.active_listening:
             client, address = self.sock.accept()
             client.settimeout(60)
             t = Thread(target=self.testClient, args=(client, address))
             t.start()
-            self.clientThreads += [t]
+            self.client_threads += [t]
 
     def testClient(self, client, address):    
         if self.expected_queue.qsize() != self.response_queue.qsize():
@@ -99,7 +103,7 @@ class MockServer(object):
             raise RuntimeError("MockServer: Did not receive expected header from client")
 
         try:
-            msgStr = self._recv_message(client, header[1])
+            msg_str = self._recv_message(client, header[1])
         except socket.error as msg:
             raise RuntimeError("MockServer: Problem receiving message from client. Error: {}".format(msg))
 
@@ -133,23 +137,23 @@ class MockServer(object):
         client.close()
 
     def shutdown(self):
-        self.activeListening = False
-        for t in self.clientThreads:
+        self.active_listening = False
+        for t in self.client_threads:
             t.join()
 
     # Private send/recv functions
-    def _send_header(self, client, msgType, msgSize):
+    def _send_header(self, client, msg_type, msg_size):
         """Sends a header to the TCPBClient
 
         Args:
             client: Client socket
-            msgSize: Size of following message (not including header)
-            msgType: Message type (defined as enum in protocol buffer)
+            msg_size: Size of following message (not including header)
+            msg_type: Message type (defined as enum in protocol buffer)
         Returns True if send was successful, False otherwise
         """
         # This will always pack integers as 4 bytes since I am requesting a standard packing (big endian)
         # Big endian is convention for network byte order (because IBM or someone)
-        header = struct.pack('>II', msgType, msgSize)
+        header = struct.pack('>II', msg_type, msg_size)
         try:
             client.sendall(header)
         except socket.error as msg:
@@ -158,16 +162,16 @@ class MockServer(object):
 
         return True
 
-    def _send_message(self, client, msgStr):
+    def _send_message(self, client, msg_str):
         """Sends a header to the TCPBClient
 
         Args:
             client: Client socket
-            msgStr: String representation of binary message
+            msg_str: String representation of binary message
         Returns True if send was successful, False otherwise
         """
         try:
-            client.sendall(msgStr)
+            client.sendall(msg_str)
         except socket.error as msg:
             print("MockServer: Could not send message. Error: {}".format(msg))
             return False
@@ -179,54 +183,54 @@ class MockServer(object):
 
         Args:
             client: Client socket
-        Returns (msgType, msgSize) on successful recv, None otherwise
+        Returns (msg_type, msg_size) on successful recv, None otherwise
         """
-        headerStr = ''
-        nleft = self.headerSize
+        header = ''
+        nleft = self.header_size
         while nleft:
             data = client.recv(nleft)
             if data == '':
                 break
-            headerStr += data
+            header += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.headerSize and data == '':
+        if nleft == self.header_size and data == '':
             print("MockServer: Could not recv header because socket was closed from client")
             return None
         elif nleft:
-            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.headerSize)
+            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)
             return None
 
-        msgInfo = struct.unpack_from(">II", headerStr)
-        return msgInfo
+        msg_info = struct.unpack_from(">II", header)
+        return msg_info
 
-    def _recv_message(self, client, msgSize):
+    def _recv_message(self, client, msg_size):
         """Receive a message from the TCPBClient
 
         Args:
             client: Client socket
-            msgSize: Integer of message size
+            msg_size: Integer of message size
         Returns a string representation of the binary message if successful, None otherwise
         """
-        if msgSize == 0:
+        if msg_size == 0:
             return ""
 
-        msgStr = ''
-        nleft = msgSize
+        msg_str = ''
+        nleft = msg_size
         while nleft:
             data = client.recv(nleft)
             if data == '':
                 break
-            msgStr += data
+            msg_str += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.headerSize and data == '':
+        if nleft == self.header_size and data == '':
             print("MockServer: Could not recv message because socket was closed from client")
             return None
         elif nleft:
-            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.headerSize))
+            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size))
             return None
 
-        return msgStr
+        return msg_str

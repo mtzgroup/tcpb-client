@@ -4,29 +4,49 @@
 #
 # Protobuf helper functions for testing
 
+import struct
+
 from . import terachem_server_pb2 as pb
 
-def save_pb(msgType, msgPB, outfile="pb.dat", append=False):
-    """Save a Protocol Buffer message (with header) to file
+def load_trace(tracefile):
+    """Load a packet trace from a TCPB client job run with trace=True
     
     Args:
-        msgType: Message type (defined as enum in protocol buffer)
-        msgPB: Protocol Buffer to save (if None, only write msgType (used for empty Status messages))
-        outfile: File to save the protocol buffer (1 line per message, space separated)
-        append: If True, append to outfile. If False, overwrite outfile.
+        tracefile: If True, append to outfile. If False, overwrite outfile.
+    Returns:
+        msgs: List of (msg_type, msg_pb) from tracefile
     """
-    if append:
-        mode = "a"
-    else:
-        mode = "w"
-    with open(outfile, mode) as f:
-        if msgPB is None:
-            f.write(msgType)
+    f.open(tracefile, 'rb')
+    data = f.read()
+    f.close()
+
+    msgs = []
+    while len(data) > 0:
+        msg_type = struct.unpack_from('>I', data[:4])
+        msg_size = struct.unpack_from('>I', data[4:8])
+        msg_end = msg_size + 8
+
+        if msg_type == pb.STATUS:
+            msg_pb = pb.Status()
+        elif msg_type == pb.MOL:
+            msg_pb = pb.Mol()
+        elif msg_type == pb.JOBINPUT:
+            msg_pb = pb.JobInput()
+        elif msg_type == pb.JOBOUTPUT:
+            msg_pb = pb.JobOutput()
         else:
-            f.write(msgType)
-            f.write(msgPB.SerializeToString())
-        f.write("\n")
-            
+            raise RuntimeError("PBHelper: Unknown message type {} for received message.".format(msg_type))
+
+        if len(data) < msg_end:
+            raise RuntimeError("PBHelper: Ran out of trace.")
+
+        msg_pb.ParseFromString(data[8:msg_end])
+
+        msgs += [(msg_type, msg_pb)]
+
+        del data[:msg_end]
+
+    return msgs
 
 def compare_pb(pb1, pb2):
     """Compare two Protocol Buffers for 'equality'
