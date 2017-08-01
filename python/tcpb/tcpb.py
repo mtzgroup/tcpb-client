@@ -28,7 +28,7 @@ class TCProtobufClient(object):
             host: String of hostname
             port: Integer of port number (must be above 1023)
             debug: If True, assumes connections work (used for testing with no server)
-            trace: If True, packets are saved to sent.dat or recv.dat (which can then be used for testing)
+            trace: If True, packets are saved to .bin files (which can then be used for testing)
             atoms: List of atoms types as strings
             charge: Total charge (int)
             spinmult: Spin multiplicity (int)
@@ -41,8 +41,8 @@ class TCProtobufClient(object):
         self.debug = debug
         self.trace = trace
         if self.trace:
-            self.intracefile = open('recv.dat', 'w')
-            self.outtracefile = open('sent.dat', 'w')
+            self.intracefile = open('client_recv.bin', 'wb')
+            self.outtracefile = open('client_sent.bin', 'wb')
 
         # Sanity checks
         if method is None:
@@ -504,14 +504,13 @@ class TCProtobufClient(object):
         except socket.error as msg:
             raise RuntimeError("TCProtobufClient: Could not send header to {}. Error: {}".format(self.tcaddr, msg))
 
-        if msg_pb is None:
-            return
-
-        try:
-            msg_str = msg_pb.SerializeToString()
-            self.tcsock.sendall(msg_str)
-        except socket.error as msg:
-            raise RuntimeError("TCProtobufClient: Could not send protobuf to {}. Error: {}".format(self.tcaddr, msg))
+        msg_str = ''
+        if msg_pb is not None:
+            try:
+                msg_str = msg_pb.SerializeToString()
+                self.tcsock.sendall(msg_str)
+            except socket.error as msg:
+                raise RuntimeError("TCProtobufClient: Could not send protobuf to {}. Error: {}".format(self.tcaddr, msg))
 
         if self.trace:
             packet = header + msg_str

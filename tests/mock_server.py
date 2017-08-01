@@ -13,7 +13,6 @@ from threading import Thread
 from Queue import Queue
 
 from tcpb import terachem_server_pb2 as pb
-from . import pbhelper
 
 
 class MockServer(object):
@@ -43,103 +42,147 @@ class MockServer(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('localhost', port))
-        self.active_listening = True
-        self.client_threads = []
+        self.listen_thread = Thread(target=self.listen)
 
         # Expected messages from client (out for client, in for server)
-        self.expected_queue = Queue()
-        self.set_expected_messages(outtracefile)
+        self.expected_msgs = self.load_trace(outtracefile)
 
         # Response message for client (in for client, out for server)
-        self.response_queue = Queue()
-        self.set_response_messages(intracefile)
+        self.response_msgs = self.load_trace(intracefile)
 
-    def set_expected_messages(self, tracefile):
-        """Add messages to the expected messages queue
+        # Start listening thread
+        self.listen_thread.start()
 
+    def load_trace(self, tracefile):
+        """Load a packet trace from a TCPB client job run with trace=True
+        
         Args:
-            tracefile: Binary file containing packets sent by client (and therefore recv'd by server)
+            tracefile: If True, append to outfile. If False, overwrite outfile.
+        Returns:
+            msgs: List of (msg_type, msg_pb) from tracefile
         """
-        msgs = pbhelper.load_trace(tracefile)
-        for m in msgs:
-            self.expected_queue.put(m)
+        f = open(tracefile, 'rb')
+        data = f.read()
+        f.close()
 
-    def set_response_messages(self, tracefile):
-        """Add messages to the response messages queue
+        msgs = []
+        packet_start = 0
+        while packet_start < len(data):
+            header_mid = packet_start + 4
+            header_end = packet_start + 8
+            msg_type = struct.unpack_from('>I', data[packet_start:header_mid])[0]
+            msg_size = struct.unpack_from('>I', data[header_mid:header_end])[0]
+            msg_end = header_end + msg_size
 
-        Args:
-            tracefile: Binary file containing packets recv'd by client (and therefore sent by server)
-        """
-        msgs = pbhelper.load_trace(tracefile)
-        for m in msgs:
-            self.response_queue.put(m)
+            if msg_type == pb.STATUS:
+                msg_pb = pb.Status()
+            elif msg_type == pb.MOL:
+                msg_pb = pb.Mol()
+            elif msg_type == pb.JOBINPUT:
+                msg_pb = pb.JobInput()
+            elif msg_type == pb.JOBOUTPUT:
+                msg_pb = pb.JobOutput()
+            else:
+                raise RuntimeError("PBHelper: Unknown message type {} for received message.".format(msg_type))
+
+            if len(data) < msg_end:
+                raise RuntimeError("PBHelper: Ran out of trace.")
+
+            msg_pb.ParseFromString(data[header_end:msg_end])
+
+            msgs += [(msg_type, msg_pb)]
+            
+            packet_start = msg_end
+
+        return msgs
 
     def listen(self):
-        self.sock.listen(5)
-        while self.active_listening:
-            client, address = self.sock.accept()
-            client.settimeout(60)
-            t = Thread(target=self.testClient, args=(client, address))
-            t.start()
-            self.client_threads += [t]
+        self.sock.listen(1)
 
-    def testClient(self, client, address):    
-        if self.expected_queue.qsize() != self.response_queue.qsize():
-            raise RuntimeError("Expected and response queues are not the same size")
+        client, address = self.sock.accept()
+        client.settimeout(5)
+        self.testClient(client)
 
+    def testClient(self, client):    
         # Handle getting message from client
-        # Slightly brittle because I only wait one minute, but should be fine for testing
-        try:
-            header = self._recv_header(client)
-        except socket.error as msg:
-            raise RuntimeError("MockServer: Problem receiving header from client. Error: {}".format(msg))
+        # Very brittle, but should be fine for testing because I control communication
+        while len(self.expected_msgs) > 0:
+            try:
+                header = self._recv_header(client)
+            except socket.error as msg:
+                print("MockServer: Problem receiving header from client. Error: {}".format(msg))
+                return
 
-        if header is None:
-            raise RuntimeError("MockServer: Problem receiving header from client")
+            if header is None:
+                print("MockServer: Problem receiving header from client")
+                return
 
-        expected_msg = self.expected_queue.get(False)
-        expected_header = (expected_msg[0], expected_msg[1].ByteSize())
-        if header != expected_header:
-            raise RuntimeError("MockServer: Did not receive expected header from client")
+            expected_msg = self.expected_msgs[0]
+            expected_header = (expected_msg[0], expected_msg[1].ByteSize())
+            if header != expected_header:
+                print("MockServer: Did not receive expected header from client")
+                return
 
-        try:
-            msg_str = self._recv_message(client, header[1])
-        except socket.error as msg:
-            raise RuntimeError("MockServer: Problem receiving message from client. Error: {}".format(msg))
+            try:
+                msg_str = self._recv_message(client, header[1])
+            except socket.error as msg:
+                print("MockServer: Problem receiving message from client. Error: {}".format(msg))
+                return
 
-        # TODO: Test protobuf is the same
-        if expected_msg[0] == pb.STATUS:
-            recvd_pb = pb.Status()
-        elif expected_msg[0] == pb.MOL:
-            recvd_pb = pb.Mol()
-        elif expected_msg[0] == pb.JOBINPUT:
-            recvd_pb = pb.JobInput()
-        elif expected_msg[0] == pb.JOBOUTPUT:
-            recvd_pb = pb.JobOutput()
-        else:
-            raise RuntimeError("MockServer: Unknown protobuf type")
+            if header[0] == pb.STATUS:
+                recvd_pb = pb.Status()
+            elif header[0] == pb.MOL:
+                recvd_pb = pb.Mol()
+            elif header[0] == pb.JOBINPUT:
+                recvd_pb = pb.JobInput()
+            elif header[0] == pb.JOBOUTPUT:
+                recvd_pb = pb.JobOutput()
+            else:
+                print("MockServer: Unknown protobuf type")
+                return
 
-        recvd_pb.ParseFromString(expected_msg[1])
-        pbhelper.compare_pb(expected_msg
+            # TODO: Compare expected, exit if wrong
+            recvd_pb.ParseFromString(msg_str)
 
-        # Send response
-        try:
-            self._send_header(client, self.response_header[0], self.response_header[1])
-        except socket.error as msg:
-            raise RuntimeError("MockServer: Problem sending header to client. Error: {}".format(msg))
+            del self.expected_msgs[0]
 
-        try:
-            self._send_message(client, self.response_pb.SerializeToString())
-        except socket.error as msg:
-            raise RuntimeError("MockServer: Problem sending message to client. Error: {}".format(msg))
+            # Send response (if one)
+            response_msg = self.response_msgs[0]
+            response_pb = response_msg[1]
+            try:
+                self._send_header(client, response_msg[0], response_pb.ByteSize())
+            except socket.error as msg:
+                print("MockServer: Problem sending header to client. Error: {}".format(msg))
+                return
+
+            try:
+                self._send_message(client, response_pb.SerializeToString())
+            except socket.error as msg:
+                print("MockServer: Problem sending message to client. Error: {}".format(msg))
+                return
+
+            if response_msg[0] == pb.STATUS and response_pb.WhichOneof("job_status") == 'completed':
+                # Also need to send joboutput, which should be next message
+                response_msg = self.response_msgs[1]
+                response_pb = response_msg[1]
+                try:
+                    self._send_header(client, response_msg[0], response_pb.ByteSize())
+                except socket.error as msg:
+                    print("MockServer: Problem sending header to client. Error: {}".format(msg))
+                    return
+
+                try:
+                    self._send_message(client, response_pb.SerializeToString())
+                except socket.error as msg:
+                    print("MockServer: Problem sending message to client. Error: {}".format(msg))
+                    return
+
+                del self.response_msgs[1]
+
+            del self.response_msgs[0]
 
         client.shutdown(2)
         client.close()
-
-    def shutdown(self):
-        self.active_listening = False
-        for t in self.client_threads:
-            t.join()
 
     # Private send/recv functions
     def _send_header(self, client, msg_type, msg_size):
@@ -199,7 +242,7 @@ class MockServer(object):
             print("MockServer: Could not recv header because socket was closed from client")
             return None
         elif nleft:
-            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)
+            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size))
             return None
 
         msg_info = struct.unpack_from(">II", header)
