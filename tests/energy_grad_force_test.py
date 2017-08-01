@@ -66,7 +66,6 @@ def run_test(port=56789, run_real_server=False):
             print('Failed force test')
             return False
 
-    print('Passed energy, gradient, and force test')
     return True
 
 if __name__ == '__main__':
