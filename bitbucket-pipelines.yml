@@ -9,6 +9,7 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
+          - cd $BUILDDIR
           - python setup.py install
           - cd tests
           - python test_tcpb.py
