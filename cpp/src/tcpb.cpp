@@ -59,14 +59,14 @@ bool TCPBClient::IsAvailable() {
   header[1] = htonl((uint32_t)0);
   sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
   if (!sendSuccess) {
-    printf("Could not send status header");
+    printf("Could not send status header\n");
     exit(1);
   }
   
   // Receive status response
   recvSuccess = HandleRecv((char *)header, sizeof(header), "IsAvailable() status header");
   if (!recvSuccess) {
-    printf("Could not receive status header");
+    printf("Could not receive status header\n");
     exit(1);
   }
 
@@ -74,19 +74,21 @@ bool TCPBClient::IsAvailable() {
   int msgSize = ntohl(header[1]);
 
   char msg[msgSize];
-  recvSuccess = HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
-  if (!recvSuccess) {
-    printf("Could not receive status protobuf");
-    exit(1);
+  if (msgSize > 0) {
+    recvSuccess = HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
+    if (!recvSuccess) {
+      printf("Could not receive status protobuf\n");
+      exit(1);
+    }
   }
 
   if (header[0] != terachem_server::STATUS) {
-    printf("Did not receive the expected status message");
+    printf("Did not receive the expected status message\n");
     exit(1);
   }
   
   terachem_server::Status status;
-  status.ParseFromString(msg);
+  if (msgSize > 0) status.ParseFromString(msg);
 
   return !status.busy();
 }
