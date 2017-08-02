@@ -9,12 +9,14 @@
 #include <errno.h>
 #include <string>
 #include <time.h>
+#include <stdarg.h>
 
 //Socket includes
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <sys/time.h>
 
 #include "tcpb.h"
@@ -36,7 +38,7 @@ TCPBClient::TCPBClient(const char* host, int port) {
 #endif
 }
 
-TCPBClient::TCPBClient() {
+TCPBClient::~TCPBClient() {
   Disconnect();
 
 #ifdef SOCKETLOGS
@@ -50,15 +52,43 @@ TCPBClient::TCPBClient() {
 
 bool TCPBClient::IsAvailable() {
   uint32_t header[2];
-  bool sendSuccess;
+  bool sendSuccess, recvSuccess;
 
+  // Send status request
   header[0] = htonl((uint32_t)terachem_server::STATUS);
   header[1] = htonl((uint32_t)0);
-  try {
-    sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
-  } catch (const std::exception& e) {
-    SocketLog("Problem sending
+  sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
+  if (!sendSuccess) {
+    printf("Could not send status header");
+    exit(1);
   }
+  
+  // Receive status response
+  recvSuccess = HandleRecv((char *)header, sizeof(header), "IsAvailable() status header");
+  if (!recvSuccess) {
+    printf("Could not receive status header");
+    exit(1);
+  }
+
+  int msgType = ntohl(header[0]);
+  int msgSize = ntohl(header[1]);
+
+  char msg[msgSize];
+  recvSuccess = HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
+  if (!recvSuccess) {
+    printf("Could not receive status protobuf");
+    exit(1);
+  }
+
+  if (header[0] != terachem_server::STATUS) {
+    printf("Did not receive the expected status message");
+    exit(1);
+  }
+  
+  terachem_server::Status status;
+  status.ParseFromString(msg);
+
+  return !status.busy();
 }
 
 /***************************
@@ -92,7 +122,7 @@ void TCPBClient::Connect() {
   }
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
-  memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, server->h_length);
+  memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, serverinfo->h_length);
   serveraddr.sin_port = htons(port_);
 
   // Connect
@@ -166,7 +196,7 @@ bool TCPBClient::HandleSend(const char* buf, int len, const char* log) {
     return false;
   }
   
-  SocketLog(logStr_, "Successfully sent packet of %d bytes for %s on socket %d\n", nsent, log, server_);
+  SocketLog("Successfully sent packet of %d bytes for %s on socket %d\n", nsent, log, server_);
   return true;
 }
 
@@ -212,10 +242,10 @@ void TCPBClient::SocketLog(const char* format, ...) {
   va_list args;
   va_start(args, format);
   char logStr[MAX_STR_LEN];
-  snprintf(logStr, MAX_STR_LEN, format, args);
+  vsnprintf(logStr, MAX_STR_LEN, format, args);
 
   // Print to file with timestamp
-  vfprintf(clientLogFile_, "%s: %s\n", asctime(t), logStr);
+  fprintf(clientLogFile_, "%s: %s\n", asctime(t), logStr);
   fflush(clientLogFile_);
 
   va_end(args);

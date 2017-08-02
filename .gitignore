@@ -3,3 +3,5 @@
 build/
 dist/
 tcpb.egg-info/
+cpp/obj/
+tcpb.so*

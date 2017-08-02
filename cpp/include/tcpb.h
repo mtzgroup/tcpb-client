@@ -55,7 +55,7 @@ class TCPBClient {
     void ComputeGradient(double& energy, double* gradient); //STUB
 
   private:
-    char host[MAX_STR_LEN];
+    char host_[MAX_STR_LEN];
     int port_;
     int server_;
     FILE* clientLogFile_;
@@ -127,6 +127,6 @@ class TCPBClient {
      * @param va_args Variable arguments for vfprintf
      **/
     void SocketLog(const char* format, ...);
-}
+};
 
 #endif
