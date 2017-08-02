@@ -23,5 +23,5 @@ if __name__ == '__main__':
     py_suite = unittest.TestLoader().loadTestsFromTestCase(TestPyTCPB)
     unittest.TextTestRunner(verbosity=2).run(py_suite)
 
-    cpp_suite = unittest.TestLoader().loadTestsFromTestCase(TestCppTCPB)
-    unittest.TextTestRunner(verbosity=2).run(cpp_suite)
+    #cpp_suite = unittest.TestLoader().loadTestsFromTestCase(TestCppTCPB)
+    #unittest.TextTestRunner(verbosity=2).run(cpp_suite)
