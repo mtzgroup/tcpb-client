@@ -1,7 +1,7 @@
 *.pyc
 *.swp
-build/
-dist/
-tcpb.egg-info/
+python/build/
+python/dist/
+python/tcpb.egg-info/
 cpp/obj/
-tcpb.so*
+cpp/build/

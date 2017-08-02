@@ -39,11 +39,21 @@ class TCPBClient {
      * SERVER COMMUNICATION *
      ************************/
     /**
+     * Initialize the server_ socket and connect to the given host (host_) and port (port_)
+     **/
+    void Connect();
+
+    /**
+     * Disconnect and discard the server_ socket
+     **/
+    void Disconnect();
+
+    /**
      * Checks whether the server is available (does not reserve server)
      *
      * @return True if server has no running job, False otherwise
      **/
-    bool IsAvailable(); //STUB
+    bool IsAvailable();
 
     bool SendJobAsync(); //STUB
     bool CheckJobAsync(); //STUB
@@ -69,17 +79,6 @@ class TCPBClient {
      ***************************/
     // TODO: These should probably be split out, pretty independent
     // TODO: These functions will not work on Windows at the moment
-
-    /**
-     * Initialize the server_ socket and connect to the given host (host_) and port (port_)
-     **/
-    void Connect();
-
-    /**
-     * Disconnect and discard the server_ socket
-     **/
-    void Disconnect();
-
     /**
      * A high-level socket recv with error checking and clean up for broken connections
      *

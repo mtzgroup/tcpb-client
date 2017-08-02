@@ -1,12 +1,12 @@
 CXX=g++
 INCDIR=./include
 CXXFLAGS=-I$(INCDIR) -fPIC
+LIBS=-lprotobuf
 VER=0.1.0
 
 # Source files
 SRCDIR=./src
 _SRC=tcpb.cpp terachem_server.pb.cpp
-SRC=$(patsubst %,$(SRCDIR)/%,$(_SRC))
 
 # Header files (based on source filenames)
 _DEPS=$(_SRC:.cpp=.h)
@@ -17,8 +17,11 @@ OBJDIR=./obj
 _OBJ=$(_SRC:.cpp=.o)
 OBJ=$(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
-# Library flags
-LIBS=-lprotobuf
+# Build directory
+BUILDDIR=./build
+
+# Prefix for installation
+PREFIX=/home/sseritan/personal_modules/software/tcpb-client/0.1
 
 
 # Rule to build object files in obj/
@@ -28,11 +31,23 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Rule to build versioned tcpb.so
-tcpb.so.$(VER): $(OBJ)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $^ $(LIBS)
-	@ln -s $@ tcpb.so
+libtcpb.so.$(VER): $(OBJ)
+	@mkdir -p $(BUILDDIR)
+	$(CXX) $(CXXFLAGS) -shared -o $(BUILDDIR)/$@ $^ $(LIBS)
 
 .PHONY: clean
-
 clean:
-	rm -r $(OBJDIR)/*.o tcpb.so tcpb.so.*
+	rm -r $(OBJDIR)/*.o $(BUILDDIR)/libtcpb.so.$(VER)
+
+
+.PHONY: install
+install:
+	@echo "Installing libtpcb.so into $(PREFIX)/lib"
+	@mkdir -p $(PREFIX)/lib
+	@cp $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
+	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
+
+.PHONY: uninstall
+uninstall:
+	@echo "Uninstalling libtcpb.so from $(PREFIX)/lib"
+	@rm $(PREFIX)/lib/libtcpb.so $(PREFIX)/lib/libtcpb.so.$(VER)

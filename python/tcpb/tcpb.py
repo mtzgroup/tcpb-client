@@ -239,7 +239,7 @@ class TCProtobufClient(object):
 
         try:
             self.tcsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.tcsock.settimeout(5.0)  # Timeout of 5 seconds
+            self.tcsock.settimeout(60.0)  # Timeout of 1 minute
             self.tcsock.connect(self.tcaddr)
         except socket.error as msg:
             raise RuntimeError("TCProtobufClient: Problem connecting to {}. Error: {}".format(self.tcaddr, msg))
