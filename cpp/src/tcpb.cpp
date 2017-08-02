@@ -244,12 +244,8 @@ void TCPBClient::SocketLog(const char* format, ...) {
   char logStr[MAX_STR_LEN];
   vsnprintf(logStr, MAX_STR_LEN, format, args);
 
-  // Get timestamp without newline
-  char* timeStr = asctime(t);
-  timeStr[strlen(timeStr) - 1] = 0;
-
   // Print to logfile with timestamp
-  fprintf(clientLogFile_, "%s: %s\n", asctime(t), logStr);
+  fprintf(clientLogFile_, "%.24s: %s\n", asctime(t), logStr);
   fflush(clientLogFile_);
 
   va_end(args);

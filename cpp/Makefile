@@ -42,12 +42,16 @@ clean:
 
 .PHONY: install
 install:
-	@echo "Installing libtpcb.so into $(PREFIX)/lib"
+	@echo "Installing TCPB C++ client into $(PREFIX)"
 	@mkdir -p $(PREFIX)/lib
 	@cp $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
 	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
+	@mkdir -p $(PREFIX)/include
+	@cp $(INCDIR)/tcpb.h $(PREFIX)/include
+	@cp $(INCDIR)/terachem_server.pb.h $(PREFIX)/include
 
 .PHONY: uninstall
 uninstall:
-	@echo "Uninstalling libtcpb.so from $(PREFIX)/lib"
+	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
 	@rm $(PREFIX)/lib/libtcpb.so $(PREFIX)/lib/libtcpb.so.$(VER)
+	@rm $(PREFIX)/include/tcpb.h $(PREFIX)/include/terachem_server.pb.h

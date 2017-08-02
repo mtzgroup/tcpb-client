@@ -5,3 +5,5 @@ python/dist/
 python/tcpb.egg-info/
 cpp/obj/
 cpp/build/
+cpp/examples/tcpb-example
+cpp/examples/client.log

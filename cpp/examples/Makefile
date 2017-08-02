@@ -1,8 +1,8 @@
-CXX=g++
-INCDIR=../include
-CXXFLAGS=-I$(INCDIR)
+# This Makefile assumes you have installed the C++ TCPB client with make install
+# and added the lib and include folders to your environment
 
-# Library flags
+CXX=g++
+CXXFLAGS=
 LIBS=-lprotobuf -ltcpb
 
 tcpb-example: tcpb-example.cpp
@@ -10,4 +10,4 @@ tcpb-example: tcpb-example.cpp
 
 .PHONY: clean
 clean:
-	@rm -rv tcpb-example client.log
+	@rm tcpb-example client.log
