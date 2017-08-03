@@ -30,6 +30,8 @@ RUN easy_install-2.7 pip
 RUN pip install google protobuf numpy
 
 # Switch to bash
+# This line doesn't do anything, but I don't want to remove it because it will be an expensive rebuild
+# TODO: Remove this when I need to make some other change
 RUN /bin/bash
 
 # Pull a newer protobuf than available for Alpine APK

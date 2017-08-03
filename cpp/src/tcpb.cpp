@@ -28,10 +28,19 @@ using namespace std;
 // Logs will be written to clientLogFile_, which is usually opened as client.log
 #define SOCKETLOGS
 
-TCPBClient::TCPBClient(const char* host, int port) {
+TCPBClient::TCPBClient(const char* host,
+                       int port) {
   snprintf(host_, MAX_STR_LEN, "%s", host);
   port_ = port;
   server_ = -1;
+
+  atomsSet = false;
+  chargeSet = false;
+  spinMultSet = false;
+  closedSet = false;
+  restrictedSet = false;
+  methodSet = false;
+  basisSet = false;
 
 #ifdef SOCKETLOGS
   clientLogFile_ = fopen("client.log", "w");
@@ -44,6 +53,75 @@ TCPBClient::~TCPBClient() {
 #ifdef SOCKETLOGS
   fclose(clientLogFile_);
 #endif
+}
+
+/***********************
+ * JOB INPUT (SETTERS) *
+ ***********************/
+
+void TCPBClient::SetAtoms(const char** atoms,
+                          const int num_atoms) {
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.clear_atoms();
+  for (int i = 0; i < num_atoms; i++) {
+    mol.add_atoms(atoms[i]);
+  }
+  atomsSet = true;
+}
+
+void TCPBClient::SetCharge(const int charge) {
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.set_charge(charge);
+  chargeSet = true;
+}
+
+void TCPBClient::SetSpinMult(const int spinMult) {
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.set_multiplicity(spinMult);
+  spinMultSet = true;
+}
+
+void TCPBClient::SetClosed(const bool closed) {
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.set_closed(closed);
+  closedSet = true;
+}
+
+void TCPBClient::SetRestricted(const bool restricted) {
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.set_restricted(restricted);
+  restrictedSet = true;
+}
+
+void TCPBClient::SetMethod(const char* method) {
+  bool valid;
+  terachem_server::JobInput_MethodType methodType;
+
+  // Convert to uppercase
+  char* methodUpper = strdup(method);
+  char* l = methodUpper;
+  while (*l) {
+    *l = toupper((unsigned char) *l);
+    l++;
+  }
+  
+  valid = jobInput_.MethodType_Parse(methodUpper, &methodType);
+  if (!valid) {
+    printf("Method %s passed to SetMethod() is not valid.\n", method);
+    printf("Valid methods (case-insensitive):\n%s\n", jobInput_.MethodType_descriptor()->DebugString());
+    exit(1);
+  }
+
+  jobInput_.set_method(methodType);
+  methodSet = true;
+  
+  free(methodUpper);
+}
+
+void TCPBClient::SetBasis(const char* basis) {
+  //TODO: Should do same check as method with enum in .proto
+  jobInput_.set_basis(basis);
+  basisSet = true;
 }
 
 /************************
@@ -91,6 +169,89 @@ bool TCPBClient::IsAvailable() {
   if (msgSize > 0) status.ParseFromString(msg);
 
   return !status.busy();
+}
+
+bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
+                              const double* geom,
+                              const int num_atoms,
+                              const terachem_server::Mol_UnitType unitType) {
+  uint32_t header[2];
+  bool sendSuccess, recvSuccess;
+  int msgType, msgSize;
+  string msgStr;
+
+  // Sanity checks
+  if (!atomsSet) { printf("Called SendJobAsync() without SetAtoms()\n"); exit(1); }
+  if (!chargeSet) { printf("Called SendJobAsync() without SetCharge()\n"); exit(1); }
+  if (!spinMultSet) { printf("Called SendJobAsync() without SetSpinMult()\n"); exit(1); }
+  if (!closedSet) { printf("Called SendJobAsync() without SetClosed()\n"); exit(1); }
+  if (!restrictedSet) { printf("Called SendJobAsync() without SetRestricted()\n"); exit(1); }
+  if (!methodSet) { printf("Called SendJobAsync() without SetMethod()\n"); exit(1); }
+  if (!basisSet) { printf("Called SendJobAsync() without SetBasis()\n"); exit(1); }
+
+  // Finish up JobInput Protocol Buffer
+  jobInput_.set_run(runType);
+
+  terachem_server::Mol mol = jobInput_.mutable_mol();
+  mol.mutable_xyz()->Resize(3*num_atoms, 0.0);
+  memcpy(mol.mutable_xyz()->mutable_data(), geom, 3*num_atoms*sizeof(geom));
+  mol.set_units(unitType);
+
+  msgType = terachem_server::JOBINPUT;
+  msgSize = jobInput_.ByteSize();
+  msgStr = jobInput_.SerializeToString();
+
+  // Send JobInput Protocol Buffer
+  header[0] = htonl((uint32_t)msgType);
+  header[1] = htonl((uint32_t)msgSize);
+  sendSuccess = HandleSend((char *)header, sizeof(header), "SendJobAsync() job input header");
+  if (!sendSuccess) {
+    printf("Could not send job input header\n");
+    exit(1);
+  }
+  
+  if (msgSize) {
+    char msg[msgSize];
+    memcpy(msg, (void*)msgStr.data(), msgSize);
+    sendSuccess = HandleSend(msg, msgSize, "SendJobAsync() job input protobuf");
+    if (!sendSuccess) {
+      printf("Could not send job input protobuf\n");
+      exit(1);
+    }
+  }
+
+  // Receive Status Protocol Buffer
+  recvSuccess = HandleRecv((char *)header, sizeof(header), "SendJobAsync() status header");
+  if (!recvSuccess) {
+    printf("Could not receive status header\n");
+    exit(1);
+  }
+
+  msgType = ntohl(header[0]);
+  msgSize = ntohl(header[1]);
+
+  char msg[msgSize];
+  if (msgSize > 0) {
+    recvSuccess = HandleRecv(msg, sizeof(msg), "SendJobAsync() status protobuf");
+    if (!recvSuccess) {
+      printf("Could not receive status protobuf\n");
+      exit(1);
+    }
+  }
+
+  if (header[0] != terachem_server::STATUS) {
+    printf("Did not receive the expected status message\n");
+    exit(1);
+  }
+  
+  terachem_server::Status status;
+  if (msgSize > 0) status.ParseFromString(msg);
+
+  if (status.job_status() != terachem_server::Status::kAcceptedFieldNumber) {
+    return false;
+  }
+
+  return true;
 }
 
 /***************************
@@ -141,7 +302,9 @@ void TCPBClient::Disconnect() {
 }
 
 
-bool TCPBClient::HandleRecv(char* buf, int len, const char* log) {
+bool TCPBClient::HandleRecv(char* buf,
+                            int len,
+                            const char* log) {
   int nrecv;
 
   // Try to recv
@@ -171,7 +334,9 @@ bool TCPBClient::HandleRecv(char* buf, int len, const char* log) {
   return true;
 }
 
-bool TCPBClient::HandleSend(const char* buf, int len, const char* log) {
+bool TCPBClient::HandleSend(const char* buf,
+                            int len,
+                            const char* log) {
   int nsent;
 
   if (len == 0) {
@@ -202,7 +367,8 @@ bool TCPBClient::HandleSend(const char* buf, int len, const char* log) {
   return true;
 }
 
-int TCPBClient::RecvN(char* buf, int len) {
+int TCPBClient::RecvN(char* buf,
+                      int len) {
   int nleft, nrecv;
 
   nleft = len;
@@ -218,7 +384,8 @@ int TCPBClient::RecvN(char* buf, int len) {
   return len - nleft;
 }
 
-int TCPBClient::SendN(const char* buf, int len) {
+int TCPBClient::SendN(const char* buf,
+                      int len) {
   int nleft, nsent;
 
   nleft = len;
