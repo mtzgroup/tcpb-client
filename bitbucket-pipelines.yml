@@ -1,10 +1,26 @@
-image: python:2.7.13
+# Since I want to test Python and C++, need to use a Linux container
+# Local debug line: docker run -it --volume=/Users/sseritan/Documents/Research/MartinezGroup/tcpb-client:/tcpb-client --workdir="/tcpb-client" sseritan/tcpb-client-docker
+image: sseritan/tcpb-client-docker:latest
 
 pipelines:
   default:
     - step:
         script:
-          - cd python/
+          # Set up Protobuf for whatever is in environment
+          - cd proto/
+          - protoc terachem_server.proto --python_out=../python/tcpb
+          - touch terachem_server.proto
+          # Set up Python
+          - cd ../python/
           - pip install .
+          # Set up C++
+          - cd ../cpp
+          - sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
+          - make && make install
+          - export LD_LIBRARY_PATH=/tmp/install/lib:$LD_LIBRARY_PATH
+          - export LIBRARY_PATH=/tmp/install/lib:$LIBRARY_PATH
+          - export CPLUS_INCLUDE_PATH=/tmp/install/include:$CPLUS_INCLUDE_PATH
+          # Test both
           - cd ../tests
-          - python test_python_tcpb.py
+          - make all
+          - python test_tcpb.py
