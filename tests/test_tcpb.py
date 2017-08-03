@@ -13,11 +13,14 @@ class TestPyTCPB(unittest.TestCase):
         self.assertTrue(available_test.run_py_test())
 
     def test_energy_grad_force(self):
-       self.assertTrue(energy_grad_force_test.run_test())
+       self.assertTrue(energy_grad_force_test.run_py_test())
 
 class TestCppTCPB(unittest.TestCase):
     def test_available(self):
         self.assertTrue(available_test.run_cpp_test())
+
+    def test_energy_grad_force(self):
+       self.assertTrue(energy_grad_force_test.run_cpp_test())
 
 if __name__ == '__main__':
     py_suite = unittest.TestLoader().loadTestsFromTestCase(TestPyTCPB)

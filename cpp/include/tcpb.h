@@ -123,7 +123,7 @@ class TCPBClient {
      *
      * @return gradient Allocated double array of computed gradient
      **/
-    double GetGradient();
+    double* GetGradient();
 
     //TODO: Add more getters
 

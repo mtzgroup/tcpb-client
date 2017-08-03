@@ -34,9 +34,6 @@ TCPBClient::TCPBClient(const char* host,
   port_ = port;
   server_ = -1;
 
-  jobInput_ = new terachem_server::JobInput();
-  jobOutput_ = new terachem_server::JobOutput();
-
   atomsSet = false;
   chargeSet = false;
   spinMultSet = false;
@@ -56,10 +53,6 @@ TCPBClient::~TCPBClient() {
 #ifdef SOCKETLOGS
   fclose(clientLogFile_);
 #endif
-
-  // Memory Management
-  delete jobInput_;
-  delete jobOutput_;
 }
 
 /***********************
@@ -68,10 +61,10 @@ TCPBClient::~TCPBClient() {
 
 void TCPBClient::SetAtoms(const char** atoms,
                           const int num_atoms) {
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.clear_atoms();
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->clear_atoms();
   for (int i = 0; i < num_atoms; i++) {
-    mol.add_atoms(atoms[i]);
+    mol->add_atoms(atoms[i]);
   }
   atomsSet = true;
 
@@ -81,8 +74,8 @@ void TCPBClient::SetAtoms(const char** atoms,
 }
 
 void TCPBClient::SetCharge(const int charge) {
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.set_charge(charge);
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->set_charge(charge);
   chargeSet = true;
 
   // Clear MO coeffs
@@ -91,8 +84,8 @@ void TCPBClient::SetCharge(const int charge) {
 }
 
 void TCPBClient::SetSpinMult(const int spinMult) {
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.set_multiplicity(spinMult);
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->set_multiplicity(spinMult);
   spinMultSet = true;
 
   // Clear MO coeffs
@@ -101,8 +94,8 @@ void TCPBClient::SetSpinMult(const int spinMult) {
 }
 
 void TCPBClient::SetClosed(const bool closed) {
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.set_closed(closed);
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->set_closed(closed);
   closedSet = true;
 
   // Clear MO coeffs
@@ -111,8 +104,8 @@ void TCPBClient::SetClosed(const bool closed) {
 }
 
 void TCPBClient::SetRestricted(const bool restricted) {
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.set_restricted(restricted);
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->set_restricted(restricted);
   restrictedSet = true;
 
   // Clear MO coeffs
@@ -135,7 +128,8 @@ void TCPBClient::SetMethod(const char* method) {
   valid = jobInput_.MethodType_Parse(methodUpper, &methodType);
   if (!valid) {
     printf("Method %s passed to SetMethod() is not valid.\n", method);
-    printf("Valid methods (case-insensitive):\n%s\n", jobInput_.MethodType_descriptor()->DebugString());
+    printf("Valid methods (case-insensitive):\n%s\n",
+           jobInput_.MethodType_descriptor()->DebugString().c_str());
     exit(1);
   }
 
@@ -164,25 +158,12 @@ void TCPBClient::SetBasis(const char* basis) {
  ***********************/
 
 double TCPBClient::GetEnergy() {
-  if (!jobOutput_.has_energy()) {
-    printf("GetEnergy: Job output protobuf does not have the energy field set.\n");
-    exit(1);
-  }
-
   return jobOutput_.energy();
 }
 
 double* TCPBClient::GetGradient() {
-  int grad_size;
-  double* gradient;
-
-  if (!jobOutput_.has_gradient()) {
-    printf("GetGradient: Job output protobuf does not have the gradient field set.\n");
-    exit(1);
-  }
-
-  grad_size = jobOutput_.gradient_size();
-  gradient = new double[grad_size];
+  int grad_size = jobOutput_.gradient_size();
+  double* gradient = new double[grad_size];
   memcpy(gradient, jobOutput_.mutable_gradient()->mutable_data(), grad_size*sizeof(double));
 
   return gradient;
@@ -259,14 +240,14 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   // Finish up JobInput Protocol Buffer
   jobInput_.set_run(runType);
 
-  terachem_server::Mol mol = jobInput_.mutable_mol();
-  mol.mutable_xyz()->Resize(3*num_atoms, 0.0);
-  memcpy(mol.mutable_xyz()->mutable_data(), geom, 3*num_atoms*sizeof(double));
-  mol.set_units(unitType);
+  terachem_server::Mol* mol = jobInput_.mutable_mol();
+  mol->mutable_xyz()->Resize(3*num_atoms, 0.0);
+  memcpy(mol->mutable_xyz()->mutable_data(), geom, 3*num_atoms*sizeof(double));
+  mol->set_units(unitType);
 
   msgType = terachem_server::JOBINPUT;
   msgSize = jobInput_.ByteSize();
-  msgStr = jobInput_.SerializeToString();
+  jobInput_.SerializeToString(&msgStr);
 
   // Send JobInput Protocol Buffer
   header[0] = htonl((uint32_t)msgType);
@@ -314,16 +295,17 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   terachem_server::Status status;
   if (msgSize > 0) status.ParseFromString(msg);
 
-  if (status.job_status() != terachem_server::Status::kAcceptedFieldNumber) {
+  if (status.job_status_case() != terachem_server::Status::kAcceptedFieldNumber) {
     return false;
   }
 
   return true;
 }
 
-void TCPBClient::CheckJobComplete() {
+bool TCPBClient::CheckJobComplete() {
   uint32_t header[2];
   int msgType, msgSize;
+  bool sendSuccess, recvSuccess;
   string msgStr;
 
   // Send Status Protocol Buffer
@@ -365,9 +347,9 @@ void TCPBClient::CheckJobComplete() {
   terachem_server::Status status;
   if (msgSize > 0) status.ParseFromString(msg);
 
-  if (status.job_status() == terachem_server::Status::kWorkingFieldNumber) {
+  if (status.job_status_case() == terachem_server::Status::kWorkingFieldNumber) {
     return false;
-  } else if (status.job_status() != terachem_server::Status::kCompletedFieldNumber) {
+  } else if (status.job_status_case() != terachem_server::Status::kCompletedFieldNumber) {
     printf("CheckJobComplete: No valid job status was received\n");
     exit(1);
   }
@@ -378,6 +360,7 @@ void TCPBClient::CheckJobComplete() {
 void TCPBClient::RecvJobAsync() {
   uint32_t header[2];
   int msgType, msgSize;
+  bool recvSuccess;
   int aSize, bSize;
 
   // Receive JobOutput Protocol Buffer
@@ -457,14 +440,14 @@ void TCPBClient::ComputeEnergy(const double* geom,
                                const bool angstrom,
                                double& energy) {
   // Run energy job
-  terachem_server::JobInput_RunType runType = terachem_server::ENERGY;
+  terachem_server::JobInput_RunType runType = terachem_server::JobInput::ENERGY;
   terachem_server::Mol_UnitType unitType;
   if (angstrom) {
-    unitType = terachem_server::ANGSTROM;
+    unitType = terachem_server::Mol::ANGSTROM;
   } else {
-    unitType = terachem_server::BOHR;
+    unitType = terachem_server::Mol::BOHR;
   }
-  ComputeJobSync(runType, geom, num_atoms, unitType)
+  ComputeJobSync(runType, geom, num_atoms, unitType);
 
   // Extract energy from jobOutput_
   energy = GetEnergy();
@@ -476,14 +459,14 @@ void TCPBClient::ComputeGradient(const double* geom,
                                  double& energy,
                                  double* gradient) {
   // Run gradient job
-  terachem_server::JobInput_RunType runType = terachem_server::GRADIENT;
+  terachem_server::JobInput_RunType runType = terachem_server::JobInput::GRADIENT;
   terachem_server::Mol_UnitType unitType;
   if (angstrom) {
-    unitType = terachem_server::ANGSTROM;
+    unitType = terachem_server::Mol::ANGSTROM;
   } else {
-    unitType = terachem_server::BOHR;
+    unitType = terachem_server::Mol::BOHR;
   }
-  ComputeJobSync(runType, geom, num_atoms, unitType)
+  ComputeJobSync(runType, geom, num_atoms, unitType);
 
   // Extract energy and gradient from jobOutput_
   energy = GetEnergy();

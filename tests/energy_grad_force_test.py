@@ -33,9 +33,8 @@ h2o_gradient = [[  0.0000002903,    0.0000000722,   -0.033101313],
                 [ -0.0000000608,   -0.0141756697,    0.016550727],
                 [ -0.0000002294,    0.0141755976,    0.016550585]]
 
-# RUN TEST
-def run_test(port=56789, run_real_server=False):
-    """Run the test
+def run_py_test(port=56789, run_real_server=False):
+    """Run the test using Python client
 
     Args:
         port: Port to use for server and client in testing
@@ -68,7 +67,32 @@ def run_test(port=56789, run_real_server=False):
 
     return True
 
+def run_cpp_test(port=56789):
+    """Run the test using an external C++ script in energy_grad_force/
+    Note that the expected answer is hardcoded in C++
+    If you change the test, make sure to update the C++ as well
+
+    Args:
+        port: Port to use for server and client in testing
+    Returns True if passed the tests, and False if failed the tests
+    """
+    # Set up MockServer for testing
+    mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
+
+    # Subprocess out, expect a returncode of 1 for failure and 0 for success
+    rc = subprocess.call("./energy_grad_force/energy_grad_force_test localhost {}".format(port), shell=True)
+
+    if rc:
+        return False
+
+    return True
+
 if __name__ == '__main__':
-    run_test()
     #run_test(run_real_server=True)
+
+    print("Running Python test...")
+    run_py_test()
+
+    print("Running C++ test...")
+    run_cpp_test()
 
