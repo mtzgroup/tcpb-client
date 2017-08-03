@@ -49,6 +49,7 @@ class TCPBClient {
      ***********************/
     /**
      * Set the atom types in the JobInput Protocol Buffer
+     * Clears saved MO coeffs
      *
      * @param atoms Array of C strings for atom types
      * @param num_atoms Integer number of entries in atoms
@@ -58,6 +59,7 @@ class TCPBClient {
 
     /**
      * Set the charge in the JobInput Protocol Buffer
+     * Clears saved MO coeffs
      *
      * @param charge Molecular charge
      **/
@@ -65,6 +67,7 @@ class TCPBClient {
 
     /**
      * Set the spin multiplicity in the JobInput Protocol Buffer
+     * Clears saved MO coeffs
      *
      * @param spinMult Spin multiplicity
      **/
@@ -72,6 +75,7 @@ class TCPBClient {
 
     /**
      * Set closed or open shell in the JobInput Protocol Buffer
+     * Clears saved MO coeffs
      *
      * @param closed If True, the system is set as closed shell
      **/
@@ -79,6 +83,7 @@ class TCPBClient {
 
     /**
      * Set restricted or unrestricted in the JobInput Protocol Buffer
+     * Clears saved MO coeffs
      *
      * @param restricted If True, the system is set as restricted
      **/
@@ -87,6 +92,7 @@ class TCPBClient {
     /**
      * Set the TeraChem method in the JobInput Protocol Buffer
      * Will error out if not a valid TeraChem method (as defined in the .proto)
+     * Clears saved MO coeffs
      *
      * @param method C string of method name (case insensitive)
      **/
@@ -95,10 +101,31 @@ class TCPBClient {
     /**
      * Set the TeraChem basis set in the JobInput Protocol Buffer
      * Will error out if not a valid TeraChem basis set (as defined in the .proto)
+     * Clears saved MO coeffs
      *
      * @param basis C string of basis set name (case insensitive)
      **/
     void SetBasis(const char* basis);
+
+    /************************
+     * JOB OUTPUT (GETTERS) *
+     ************************/
+    /**
+     * Gets the energy from the JobOutput Protocol Buffer
+     *
+     * @return energy Double of computed energy
+     **/
+    double GetEnergy();
+
+    /**
+     * Gets the gradient from the JobOutput Protocol Buffer
+     * Allocates memory
+     *
+     * @return gradient Allocated double array of computed gradient
+     **/
+    double GetGradient();
+
+    //TODO: Add more getters
 
     /************************
      * SERVER COMMUNICATION *
@@ -134,14 +161,85 @@ class TCPBClient {
                       const double* geom,
                       const int num_atoms,
                       const terachem_server::Mol_UnitType unitType);
-    bool SendJobAsync();
-    bool CheckJobAsync(); //STUB
-    bool RecvJobAsync(); //STUB
 
-    // Convenience Functions
-    void ComputeJobSync(); //STUB
-    void ComputeEnergy(double& energy); //STUB
-    void ComputeGradient(double& energy, double* gradient); //STUB
+    /**
+     * Send a Status Protocol Buffer to the TCPB server to check on a submitted job
+     * Send/recv are blocking, but server should respond with status immediately
+     * Once the completed Status message is received, the following message should be the job output
+     *
+     * @return True if job is complete, False if job is still in progress
+     **/
+    bool CheckJobComplete();
+
+    /**
+     * Receive the JobOutput Protocol Buffer from the TCPB server
+     * Errors out if there are any issues, otherwise overwrites jobOutput_
+     * Side effect: Sets MO coeffs in jobInput_
+     **/
+    void RecvJobAsync();
+
+    /**
+     * Blocking wrapper for SendJobAsync(), CheckJobComplete(), and RecvJobAsync()
+     * On return, jobOutput_ will correspond to the submitted job
+     *
+     * @param runType TeraChem run type, as defined in the JobInput_RunType enum 
+     * @param geom Double array of XYZs for each atom
+     * @param num_atoms Integer number of atoms stored in geom
+     * @param unitType Geometry units, as defined in the Mol_UnitType enum
+     **/
+    void ComputeJobSync(const terachem_server::JobInput_RunType runType,
+                        const double* geom,
+                        const int num_atoms,
+                        const terachem_server::Mol_UnitType unitType);
+
+    /*************************
+     * CONVENIENCE FUNCTIONS *
+     *************************/
+    /**
+     * Blocking wrapper for an energy ComputeJobSync() call
+     *
+     * @param geom Double array of XYZs for each atom
+     * @param num_atoms Integer number of atoms stored in geom
+     * @param angstrom If True, geometry units are Angstrom instead of Bohr
+     * @param energy Double for storing the computed energy
+     **/
+    void ComputeEnergy(const double* geom,
+                       const int num_atoms,
+                       const bool angstrom,
+                       double& energy);
+
+    /**
+     * Blocking wrapper for a gradient ComputeJobSync() call
+     * Allocates memory for gradient
+     *
+     * @param geom Double array of XYZs for each atom
+     * @param num_atoms Integer number of atoms stored in geom
+     * @param angstrom If True, geometry units are Angstrom instead of Bohr
+     * @param energy Double for storing the computed energy
+     * @param gradient Pointer for storing the computed gradient
+     **/
+    void ComputeGradient(const double* geom,
+                         const int num_atoms,
+                         const bool angstrom,
+                         double& energy,
+                         double* gradient);
+
+    /**
+     * Blocking wrapper for a gradient ComputeJobSync() call
+     * Exactly the same as ComputeGradient(), but returns -gradient as forces
+     * Allocates memory for forces
+     *
+     * @param geom Double array of XYZs for each atom
+     * @param num_atoms Integer number of atoms stored in geom
+     * @param angstrom If True, geometry units are Angstrom instead of Bohr
+     * @param energy Double for storing the computed energy
+     * @param forces Pointer for storing the negative of the computed gradient
+     **/
+    void ComputeForces(const double* geom,
+                       const int num_atoms,
+                       const bool angstrom,
+                       double& energy,
+                       double* forces);
 
   private:
     char host_[MAX_STR_LEN];
@@ -151,7 +249,7 @@ class TCPBClient {
     // Protocol buffer variables
     terachem_server::JobInput jobInput_;
     terachem_server::JobOutput jobOutput_;
-    // State variables, ensuring everything is set prior to 
+    // State variables, ensuring everything is set prior to sending the job
     bool atomsSet, chargeSet, spinMultSet, closedSet, restrictedSet, methodSet, basisSet;
 
     /***************************

@@ -34,6 +34,9 @@ TCPBClient::TCPBClient(const char* host,
   port_ = port;
   server_ = -1;
 
+  jobInput_ = new terachem_server::JobInput();
+  jobOutput_ = new terachem_server::JobOutput();
+
   atomsSet = false;
   chargeSet = false;
   spinMultSet = false;
@@ -53,6 +56,10 @@ TCPBClient::~TCPBClient() {
 #ifdef SOCKETLOGS
   fclose(clientLogFile_);
 #endif
+
+  // Memory Management
+  delete jobInput_;
+  delete jobOutput_;
 }
 
 /***********************
@@ -67,30 +74,50 @@ void TCPBClient::SetAtoms(const char** atoms,
     mol.add_atoms(atoms[i]);
   }
   atomsSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
 }
 
 void TCPBClient::SetCharge(const int charge) {
   terachem_server::Mol mol = jobInput_.mutable_mol();
   mol.set_charge(charge);
   chargeSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
 }
 
 void TCPBClient::SetSpinMult(const int spinMult) {
   terachem_server::Mol mol = jobInput_.mutable_mol();
   mol.set_multiplicity(spinMult);
   spinMultSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
 }
 
 void TCPBClient::SetClosed(const bool closed) {
   terachem_server::Mol mol = jobInput_.mutable_mol();
   mol.set_closed(closed);
   closedSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
 }
 
 void TCPBClient::SetRestricted(const bool restricted) {
   terachem_server::Mol mol = jobInput_.mutable_mol();
   mol.set_restricted(restricted);
   restrictedSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
 }
 
 void TCPBClient::SetMethod(const char* method) {
@@ -114,7 +141,11 @@ void TCPBClient::SetMethod(const char* method) {
 
   jobInput_.set_method(methodType);
   methodSet = true;
-  
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
+
   free(methodUpper);
 }
 
@@ -122,6 +153,39 @@ void TCPBClient::SetBasis(const char* basis) {
   //TODO: Should do same check as method with enum in .proto
   jobInput_.set_basis(basis);
   basisSet = true;
+
+  // Clear MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
+}
+
+/***********************
+ * JOB INPUT (SETTERS) *
+ ***********************/
+
+double TCPBClient::GetEnergy() {
+  if (!jobOutput_.has_energy()) {
+    printf("GetEnergy: Job output protobuf does not have the energy field set.\n");
+    exit(1);
+  }
+
+  return jobOutput_.energy();
+}
+
+double* TCPBClient::GetGradient() {
+  int grad_size;
+  double* gradient;
+
+  if (!jobOutput_.has_gradient()) {
+    printf("GetGradient: Job output protobuf does not have the gradient field set.\n");
+    exit(1);
+  }
+
+  grad_size = jobOutput_.gradient_size();
+  gradient = new double[grad_size];
+  memcpy(gradient, jobOutput_.mutable_gradient()->mutable_data(), grad_size*sizeof(double));
+
+  return gradient;
 }
 
 /************************
@@ -130,38 +194,41 @@ void TCPBClient::SetBasis(const char* basis) {
 
 bool TCPBClient::IsAvailable() {
   uint32_t header[2];
+  int msgType, msgSize;
   bool sendSuccess, recvSuccess;
 
-  // Send status request
-  header[0] = htonl((uint32_t)terachem_server::STATUS);
-  header[1] = htonl((uint32_t)0);
+  // Send Status Protocol Buffer
+  msgType = terachem_server::STATUS;
+  msgSize = 0;
+  header[0] = htonl((uint32_t)msgType);
+  header[1] = htonl((uint32_t)msgSize);
   sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
   if (!sendSuccess) {
-    printf("Could not send status header\n");
+    printf("IsAvailable: Could not send status header\n");
     exit(1);
   }
   
-  // Receive status response
+  // Receive Status Protocol Buffer
   recvSuccess = HandleRecv((char *)header, sizeof(header), "IsAvailable() status header");
   if (!recvSuccess) {
-    printf("Could not receive status header\n");
+    printf("IsAvailable: Could not receive status header\n");
     exit(1);
   }
 
-  int msgType = ntohl(header[0]);
-  int msgSize = ntohl(header[1]);
+  msgType = ntohl(header[0]);
+  msgSize = ntohl(header[1]);
 
   char msg[msgSize];
   if (msgSize > 0) {
     recvSuccess = HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
     if (!recvSuccess) {
-      printf("Could not receive status protobuf\n");
+      printf("IsAvailable: Could not receive status protobuf\n");
       exit(1);
     }
   }
 
   if (header[0] != terachem_server::STATUS) {
-    printf("Did not receive the expected status message\n");
+    printf("IsAvailable: Did not receive the expected status message\n");
     exit(1);
   }
   
@@ -194,7 +261,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
 
   terachem_server::Mol mol = jobInput_.mutable_mol();
   mol.mutable_xyz()->Resize(3*num_atoms, 0.0);
-  memcpy(mol.mutable_xyz()->mutable_data(), geom, 3*num_atoms*sizeof(geom));
+  memcpy(mol.mutable_xyz()->mutable_data(), geom, 3*num_atoms*sizeof(double));
   mol.set_units(unitType);
 
   msgType = terachem_server::JOBINPUT;
@@ -206,7 +273,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   header[1] = htonl((uint32_t)msgSize);
   sendSuccess = HandleSend((char *)header, sizeof(header), "SendJobAsync() job input header");
   if (!sendSuccess) {
-    printf("Could not send job input header\n");
+    printf("SendJobAsync: Could not send job input header\n");
     exit(1);
   }
   
@@ -215,7 +282,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
     memcpy(msg, (void*)msgStr.data(), msgSize);
     sendSuccess = HandleSend(msg, msgSize, "SendJobAsync() job input protobuf");
     if (!sendSuccess) {
-      printf("Could not send job input protobuf\n");
+      printf("SendJobAsync: Could not send job input protobuf\n");
       exit(1);
     }
   }
@@ -223,7 +290,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   // Receive Status Protocol Buffer
   recvSuccess = HandleRecv((char *)header, sizeof(header), "SendJobAsync() status header");
   if (!recvSuccess) {
-    printf("Could not receive status header\n");
+    printf("SendJobAsync: Could not receive status header\n");
     exit(1);
   }
 
@@ -234,13 +301,13 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   if (msgSize > 0) {
     recvSuccess = HandleRecv(msg, sizeof(msg), "SendJobAsync() status protobuf");
     if (!recvSuccess) {
-      printf("Could not receive status protobuf\n");
+      printf("SendJobAsync: Could not receive status protobuf\n");
       exit(1);
     }
   }
 
-  if (header[0] != terachem_server::STATUS) {
-    printf("Did not receive the expected status message\n");
+  if (msgType != terachem_server::STATUS) {
+    printf("SendJobAsync: Did not receive the expected status message\n");
     exit(1);
   }
   
@@ -252,6 +319,190 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   }
 
   return true;
+}
+
+void TCPBClient::CheckJobComplete() {
+  uint32_t header[2];
+  int msgType, msgSize;
+  string msgStr;
+
+  // Send Status Protocol Buffer
+  msgType = terachem_server::STATUS;
+  msgSize = 0;
+
+  header[0] = htonl((uint32_t)msgType);
+  header[1] = htonl((uint32_t)msgSize);
+  sendSuccess = HandleSend((char *)header, sizeof(header), "CheckJobComplete() status header");
+  if (!sendSuccess) {
+    printf("CheckJobComplete: Could not send status header\n");
+    exit(1);
+  }
+  
+  // Receive Status Protocol Buffer
+  recvSuccess = HandleRecv((char *)header, sizeof(header), "CheckJobComplete() status header");
+  if (!recvSuccess) {
+    printf("CheckJobComplete: Could not receive status header\n");
+    exit(1);
+  }
+
+  msgType = ntohl(header[0]);
+  msgSize = ntohl(header[1]);
+
+  char msg[msgSize];
+  if (msgSize > 0) {
+    recvSuccess = HandleRecv(msg, sizeof(msg), "CheckJobComplete() status protobuf");
+    if (!recvSuccess) {
+      printf("CheckJobComplete: Could not receive status protobuf\n");
+      exit(1);
+    }
+  }
+
+  if (msgType != terachem_server::STATUS) {
+    printf("CheckJobComplete: Did not receive the expected status message\n");
+    exit(1);
+  }
+  
+  terachem_server::Status status;
+  if (msgSize > 0) status.ParseFromString(msg);
+
+  if (status.job_status() == terachem_server::Status::kWorkingFieldNumber) {
+    return false;
+  } else if (status.job_status() != terachem_server::Status::kCompletedFieldNumber) {
+    printf("CheckJobComplete: No valid job status was received\n");
+    exit(1);
+  }
+
+  return true;
+}
+
+void TCPBClient::RecvJobAsync() {
+  uint32_t header[2];
+  int msgType, msgSize;
+  int aSize, bSize;
+
+  // Receive JobOutput Protocol Buffer
+  recvSuccess = HandleRecv((char *)header, sizeof(header), "RecvJobAsync() job output header");
+  if (!recvSuccess) {
+    printf("RecvJobAsync: Could not receive job output header\n");
+    exit(1);
+  }
+
+  msgType = ntohl(header[0]);
+  msgSize = ntohl(header[1]);
+
+  char msg[msgSize];
+  if (msgSize > 0) {
+    recvSuccess = HandleRecv(msg, sizeof(msg), "RecvJobAsync() job output protobuf");
+    if (!recvSuccess) {
+      printf("RecvJobAsync: Could not receive job output protobuf\n");
+      exit(1);
+    }
+  }
+
+  if (msgType != terachem_server::JOBOUTPUT) {
+    printf("RecvJobAsync: Did not receive the expected job output message\n");
+    exit(1);
+  } else if (msgSize == 0) {
+    printf("RecvJobAsync: Received empty job output message\n");
+    exit(1);
+  }
+  
+  // Overwrite Job Output Protocol Buffer
+  jobOutput_.ParseFromString(msg);
+
+  // Save MO coeffs
+  jobInput_.clear_guess_mo_coeffs_a();
+  jobInput_.clear_guess_mo_coeffs_b();
+  aSize = jobOutput_.mo_coeffs_a_size();
+  bSize = jobOutput_.mo_coeffs_b_size();
+  if (aSize) {
+    jobInput_.mutable_guess_mo_coeffs_a()->Resize(aSize, 0.0);
+    memcpy(jobInput_.mutable_guess_mo_coeffs_a()->mutable_data(),
+           jobOutput_.mutable_mo_coeffs_a()->mutable_data(),
+           aSize*sizeof(double));
+  }
+  if (bSize) {
+    jobInput_.mutable_guess_mo_coeffs_b()->Resize(bSize, 0.0);
+    memcpy(jobInput_.mutable_guess_mo_coeffs_b()->mutable_data(),
+           jobOutput_.mutable_mo_coeffs_b()->mutable_data(),
+           bSize*sizeof(double));
+  }
+}
+
+void TCPBClient::ComputeJobSync(const terachem_server::JobInput_RunType runType,
+                                const double* geom,
+                                const int num_atoms,
+                                const terachem_server::Mol_UnitType unitType) {
+  // Try to submit job
+  while (!SendJobAsync(runType, geom, num_atoms, unitType)) {
+    //Sleep for 0.1 second 
+    usleep(1000000);
+  }
+
+  // Check for job completion
+  while (!CheckJobComplete()) {
+    //Sleep for 0.1 second 
+    usleep(1000000);
+  }
+
+  RecvJobAsync();
+}
+
+/*************************
+ * CONVENIENCE FUNCTIONS *
+ *************************/
+
+void TCPBClient::ComputeEnergy(const double* geom,
+                               const int num_atoms,
+                               const bool angstrom,
+                               double& energy) {
+  // Run energy job
+  terachem_server::JobInput_RunType runType = terachem_server::ENERGY;
+  terachem_server::Mol_UnitType unitType;
+  if (angstrom) {
+    unitType = terachem_server::ANGSTROM;
+  } else {
+    unitType = terachem_server::BOHR;
+  }
+  ComputeJobSync(runType, geom, num_atoms, unitType)
+
+  // Extract energy from jobOutput_
+  energy = GetEnergy();
+}
+
+void TCPBClient::ComputeGradient(const double* geom,
+                                 const int num_atoms,
+                                 const bool angstrom,
+                                 double& energy,
+                                 double* gradient) {
+  // Run gradient job
+  terachem_server::JobInput_RunType runType = terachem_server::GRADIENT;
+  terachem_server::Mol_UnitType unitType;
+  if (angstrom) {
+    unitType = terachem_server::ANGSTROM;
+  } else {
+    unitType = terachem_server::BOHR;
+  }
+  ComputeJobSync(runType, geom, num_atoms, unitType)
+
+  // Extract energy and gradient from jobOutput_
+  energy = GetEnergy();
+  gradient = GetGradient(); //Allocates memory
+}
+
+void TCPBClient::ComputeForces(const double* geom,
+                               const int num_atoms,
+                               const bool angstrom,
+                               double& energy,
+                               double* gradient) {
+  // Compute energy and gradient
+  // Allocates memory for gradient
+  ComputeGradient(geom, num_atoms, angstrom, energy, gradient);
+
+  // Flip sign on gradient
+  for (int i = 0; i < 3*num_atoms; i++) {
+    gradient[i] *= -1.0;
+  }
 }
 
 /***************************
