@@ -41,20 +41,39 @@ const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[4];
 
 }  // namespace
 
+PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::ParseTableField
+    const TableStruct::entries[] = {
+  {0, 0, 0, ::google::protobuf::internal::kInvalidMask, 0, 0},
+};
+
+PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::AuxillaryParseTableField
+    const TableStruct::aux[] = {
+  ::google::protobuf::internal::AuxillaryParseTableField(),
+};
+PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::ParseTable const
+    TableStruct::schema[] = {
+  { NULL, NULL, 0, -1, -1, false },
+  { NULL, NULL, 0, -1, -1, false },
+  { NULL, NULL, 0, -1, -1, false },
+  { NULL, NULL, 0, -1, -1, false },
+};
+
 const ::google::protobuf::uint32 TableStruct::offsets[] = {
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Status, _internal_metadata_),
   ~0u,  // no _extensions_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Status, _oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Status, busy_),
-  PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), accepted_),
-  PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), working_),
-  PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), completed_),
+  GOOGLE_PROTOBUF_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), accepted_),
+  GOOGLE_PROTOBUF_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), working_),
+  GOOGLE_PROTOBUF_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET((&_Status_default_instance_), completed_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Status, job_status_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mol, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mol, atoms_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mol, xyz_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mol, units_),
@@ -66,6 +85,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobInput, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobInput, mol_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobInput, run_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobInput, method_),
@@ -78,6 +98,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobOutput, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobOutput, mol_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobOutput, energy_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(JobOutput, gradient_),
@@ -92,9 +113,9 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
 
 static const ::google::protobuf::internal::MigrationSchema schemas[] = {
   { 0, -1, sizeof(Status)},
-  { 9, -1, sizeof(Mol)},
-  { 20, -1, sizeof(JobInput)},
-  { 32, -1, sizeof(JobOutput)},
+  { 10, -1, sizeof(Mol)},
+  { 22, -1, sizeof(JobInput)},
+  { 35, -1, sizeof(JobOutput)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -404,7 +425,7 @@ void Status::SetCachedSize(int size) const {
 }
 const ::google::protobuf::Descriptor* Status::descriptor() {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[0].descriptor;
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
 const Status& Status::default_instance() {
@@ -461,7 +482,8 @@ bool Status::MergePartialFromCodedStream(
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // bool busy = 1;
       case 1: {
-        if (tag == 8u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(8u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -474,7 +496,8 @@ bool Status::MergePartialFromCodedStream(
 
       // bool accepted = 2;
       case 2: {
-        if (tag == 16u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(16u)) {
           clear_job_status();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -488,7 +511,8 @@ bool Status::MergePartialFromCodedStream(
 
       // bool working = 3;
       case 3: {
-        if (tag == 24u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(24u)) {
           clear_job_status();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -502,7 +526,8 @@ bool Status::MergePartialFromCodedStream(
 
       // bool completed = 4;
       case 4: {
-        if (tag == 32u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(32u)) {
           clear_job_status();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -538,6 +563,9 @@ failure:
 void Status::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:terachem_server.Status)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // bool busy = 1;
   if (this->busy() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->busy(), output);
@@ -563,8 +591,10 @@ void Status::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Status::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic;  // Unused
   // @@protoc_insertion_point(serialize_to_array_start:terachem_server.Status)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // bool busy = 1;
   if (this->busy() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->busy(), target);
@@ -644,6 +674,9 @@ void Status::MergeFrom(const Status& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:terachem_server.Status)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   if (from.busy() != 0) {
     set_busy(from.busy());
   }
@@ -697,7 +730,7 @@ void Status::InternalSwap(Status* other) {
 
 ::google::protobuf::Metadata Status::GetMetadata() const {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[0];
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages];
 }
 
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -869,7 +902,7 @@ void Mol::SetCachedSize(int size) const {
 }
 const ::google::protobuf::Descriptor* Mol::descriptor() {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[1].descriptor;
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
 const Mol& Mol::default_instance() {
@@ -905,7 +938,8 @@ bool Mol::MergePartialFromCodedStream(
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // repeated string atoms = 1;
       case 1: {
-        if (tag == 10u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->add_atoms()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -921,11 +955,13 @@ bool Mol::MergePartialFromCodedStream(
 
       // repeated double xyz = 2;
       case 2: {
-        if (tag == 18u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(18u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_xyz())));
-        } else if (tag == 17u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(17u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 18u, input, this->mutable_xyz())));
@@ -937,7 +973,8 @@ bool Mol::MergePartialFromCodedStream(
 
       // .terachem_server.Mol.UnitType units = 3;
       case 3: {
-        if (tag == 24u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(24u)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -951,7 +988,8 @@ bool Mol::MergePartialFromCodedStream(
 
       // int32 charge = 4;
       case 4: {
-        if (tag == 32u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(32u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -964,7 +1002,8 @@ bool Mol::MergePartialFromCodedStream(
 
       // int32 multiplicity = 5;
       case 5: {
-        if (tag == 40u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(40u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -977,7 +1016,8 @@ bool Mol::MergePartialFromCodedStream(
 
       // bool closed = 6;
       case 6: {
-        if (tag == 48u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(48u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -990,7 +1030,8 @@ bool Mol::MergePartialFromCodedStream(
 
       // bool restricted = 7;
       case 7: {
-        if (tag == 56u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(56u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -1025,8 +1066,11 @@ failure:
 void Mol::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:terachem_server.Mol)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // repeated string atoms = 1;
-  for (int i = 0; i < this->atoms_size(); i++) {
+  for (int i = 0, n = this->atoms_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->atoms(i).data(), this->atoms(i).length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
@@ -1074,10 +1118,12 @@ void Mol::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Mol::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic;  // Unused
   // @@protoc_insertion_point(serialize_to_array_start:terachem_server.Mol)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // repeated string atoms = 1;
-  for (int i = 0; i < this->atoms_size(); i++) {
+  for (int i = 0, n = this->atoms_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->atoms(i).data(), this->atoms(i).length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
@@ -1094,10 +1140,8 @@ void Mol::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _xyz_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->xyz_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->xyz(i), target);
+      WriteDoubleNoTagToArray(this->xyz_, target);
   }
 
   // .terachem_server.Mol.UnitType units = 3;
@@ -1137,7 +1181,7 @@ size_t Mol::ByteSizeLong() const {
   // repeated string atoms = 1;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->atoms_size());
-  for (int i = 0; i < this->atoms_size(); i++) {
+  for (int i = 0, n = this->atoms_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->atoms(i));
   }
@@ -1213,6 +1257,9 @@ void Mol::MergeFrom(const Mol& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:terachem_server.Mol)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   atoms_.MergeFrom(from.atoms_);
   xyz_.MergeFrom(from.xyz_);
   if (from.units() != 0) {
@@ -1255,8 +1302,8 @@ void Mol::Swap(Mol* other) {
   InternalSwap(other);
 }
 void Mol::InternalSwap(Mol* other) {
-  atoms_.UnsafeArenaSwap(&other->atoms_);
-  xyz_.UnsafeArenaSwap(&other->xyz_);
+  atoms_.InternalSwap(&other->atoms_);
+  xyz_.InternalSwap(&other->xyz_);
   std::swap(units_, other->units_);
   std::swap(charge_, other->charge_);
   std::swap(multiplicity_, other->multiplicity_);
@@ -1267,7 +1314,7 @@ void Mol::InternalSwap(Mol* other) {
 
 ::google::protobuf::Metadata Mol::GetMetadata() const {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[1];
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages];
 }
 
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -1292,7 +1339,14 @@ void Mol::set_atoms(int index, const ::std::string& value) {
   // @@protoc_insertion_point(field_set:terachem_server.Mol.atoms)
   atoms_.Mutable(index)->assign(value);
 }
+#if LANG_CXX11
+void Mol::set_atoms(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:terachem_server.Mol.atoms)
+  atoms_.Mutable(index)->assign(std::move(value));
+}
+#endif
 void Mol::set_atoms(int index, const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   atoms_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:terachem_server.Mol.atoms)
 }
@@ -1309,7 +1363,14 @@ void Mol::add_atoms(const ::std::string& value) {
   atoms_.Add()->assign(value);
   // @@protoc_insertion_point(field_add:terachem_server.Mol.atoms)
 }
+#if LANG_CXX11
+void Mol::add_atoms(::std::string&& value) {
+  atoms_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:terachem_server.Mol.atoms)
+}
+#endif
 void Mol::add_atoms(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   atoms_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:terachem_server.Mol.atoms)
 }
@@ -1500,7 +1561,7 @@ void JobInput::SetCachedSize(int size) const {
 }
 const ::google::protobuf::Descriptor* JobInput::descriptor() {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[2].descriptor;
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
 const JobInput& JobInput::default_instance() {
@@ -1542,7 +1603,8 @@ bool JobInput::MergePartialFromCodedStream(
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .terachem_server.Mol mol = 1;
       case 1: {
-        if (tag == 10u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_mol()));
         } else {
@@ -1553,7 +1615,8 @@ bool JobInput::MergePartialFromCodedStream(
 
       // .terachem_server.JobInput.RunType run = 2;
       case 2: {
-        if (tag == 16u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(16u)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -1567,7 +1630,8 @@ bool JobInput::MergePartialFromCodedStream(
 
       // .terachem_server.JobInput.MethodType method = 3;
       case 3: {
-        if (tag == 24u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(24u)) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
@@ -1581,7 +1645,8 @@ bool JobInput::MergePartialFromCodedStream(
 
       // string basis = 4;
       case 4: {
-        if (tag == 34u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_basis()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -1596,11 +1661,13 @@ bool JobInput::MergePartialFromCodedStream(
 
       // repeated double guess_mo_coeffs_a = 5;
       case 5: {
-        if (tag == 42u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(42u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_guess_mo_coeffs_a())));
-        } else if (tag == 41u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(41u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 42u, input, this->mutable_guess_mo_coeffs_a())));
@@ -1612,11 +1679,13 @@ bool JobInput::MergePartialFromCodedStream(
 
       // repeated double guess_mo_coeffs_b = 6;
       case 6: {
-        if (tag == 50u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(50u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_guess_mo_coeffs_b())));
-        } else if (tag == 49u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(49u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 50u, input, this->mutable_guess_mo_coeffs_b())));
@@ -1628,7 +1697,8 @@ bool JobInput::MergePartialFromCodedStream(
 
       // repeated string user_options = 7;
       case 7: {
-        if (tag == 58u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(58u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->add_user_options()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -1644,7 +1714,8 @@ bool JobInput::MergePartialFromCodedStream(
 
       // bool return_bond_order = 16;
       case 16: {
-        if (tag == 128u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(128u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
@@ -1679,6 +1750,9 @@ failure:
 void JobInput::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:terachem_server.JobInput)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // .terachem_server.Mol mol = 1;
   if (this->has_mol()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1724,7 +1798,7 @@ void JobInput::SerializeWithCachedSizes(
   }
 
   // repeated string user_options = 7;
-  for (int i = 0; i < this->user_options_size(); i++) {
+  for (int i = 0, n = this->user_options_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->user_options(i).data(), this->user_options(i).length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
@@ -1743,13 +1817,15 @@ void JobInput::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* JobInput::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic;  // Unused
   // @@protoc_insertion_point(serialize_to_array_start:terachem_server.JobInput)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // .terachem_server.Mol mol = 1;
   if (this->has_mol()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        1, *this->mol_, false, target);
+        1, *this->mol_, deterministic, target);
   }
 
   // .terachem_server.JobInput.RunType run = 2;
@@ -1783,10 +1859,8 @@ void JobInput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _guess_mo_coeffs_a_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->guess_mo_coeffs_a_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->guess_mo_coeffs_a(i), target);
+      WriteDoubleNoTagToArray(this->guess_mo_coeffs_a_, target);
   }
 
   // repeated double guess_mo_coeffs_b = 6;
@@ -1797,14 +1871,12 @@ void JobInput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _guess_mo_coeffs_b_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->guess_mo_coeffs_b_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->guess_mo_coeffs_b(i), target);
+      WriteDoubleNoTagToArray(this->guess_mo_coeffs_b_, target);
   }
 
   // repeated string user_options = 7;
-  for (int i = 0; i < this->user_options_size(); i++) {
+  for (int i = 0, n = this->user_options_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->user_options(i).data(), this->user_options(i).length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
@@ -1859,7 +1931,7 @@ size_t JobInput::ByteSizeLong() const {
   // repeated string user_options = 7;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->user_options_size());
-  for (int i = 0; i < this->user_options_size(); i++) {
+  for (int i = 0, n = this->user_options_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->user_options(i));
   }
@@ -1921,6 +1993,9 @@ void JobInput::MergeFrom(const JobInput& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:terachem_server.JobInput)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   guess_mo_coeffs_a_.MergeFrom(from.guess_mo_coeffs_a_);
   guess_mo_coeffs_b_.MergeFrom(from.guess_mo_coeffs_b_);
   user_options_.MergeFrom(from.user_options_);
@@ -1965,9 +2040,9 @@ void JobInput::Swap(JobInput* other) {
   InternalSwap(other);
 }
 void JobInput::InternalSwap(JobInput* other) {
-  guess_mo_coeffs_a_.UnsafeArenaSwap(&other->guess_mo_coeffs_a_);
-  guess_mo_coeffs_b_.UnsafeArenaSwap(&other->guess_mo_coeffs_b_);
-  user_options_.UnsafeArenaSwap(&other->user_options_);
+  guess_mo_coeffs_a_.InternalSwap(&other->guess_mo_coeffs_a_);
+  guess_mo_coeffs_b_.InternalSwap(&other->guess_mo_coeffs_b_);
+  user_options_.InternalSwap(&other->user_options_);
   basis_.Swap(&other->basis_);
   std::swap(mol_, other->mol_);
   std::swap(run_, other->run_);
@@ -1978,7 +2053,7 @@ void JobInput::InternalSwap(JobInput* other) {
 
 ::google::protobuf::Metadata JobInput::GetMetadata() const {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[2];
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages];
 }
 
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -2068,11 +2143,12 @@ void JobInput::set_basis(const ::std::string& value) {
 void JobInput::set_basis(::std::string&& value) {
   
   basis_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), std::move(value));
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:terachem_server.JobInput.basis)
 }
 #endif
 void JobInput::set_basis(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   
   basis_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:terachem_server.JobInput.basis)
@@ -2182,7 +2258,14 @@ void JobInput::set_user_options(int index, const ::std::string& value) {
   // @@protoc_insertion_point(field_set:terachem_server.JobInput.user_options)
   user_options_.Mutable(index)->assign(value);
 }
+#if LANG_CXX11
+void JobInput::set_user_options(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:terachem_server.JobInput.user_options)
+  user_options_.Mutable(index)->assign(std::move(value));
+}
+#endif
 void JobInput::set_user_options(int index, const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   user_options_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:terachem_server.JobInput.user_options)
 }
@@ -2199,7 +2282,14 @@ void JobInput::add_user_options(const ::std::string& value) {
   user_options_.Add()->assign(value);
   // @@protoc_insertion_point(field_add:terachem_server.JobInput.user_options)
 }
+#if LANG_CXX11
+void JobInput::add_user_options(::std::string&& value) {
+  user_options_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:terachem_server.JobInput.user_options)
+}
+#endif
 void JobInput::add_user_options(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   user_options_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:terachem_server.JobInput.user_options)
 }
@@ -2308,7 +2398,7 @@ void JobOutput::SetCachedSize(int size) const {
 }
 const ::google::protobuf::Descriptor* JobOutput::descriptor() {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[3].descriptor;
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
 const JobOutput& JobOutput::default_instance() {
@@ -2353,7 +2443,8 @@ bool JobOutput::MergePartialFromCodedStream(
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .terachem_server.Mol mol = 1;
       case 1: {
-        if (tag == 10u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_mol()));
         } else {
@@ -2364,7 +2455,8 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // double energy = 2;
       case 2: {
-        if (tag == 17u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(17u)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
@@ -2377,11 +2469,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double gradient = 3;
       case 3: {
-        if (tag == 26u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_gradient())));
-        } else if (tag == 25u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(25u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 26u, input, this->mutable_gradient())));
@@ -2393,11 +2487,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double charges = 4;
       case 4: {
-        if (tag == 34u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_charges())));
-        } else if (tag == 33u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(33u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 34u, input, this->mutable_charges())));
@@ -2409,11 +2505,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double spins = 5;
       case 5: {
-        if (tag == 42u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(42u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_spins())));
-        } else if (tag == 41u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(41u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 42u, input, this->mutable_spins())));
@@ -2425,11 +2523,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double dipoles = 6;
       case 6: {
-        if (tag == 50u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(50u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_dipoles())));
-        } else if (tag == 49u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(49u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 50u, input, this->mutable_dipoles())));
@@ -2441,11 +2541,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double mo_coeffs_a = 7;
       case 7: {
-        if (tag == 58u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(58u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_mo_coeffs_a())));
-        } else if (tag == 57u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(57u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 58u, input, this->mutable_mo_coeffs_a())));
@@ -2457,11 +2559,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double mo_coeffs_b = 8;
       case 8: {
-        if (tag == 66u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(66u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_mo_coeffs_b())));
-        } else if (tag == 65u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(65u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  1, 66u, input, this->mutable_mo_coeffs_b())));
@@ -2473,7 +2577,8 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // string job_dir = 9;
       case 9: {
-        if (tag == 74u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(74u)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_job_dir()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -2488,11 +2593,13 @@ bool JobOutput::MergePartialFromCodedStream(
 
       // repeated double bond_order = 16;
       case 16: {
-        if (tag == 130u) {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(130u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, this->mutable_bond_order())));
-        } else if (tag == 129u) {
+        } else if (static_cast< ::google::protobuf::uint8>(tag) ==
+                   static_cast< ::google::protobuf::uint8>(129u)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  2, 130u, input, this->mutable_bond_order())));
@@ -2526,6 +2633,9 @@ failure:
 void JobOutput::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:terachem_server.JobOutput)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // .terachem_server.Mol mol = 1;
   if (this->has_mol()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -2608,13 +2718,15 @@ void JobOutput::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* JobOutput::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic;  // Unused
   // @@protoc_insertion_point(serialize_to_array_start:terachem_server.JobOutput)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   // .terachem_server.Mol mol = 1;
   if (this->has_mol()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        1, *this->mol_, false, target);
+        1, *this->mol_, deterministic, target);
   }
 
   // double energy = 2;
@@ -2630,10 +2742,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _gradient_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->gradient_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->gradient(i), target);
+      WriteDoubleNoTagToArray(this->gradient_, target);
   }
 
   // repeated double charges = 4;
@@ -2644,10 +2754,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _charges_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->charges_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->charges(i), target);
+      WriteDoubleNoTagToArray(this->charges_, target);
   }
 
   // repeated double spins = 5;
@@ -2658,10 +2766,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _spins_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->spins_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->spins(i), target);
+      WriteDoubleNoTagToArray(this->spins_, target);
   }
 
   // repeated double dipoles = 6;
@@ -2672,10 +2778,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _dipoles_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->dipoles_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->dipoles(i), target);
+      WriteDoubleNoTagToArray(this->dipoles_, target);
   }
 
   // repeated double mo_coeffs_a = 7;
@@ -2686,10 +2790,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _mo_coeffs_a_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->mo_coeffs_a_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->mo_coeffs_a(i), target);
+      WriteDoubleNoTagToArray(this->mo_coeffs_a_, target);
   }
 
   // repeated double mo_coeffs_b = 8;
@@ -2700,10 +2802,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _mo_coeffs_b_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->mo_coeffs_b_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->mo_coeffs_b(i), target);
+      WriteDoubleNoTagToArray(this->mo_coeffs_b_, target);
   }
 
   // string job_dir = 9;
@@ -2725,10 +2825,8 @@ void JobOutput::SerializeWithCachedSizes(
       target);
     target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
       _bond_order_cached_byte_size_, target);
-  }
-  for (int i = 0; i < this->bond_order_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteDoubleNoTagToArray(this->bond_order(i), target);
+      WriteDoubleNoTagToArray(this->bond_order_, target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:terachem_server.JobOutput)
@@ -2889,6 +2987,9 @@ void JobOutput::MergeFrom(const JobOutput& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:terachem_server.JobOutput)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
   gradient_.MergeFrom(from.gradient_);
   charges_.MergeFrom(from.charges_);
   spins_.MergeFrom(from.spins_);
@@ -2931,13 +3032,13 @@ void JobOutput::Swap(JobOutput* other) {
   InternalSwap(other);
 }
 void JobOutput::InternalSwap(JobOutput* other) {
-  gradient_.UnsafeArenaSwap(&other->gradient_);
-  charges_.UnsafeArenaSwap(&other->charges_);
-  spins_.UnsafeArenaSwap(&other->spins_);
-  dipoles_.UnsafeArenaSwap(&other->dipoles_);
-  mo_coeffs_a_.UnsafeArenaSwap(&other->mo_coeffs_a_);
-  mo_coeffs_b_.UnsafeArenaSwap(&other->mo_coeffs_b_);
-  bond_order_.UnsafeArenaSwap(&other->bond_order_);
+  gradient_.InternalSwap(&other->gradient_);
+  charges_.InternalSwap(&other->charges_);
+  spins_.InternalSwap(&other->spins_);
+  dipoles_.InternalSwap(&other->dipoles_);
+  mo_coeffs_a_.InternalSwap(&other->mo_coeffs_a_);
+  mo_coeffs_b_.InternalSwap(&other->mo_coeffs_b_);
+  bond_order_.InternalSwap(&other->bond_order_);
   job_dir_.Swap(&other->job_dir_);
   std::swap(mol_, other->mol_);
   std::swap(energy_, other->energy_);
@@ -2946,7 +3047,7 @@ void JobOutput::InternalSwap(JobOutput* other) {
 
 ::google::protobuf::Metadata JobOutput::GetMetadata() const {
   protobuf_terachem_5fserver_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_terachem_5fserver_2eproto::file_level_metadata[3];
+  return protobuf_terachem_5fserver_2eproto::file_level_metadata[kIndexInFileMessages];
 }
 
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -3202,11 +3303,12 @@ void JobOutput::set_job_dir(const ::std::string& value) {
 void JobOutput::set_job_dir(::std::string&& value) {
   
   job_dir_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), std::move(value));
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:terachem_server.JobOutput.job_dir)
 }
 #endif
 void JobOutput::set_job_dir(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
   
   job_dir_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:terachem_server.JobOutput.job_dir)
