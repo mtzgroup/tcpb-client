@@ -4,6 +4,8 @@ This repository is designed to facilitate the development of C++ and Python clie
 
 These clients use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output.
 
+For more information, see the [Wiki](https://bitbucket.org/sseritan/tcpb-client/wiki/Home).
+
 ## MPI Engine vs. TCPB vs. PyTC: Why Do We Have So Many Clients for TeraChem?
 
 There are three projects that are being developed in parallel: the MPI SinglePoint engine, these TCPB clients, and the PyTC client, which is part of larger TeraChem-Cloud project.
@@ -19,6 +21,3 @@ For these projects, the TCPB clients make the most sense.
 
 All three clients will have similar job setup and convenience functions, so if you stay away from calling any protobuf-specific code,
 you should be able to swap the clients easily.
-
-
-For more information, see the [Wiki](https://bitbucket.org/sseritan/tcpb-client/wiki/Home).
