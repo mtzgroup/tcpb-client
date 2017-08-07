@@ -6,6 +6,10 @@ These clients use C-style sockets for communication, and Protocol Buffers for a 
 
 For more information, see the [Wiki](https://bitbucket.org/sseritan/tcpb-client/wiki/Home).
 
+## Contact
+
+* Stefan Seritan <sseritan@stanford.edu>
+
 ## MPI Engine vs. TCPB vs. PyTC: Why Do We Have So Many Clients for TeraChem?
 
 There are three projects that are being developed in parallel: the MPI SinglePoint engine, these TCPB clients, and the PyTC client, which is part of larger TeraChem-Cloud project.
