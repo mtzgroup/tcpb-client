@@ -3,6 +3,7 @@
 #
 # Unit testing for TCPB clients
 
+import sys
 import unittest
 
 import available_test
@@ -24,7 +25,15 @@ class TestCppTCPB(unittest.TestCase):
 
 if __name__ == '__main__':
     py_suite = unittest.TestLoader().loadTestsFromTestCase(TestPyTCPB)
-    unittest.TextTestRunner(verbosity=2).run(py_suite)
+    py_results = unittest.TextTestRunner(verbosity=2).run(py_suite)
 
     cpp_suite = unittest.TestLoader().loadTestsFromTestCase(TestCppTCPB)
-    unittest.TextTestRunner(verbosity=2).run(cpp_suite)
+    cpp_results = unittest.TextTestRunner(verbosity=2).run(cpp_suite)
+
+    if len(py_results.errors) or len(py_results.failures):
+        print("\n!!! Errors in Python client !!!")
+        sys.exit(1)
+
+    if len(cpp_results.errors) or len(cpp_results.failures):
+        print("\n!!! Errors in C++ client !!!")
+        sys.exit(1)
