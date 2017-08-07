@@ -117,40 +117,45 @@ class MockServer(object):
                 print("MockServer: Problem receiving header from client")
                 return
 
-            expected_msg = self.expected_msgs[0]
-            expected_header = (expected_msg[0], expected_msg[1].ByteSize())
-            if header != expected_header:
-                print("MockServer: Did not receive expected header from client")
+            msg_type = header[0]
+            msg_size = header[1]
+
+            expected_type, expected_pb = self.expected_msgs[0]
+            if msg_type != expected_type:
+                print("MockServer: Did not receive expected msg type from client")
                 return
 
             try:
-                msg_str = self._recv_message(client, header[1])
+                msg_str = self._recv_message(client, msg_size)
             except socket.error as msg:
                 print("MockServer: Problem receiving message from client. Error: {}".format(msg))
                 return
 
-            if header[0] == pb.STATUS:
+            if msg_type == pb.STATUS:
                 recvd_pb = pb.Status()
-            elif header[0] == pb.MOL:
+            elif msg_type == pb.MOL:
                 recvd_pb = pb.Mol()
-            elif header[0] == pb.JOBINPUT:
+            elif msg_type == pb.JOBINPUT:
                 recvd_pb = pb.JobInput()
-            elif header[0] == pb.JOBOUTPUT:
+            elif msg_type == pb.JOBOUTPUT:
                 recvd_pb = pb.JobOutput()
             else:
                 print("MockServer: Unknown protobuf type")
                 return
 
-            # TODO: Compare expected, exit if wrong
             recvd_pb.ParseFromString(msg_str)
+
+            # Compare to expected protobuf
+            if recvd_pb.SerializeToString() != expected_pb.SerializeToString():
+                print("MockServer: Expected protobuf did not match received protobuf")
+                return
 
             del self.expected_msgs[0]
 
             # Send response (if one)
-            response_msg = self.response_msgs[0]
-            response_pb = response_msg[1]
+            response_type, response_pb = self.response_msgs[0]
             try:
-                self._send_header(client, response_msg[0], response_pb.ByteSize())
+                self._send_header(client, response_type, response_pb.ByteSize())
             except socket.error as msg:
                 print("MockServer: Problem sending header to client. Error: {}".format(msg))
                 return
@@ -161,12 +166,11 @@ class MockServer(object):
                 print("MockServer: Problem sending message to client. Error: {}".format(msg))
                 return
 
-            if response_msg[0] == pb.STATUS and response_pb.WhichOneof("job_status") == 'completed':
+            if response_type == pb.STATUS and response_pb.WhichOneof("job_status") == 'completed':
                 # Also need to send joboutput, which should be next message
-                response_msg = self.response_msgs[1]
-                response_pb = response_msg[1]
+                response_type, response_pb = self.response_msgs[1]
                 try:
-                    self._send_header(client, response_msg[0], response_pb.ByteSize())
+                    self._send_header(client, response_type, response_pb.ByteSize())
                 except socket.error as msg:
                     print("MockServer: Problem sending header to client. Error: {}".format(msg))
                     return
