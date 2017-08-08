@@ -3,7 +3,7 @@ PROTOC=protoc
 INCDIR=./include
 CXXFLAGS=-I$(INCDIR) -fPIC
 LIBS=-lprotobuf
-VER=0.1.0
+VER=0.2.0
 
 # Subdirectories
 SRCDIR=./src
@@ -12,7 +12,7 @@ BUILDDIR=./build
 PROTODIR=../proto
 
 # Prefix for installation
-PREFIX=/home/sseritan/personal_modules/software/tcpb-client/0.1
+PREFIX=/global/user_software/tcpb-client/$(VER)
 
 .PHONY: all
 all: $(SRCDIR)/terachem_server.pb.cpp libtcpb.so.$(VER)

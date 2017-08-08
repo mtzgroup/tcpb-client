@@ -7,7 +7,7 @@ def readme():
 
 __title__ = "tcpb"
 __copyright__ = "Martinez Group, Stanford University, CA, USA, Planet Earth"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __status__ = "alpha"
 
 
@@ -16,6 +16,6 @@ setup(name="tcpb",
       description="Python client for TeraChem Protocol Buffer server",
       packages=["tcpb"],
       test_suite="tcpb",
-      long_description="""This is still very much a work in progress.""",
+      long_description="""Python client for TeraChem Protocol Buffer server""",
       install_requires=['google>=1.9.3','protobuf>=3.2.0','numpy>=1.13']
       )
