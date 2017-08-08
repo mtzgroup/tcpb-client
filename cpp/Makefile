@@ -39,21 +39,21 @@ libtcpb.so.$(VER): $(OBJDIR)/tcpb.o $(OBJDIR)/terachem_server.pb.o
 
 .PHONY: clean
 clean:
-	rm -r $(OBJDIR)/*.o $(BUILDDIR)/libtcpb.so.$(VER)
-
+	@rm -r $(OBJDIR)/*.o $(BUILDDIR)/libtcpb.so.$(VER)
+	@rm -r $(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h
 
 .PHONY: install
 install:
 	@echo "Installing TCPB C++ client into $(PREFIX)"
 	@mkdir -p $(PREFIX)/lib
-	@cp $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
+	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
 	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
 	@mkdir -p $(PREFIX)/include
-	@cp $(INCDIR)/tcpb.h $(PREFIX)/include
-	@cp $(INCDIR)/terachem_server.pb.h $(PREFIX)/include
+	@cp -v $(INCDIR)/tcpb.h $(PREFIX)/include
+	@cp -v $(INCDIR)/terachem_server.pb.h $(PREFIX)/include
 
 .PHONY: uninstall
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
-	@rm $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
-	@rm $(PREFIX)/include/{tcpb.h,terachem_server.pb.h}
+	@rm -v $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
+	@rm -v $(PREFIX)/include/{tcpb.h,terachem_server.pb.h}

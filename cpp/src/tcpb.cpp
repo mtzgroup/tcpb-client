@@ -20,6 +20,7 @@
 #include <sys/time.h>
 
 #include "tcpb.h"
+// terachem_server.pb.cpp/h must be generated from terachem_server.proto
 #include "terachem_server.pb.h"
 
 using namespace std;
