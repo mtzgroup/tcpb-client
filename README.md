@@ -4,7 +4,7 @@ This repository is designed to facilitate the development of C++ and Python clie
 
 These clients use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output.
 
-For more information, see the [Wiki](https://bitbucket.org/sseritan/tcpb-client/wiki/Home).
+For more information, see the [Wiki](https://bitbucket.org/mtzcloud/tcpb-client/wiki/Home).
 
 ## Contact
 
