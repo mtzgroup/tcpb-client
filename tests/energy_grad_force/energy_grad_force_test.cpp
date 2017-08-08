@@ -62,20 +62,20 @@ int main(int argc, char** argv) {
   double energy;
   double* grad;
 
-  TC->ComputeEnergy(geom, num_atoms, true, energy);
+  TC->ComputeEnergy(geom, num_atoms, false, energy);
   if (!FuzzyEqual(&energy, &expected_energy, 1, tol)) {
     printf("Failed energy test\n");
     return 1;
   }
 
-  TC->ComputeGradient(geom, num_atoms, true, energy, grad);
+  TC->ComputeGradient(geom, num_atoms, false, energy, grad);
   if (!FuzzyEqual(&energy, &expected_energy, 1, tol) || !FuzzyEqual(grad, expected_grad, 3*num_atoms, tol)) {
     printf("Failed gradient test\n");
     return 1;
   }
   delete grad;
 
-  TC->ComputeGradient(geom, num_atoms, true, energy, grad);
+  TC->ComputeGradient(geom, num_atoms, false, energy, grad);
   for (int i = 0; i < 3*num_atoms; i++) {
     grad[i] *= -1.0;
   }
