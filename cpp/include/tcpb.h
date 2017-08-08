@@ -113,17 +113,16 @@ class TCPBClient {
     /**
      * Gets the energy from the JobOutput Protocol Buffer
      *
-     * @return energy Double of computed energy
+     * @param energy Double reference of computed energy
      **/
-    double GetEnergy();
+    void GetEnergy(double& energy);
 
     /**
      * Gets the gradient from the JobOutput Protocol Buffer
-     * Allocates memory
      *
-     * @return gradient Allocated double array of computed gradient
+     * @param gradient Double array of computed gradient (user-allocated)
      **/
-    double* GetGradient();
+    void GetGradient(double* gradient);
 
     //TODO: Add more getters
 
@@ -210,13 +209,12 @@ class TCPBClient {
 
     /**
      * Blocking wrapper for a gradient ComputeJobSync() call
-     * Allocates memory for gradient
      *
      * @param geom Double array of XYZs for each atom
      * @param num_atoms Integer number of atoms stored in geom
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
-     * @param gradient Pointer for storing the computed gradient
+     * @param gradient Double array for storing the computed gradient (user-allocated)
      **/
     void ComputeGradient(const double* geom,
                          const int num_atoms,
@@ -227,13 +225,12 @@ class TCPBClient {
     /**
      * Blocking wrapper for a gradient ComputeJobSync() call
      * Exactly the same as ComputeGradient(), but returns -gradient as forces
-     * Allocates memory for forces
      *
      * @param geom Double array of XYZs for each atom
      * @param num_atoms Integer number of atoms stored in geom
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
-     * @param forces Pointer for storing the negative of the computed gradient
+     * @param forces Double array for storing the negative of the computed gradient (user-allocated)
      **/
     void ComputeForces(const double* geom,
                        const int num_atoms,

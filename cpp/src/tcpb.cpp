@@ -158,16 +158,13 @@ void TCPBClient::SetBasis(const char* basis) {
  * JOB INPUT (SETTERS) *
  ***********************/
 
-double TCPBClient::GetEnergy() {
-  return jobOutput_.energy();
+void TCPBClient::GetEnergy(double& energy) {
+  energy = jobOutput_.energy();
 }
 
-double* TCPBClient::GetGradient() {
+void TCPBClient::GetGradient(double* gradient) {
   int grad_size = jobOutput_.gradient_size();
-  double* gradient = new double[grad_size];
   memcpy(gradient, jobOutput_.mutable_gradient()->mutable_data(), grad_size*sizeof(double));
-
-  return gradient;
 }
 
 /************************
@@ -361,6 +358,7 @@ bool TCPBClient::CheckJobComplete() {
 void TCPBClient::RecvJobAsync() {
   uint32_t header[2];
   int msgType, msgSize;
+  string msgStr;
   bool recvSuccess;
   int aSize, bSize;
 
@@ -390,9 +388,14 @@ void TCPBClient::RecvJobAsync() {
     printf("RecvJobAsync: Received empty job output message\n");
     exit(1);
   }
+
+  // Cast char* to string, avoiding binary 0 being counted as null termination
+  msgStr.resize(msgSize);
+  memcpy((void*)msgStr.data(), msg, msgSize);
   
   // Overwrite Job Output Protocol Buffer
-  jobOutput_.ParseFromString(msg);
+  jobOutput_.ParseFromString(msgStr);
+  //printf("Received job output:\n%s\n", jobOutput_.DebugString().c_str());
 
   // Save MO coeffs
   jobInput_.clear_guess_mo_coeffs_a();
@@ -420,13 +423,13 @@ void TCPBClient::ComputeJobSync(const terachem_server::JobInput_RunType runType,
   // Try to submit job
   while (!SendJobAsync(runType, geom, num_atoms, unitType)) {
     //Sleep for 0.1 second 
-    usleep(1000000);
+    //usleep(1000000);
   }
 
   // Check for job completion
   while (!CheckJobComplete()) {
     //Sleep for 0.1 second 
-    usleep(1000000);
+    //usleep(1000000);
   }
 
   RecvJobAsync();
@@ -451,7 +454,7 @@ void TCPBClient::ComputeEnergy(const double* geom,
   ComputeJobSync(runType, geom, num_atoms, unitType);
 
   // Extract energy from jobOutput_
-  energy = GetEnergy();
+  GetEnergy(energy);
 }
 
 void TCPBClient::ComputeGradient(const double* geom,
@@ -470,8 +473,8 @@ void TCPBClient::ComputeGradient(const double* geom,
   ComputeJobSync(runType, geom, num_atoms, unitType);
 
   // Extract energy and gradient from jobOutput_
-  energy = GetEnergy();
-  gradient = GetGradient(); //Allocates memory
+  GetEnergy(energy);
+  GetGradient(gradient);
 }
 
 void TCPBClient::ComputeForces(const double* geom,
@@ -480,7 +483,6 @@ void TCPBClient::ComputeForces(const double* geom,
                                double& energy,
                                double* gradient) {
   // Compute energy and gradient
-  // Allocates memory for gradient
   ComputeGradient(geom, num_atoms, angstrom, energy, gradient);
 
   // Flip sign on gradient

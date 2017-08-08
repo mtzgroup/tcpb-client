@@ -6,11 +6,9 @@ pipelines:
   default:
     - step:
         script:
-          # Set up Protobuf for whatever is in environment
+          # Set up Python
           - cd proto/
           - protoc terachem_server.proto --python_out=../python/tcpb
-          - touch terachem_server.proto
-          # Set up Python
           - cd ../python/
           - pip install .
           # Set up C++
