@@ -199,7 +199,10 @@ class TCProtobufClient(object):
             del self.tc_options.guess_mo_coeffs_b[:]
 
         for key, value in kwargs.iteritems():
-            if key == 'bond_order':
+            if key == 'geom':
+                del self.tc_options.mol.xyz[:]
+                self.tc_options.mol.xyz.extend(geom)
+            elif key == 'bond_order':
                 self.tc_options.return_bond_order = value
             elif key in self.tc_options.user_options:
                 index = self.tc_options.user_options.index(key)

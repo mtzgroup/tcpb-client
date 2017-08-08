@@ -148,6 +148,10 @@ class MockServer(object):
             # Compare to expected protobuf
             if recvd_pb.SerializeToString() != expected_pb.SerializeToString():
                 print("MockServer: Expected protobuf did not match received protobuf")
+                print("EXPECTED PROTOBUF:")
+                print(expected_pb)
+                print("\nRECEIVED PROTOBUF:")
+                print(recvd_pb)
                 return
 
             del self.expected_msgs[0]

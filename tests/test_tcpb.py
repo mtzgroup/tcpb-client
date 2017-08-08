@@ -27,13 +27,19 @@ if __name__ == '__main__':
     py_suite = unittest.TestLoader().loadTestsFromTestCase(TestPyTCPB)
     py_results = unittest.TextTestRunner(verbosity=2).run(py_suite)
 
+    print("\n-----")
+
     cpp_suite = unittest.TestLoader().loadTestsFromTestCase(TestCppTCPB)
     cpp_results = unittest.TextTestRunner(verbosity=2).run(cpp_suite)
 
+    failures = False
     if len(py_results.errors) or len(py_results.failures):
         print("\n!!! Errors in Python client !!!")
-        sys.exit(1)
+        failures = True
 
     if len(cpp_results.errors) or len(cpp_results.failures):
         print("\n!!! Errors in C++ client !!!")
+        failures = True
+
+    if failures is True:
         sys.exit(1)
