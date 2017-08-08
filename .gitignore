@@ -1,8 +1,11 @@
 *.pyc
 *.swp
+python/tcpb/terachem_server_pb2.py
 python/build/
 python/dist/
 python/tcpb.egg-info/
+cpp/src/terachem_server.pb.c*
+cpp/include/terachem_server.pb.h
 cpp/obj/
 cpp/build/
 cpp/examples/tcpb-example

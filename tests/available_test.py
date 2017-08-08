@@ -7,7 +7,7 @@ from tcpb import TCProtobufClient
 from mock_server import MockServer
 
 # JOB OUTPUT
-expected_cycles = 4
+expected_cycles = 6
 
 def run_py_test(port=56789, run_real_server=False):
     """Run the test
@@ -25,6 +25,8 @@ def run_py_test(port=56789, run_real_server=False):
     with TCProtobufClient(host='localhost', port=port, trace=run_real_server, method='hf', basis='sto-3g') as TC:
         count = 0
         while not TC.is_available():
+            if run_real_server is True:
+                print('Not available')
             count += 1
 
         if count != expected_cycles:
@@ -54,7 +56,7 @@ def run_cpp_test(port=56789):
     return True
 
 if __name__ == '__main__':
-    #run_test(run_real_server=True)
+    #run_py_test(run_real_server=True)
 
     print("Running Python test...")
     run_py_test()

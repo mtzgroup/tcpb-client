@@ -10,7 +10,7 @@
 
 #include "tcpb.h"
 
-const int expected_cycles = 4;
+const int expected_cycles = 6;
 
 int main(int argc, char** argv) {
   if (argc != 3) {

@@ -201,7 +201,7 @@ class TCProtobufClient(object):
         for key, value in kwargs.iteritems():
             if key == 'geom':
                 del self.tc_options.mol.xyz[:]
-                self.tc_options.mol.xyz.extend(geom)
+                self.tc_options.mol.xyz.extend(value)
             elif key == 'bond_order':
                 self.tc_options.return_bond_order = value
             elif key in self.tc_options.user_options:

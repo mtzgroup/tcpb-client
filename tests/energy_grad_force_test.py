@@ -47,6 +47,10 @@ def run_py_test(port=56789, run_real_server=False):
         mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
 
     with TCProtobufClient(host='localhost', port=port, trace=run_real_server, **h2o_system) as TC:
+        if run_real_server:
+            print('TCPB Client Protobuf:')
+            print(TC.tc_options)
+
         # Energy calculation
         energy = TC.compute_energy(h2o_system['geom'])
         if not np.allclose([h2o_energy], [energy], atol=tol):
@@ -88,7 +92,7 @@ def run_cpp_test(port=56789):
     return True
 
 if __name__ == '__main__':
-    #run_test(run_real_server=True)
+    #run_py_test(run_real_server=True)
 
     print("Running Python test...")
     run_py_test()
