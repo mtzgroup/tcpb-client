@@ -17,20 +17,22 @@
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Client class
- * Handles communicating with a TeraChem server through sockets and protocol buffers
- * Based on protobufserver.cpp/.h in the TeraChem source code and tcpb.py (that came first)
- * Direct control of the asynchronous server communication is possible,
- * but the typical use would be the convenience functions like ComputeEnergy()
  *
- * One major difference to the TCPB server code is that the client only needs one active connection
- * This removes most threading and select logic (but limits communication to one server)
- * However, timeouts do need to be explicitly set on the socket
+ * TCPBClient handles communicating with a TeraChem server through sockets and protocol buffers.
+ * This class is based on protobufserver.cpp/.h in the TeraChem source code and tcpb.py (which came first).
+ * Direct control of the asynchronous server communication is possible,
+ * but the typical use would be the convenience functions like ComputeEnergy().
+ * One major difference to the TCPB server code is that the client only needs one active connection.
+ * This removes most threading and select logic (but limits communication to one server);
+ * however, timeouts do need to be explicitly set on the socket.
  **/
 class TCPBClient {
   public:
     //Constructor/Destructor
     /**
-     * Constructor for TCPBClient class
+     * \brief Constructor for TCPBClient class
+     *
+     * Sets up the logfile if the #SOCKETLOGS macro is defined.
      *
      * @param host C string of hostname with TCPB server
      * @param port Integer port of TCPB server
@@ -39,8 +41,9 @@ class TCPBClient {
                int port);
 
     /**
-     * Destructor for TCPBClient
-     * Handles disconnect and logfile cleanup
+     * \brief Destructor for TCPBClient
+     *
+     * The destructor also handles disconnect and logfile cleanup.
      **/
     ~TCPBClient();
 
@@ -48,8 +51,10 @@ class TCPBClient {
      * JOB INPUT (SETTERS) *
      ***********************/
     /**
-     * Set the atom types in the JobInput Protocol Buffer
-     * Clears saved MO coeffs
+     * \brief Set the atom types in the JobInput Protocol Buffer
+     *
+     * Also clears saved MO coefficients in jobInput_,
+     * since changing the atoms invalidates the previous solution.
      *
      * @param atoms Array of C strings for atom types
      * @param num_atoms Integer number of entries in atoms
@@ -58,50 +63,62 @@ class TCPBClient {
                   const int num_atoms);
 
     /**
-     * Set the charge in the JobInput Protocol Buffer
-     * Clears saved MO coeffs
+     * \brief Set the charge in the JobInput Protocol Buffer
+     *
+     * Also clears saved MO coefficients in jobInput_,
+     * since changing the charge invalidates the previous solution.
      *
      * @param charge Molecular charge
      **/
     void SetCharge(const int charge);
 
     /**
-     * Set the spin multiplicity in the JobInput Protocol Buffer
-     * Clears saved MO coeffs
+     * \brief Set the spin multiplicity in the JobInput Protocol Buffer
+     *
+     * Also clears saved MO coefficients in jobInput_,
+     * since changing the spin multiplicity invalidates the previous solution.
      *
      * @param spinMult Spin multiplicity
      **/
     void SetSpinMult(const int spinMult);
 
     /**
-     * Set closed or open shell in the JobInput Protocol Buffer
-     * Clears saved MO coeffs
+     * \brief Set closed or open shell in the JobInput Protocol Buffer
+     *
+     * Also clears saved MO coefficients in jobInput_,
+     * since changing between closed and open shell invalidates the previous solution.
      *
      * @param closed If True, the system is set as closed shell
      **/
     void SetClosed(const bool closed);
 
     /**
-     * Set restricted or unrestricted in the JobInput Protocol Buffer
-     * Clears saved MO coeffs
+     * \brief Set restricted or unrestricted in the JobInput Protocol Buffer
+     *
+     * Also clears saved MO coefficients in jobInput_,
+     * since changing between restricted and unrestricted invalidates the previous solution.
      *
      * @param restricted If True, the system is set as restricted
      **/
     void SetRestricted(const bool restricted);
 
     /**
-     * Set the TeraChem method in the JobInput Protocol Buffer
-     * Will error out if not a valid TeraChem method (as defined in the .proto)
-     * Clears saved MO coeffs
+     * \brief Set the TeraChem method in the JobInput Protocol Buffer
+     *
+     * Clears saved MO coefficients in jobInput_,
+     * since changing the method invalidates the previous solution.
+     * Also, will error out if not given a valid TeraChem method (as defined in terachem_server.proto).
      *
      * @param method C string of method name (case insensitive)
      **/
     void SetMethod(const char* method);
 
     /**
-     * Set the TeraChem basis set in the JobInput Protocol Buffer
-     * Will error out if not a valid TeraChem basis set (as defined in the .proto)
-     * Clears saved MO coeffs
+     * \brief Set the TeraChem basis set in the JobInput Protocol Buffer
+     *
+     * Clears saved MO coefficients in jobInput_,
+     * since changing the basis set invalidates the previous solution.
+     * Also, will error out if not a valid TeraChem basis set (as defined in terachem_server.proto).
      *
      * @param basis C string of basis set name (case insensitive)
      **/
@@ -111,14 +128,21 @@ class TCPBClient {
      * JOB OUTPUT (GETTERS) *
      ************************/
     /**
-     * Gets the energy from the JobOutput Protocol Buffer
+     * \brief Gets the energy from the JobOutput Protocol Buffer
+     *
+     * Takes the energy from the current jobOutput_,
+     * and stores it in the double passed in by reference.
+     * This is to stay consistent with how the getters for arrays is coded.
      *
      * @param energy Double reference of computed energy
      **/
     void GetEnergy(double& energy);
 
     /**
-     * Gets the gradient from the JobOutput Protocol Buffer
+     * \brief Gets the gradient from the JobOutput Protocol Buffer
+     *
+     * Takes the gradient array from the current jobOutput_.
+     * It currently does not check the size of the array, which must be allocated by the user.
      *
      * @param gradient Double array of computed gradient (user-allocated)
      **/
@@ -130,25 +154,36 @@ class TCPBClient {
      * SERVER COMMUNICATION *
      ************************/
     /**
-     * Initialize the server_ socket and connect to the given host (host_) and port (port_)
+     * \brief Connect to the TCPB server
+     *
+     * Initializes the server_ socket and connects to the given host (host_) and port (port_).
      **/
     void Connect();
 
     /**
-     * Disconnect and discard the server_ socket
+     * \brief Disconnect from the TCPB server
+     *
+     * Disconnects and discards the server_ socket.
      **/
     void Disconnect();
 
     /**
-     * Checks whether the server is available (does not reserve server)
+     * \brief Checks whether the server is available
+     *
+     * Does not reserve the server, only returns the current availability
      *
      * @return True if server has no running job, False otherwise
      **/
     bool IsAvailable();
 
     /**
-     * Send the JobInput Protocol Buffer to the TCPB server
-     * Send is blocking, but function will not wait for job completion (thus job is asynchronous)
+     * \brief Send the JobInput Protocol Buffer to the TCPB server
+     *
+     * The client sends a JobInput protobuf and waits for a Status protobuf,
+     * which indicates whether the server has accepted or declined the job.
+     * The send and recv are actually blocking;
+     * however, this is asynchronous in sense that the function does not wait for job completion.
+     * Status responses should be immediate from the server.
      *
      * @param runType TeraChem run type, as defined in the JobInput_RunType enum 
      * @param geom Double array of XYZs for each atom
@@ -162,24 +197,33 @@ class TCPBClient {
                       const terachem_server::Mol_UnitType unitType);
 
     /**
-     * Send a Status Protocol Buffer to the TCPB server to check on a submitted job
-     * Send/recv are blocking, but server should respond with status immediately
-     * Once the completed Status message is received, the following message should be the job output
+     * \brief Send a Status Protocol Buffer to the TCPB server to check on a submitted job
+     *
+     * The client sends a Status protobuf and waits for Status protobuf,
+     * which indicates whether the server is still working on or has completed the submitted job.
+     * The send and recv are actually blocking;
+     * however, this is asynchronous in sense that the function does not wait for job completion.
+     * Status responses should be immediate from the server.
      *
      * @return True if job is complete, False if job is still in progress
      **/
     bool CheckJobComplete();
 
     /**
-     * Receive the JobOutput Protocol Buffer from the TCPB server
-     * Errors out if there are any issues, otherwise overwrites jobOutput_
-     * Side effect: Sets MO coeffs in jobInput_
+     * \brief Receive the JobOutput Protocol Buffer from the TCPB server
+     *
+     * The client receives a JobOutput protobuf from the server,
+     * overwritting jobOutput_ with the new protobuf.
+     * The MO coefficients are taken from jobOutput_ 
+     * and placed as guess MO coefficients in jobInput_ for the next job.
      **/
     void RecvJobAsync();
 
     /**
-     * Blocking wrapper for SendJobAsync(), CheckJobComplete(), and RecvJobAsync()
-     * On return, jobOutput_ will correspond to the submitted job
+     * \brief Blocking wrapper for SendJobAsync(), CheckJobComplete(), and RecvJobAsync()
+     *
+     * The client repeatedly tries to submit and check on the status of the job, until job completion.
+     * Called exactly like SendJobAsync(), but blocks until the job is finished and stored in jobOutput_.
      *
      * @param runType TeraChem run type, as defined in the JobInput_RunType enum 
      * @param geom Double array of XYZs for each atom
@@ -195,7 +239,10 @@ class TCPBClient {
      * CONVENIENCE FUNCTIONS *
      *************************/
     /**
-     * Blocking wrapper for an energy ComputeJobSync() call
+     * \brief Blocking wrapper for an energy ComputeJobSync() call
+     *
+     * Calls ComputeJobSync for an energy calculation,
+     * and abstracts away the Protobuf-specific runtype/unit code
      *
      * @param geom Double array of XYZs for each atom
      * @param num_atoms Integer number of atoms stored in geom
@@ -208,7 +255,10 @@ class TCPBClient {
                        double& energy);
 
     /**
-     * Blocking wrapper for a gradient ComputeJobSync() call
+     * \brief Blocking wrapper for a gradient ComputeJobSync() call
+     *
+     * Calls ComputeJobSync for a gradient calculation,
+     * and abstracts away the Protobuf-specific runtype/unit code
      *
      * @param geom Double array of XYZs for each atom
      * @param num_atoms Integer number of atoms stored in geom
@@ -223,7 +273,8 @@ class TCPBClient {
                          double* gradient);
 
     /**
-     * Blocking wrapper for a gradient ComputeJobSync() call
+     * \brief Blocking wrapper for a gradient ComputeJobSync() call
+     *
      * Exactly the same as ComputeGradient(), but returns -gradient as forces
      *
      * @param geom Double array of XYZs for each atom
@@ -255,7 +306,7 @@ class TCPBClient {
     // TODO: These should probably be split out, pretty independent
     // TODO: These functions will not work on Windows at the moment
     /**
-     * A high-level socket recv with error checking and clean up for broken connections
+     * \brief A high-level socket recv with error checking and clean up for broken connections
      *
      * @param buf Buffer for incoming packet
      * @param len Byte size of incoming packet
@@ -267,7 +318,7 @@ class TCPBClient {
                     const char* log);
 
     /**
-     * A high-level socket send with error checking and clean up for broken connections
+     * \brief A high-level socket send with error checking and clean up for broken connections
      *
      * @param buf Buffer for outgoing packet
      * @param len Byte size of outgoing packet
@@ -279,7 +330,7 @@ class TCPBClient {
                     const char* log);
 
     /**
-     * A low-level socket recv wrapper to ensure full packet recv
+     * \brief A low-level socket recv wrapper to ensure full packet recv
      *
      * @param buf Buffer for incoming packet
      * @param len Byte size of incoming packet
@@ -289,7 +340,7 @@ class TCPBClient {
               int len);
 
     /**
-     * A low-level socket send wrapper to ensure full packet send
+     * \brief A low-level socket send wrapper to ensure full packet send
      *
      * @param buf Buffer for outgoing packet
      * @param len Byte size of outgoing packet
@@ -299,12 +350,14 @@ class TCPBClient {
               int len);
 
     /**
-     * Verbose logging with timestamps for the client socket into "client.log"
-     * This function is similar to fprintf(clientLogFile_, format, ...) with SOCKETLOGS defined
-     * This function does nothing without SOCKETLOGS defined
+     * \brief Verbose logging with timestamps for the client socket into "client.log"
      *
-     * @param format Format string for vfprintf
-     * @param va_args Variable arguments for vfprintf
+     * With SOCKETLOGS defined, this method is analagous to fprintf(clientLogFile_, format, asctime(), ...).
+     *
+     * Without SOCKETLOGS defined, this method does nothing.
+     *
+     * @param format Format string for fprintf
+     * @param va_args Variable arguments for fprintf
      **/
     void SocketLog(const char* format, ...);
 };
