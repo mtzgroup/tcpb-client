@@ -12,4 +12,4 @@ cpp/examples/tcpb-example
 client.log
 tests/available/available_test
 tests/energy_grad_force/energy_grad_force_test
-docs/latex
+docs/latex*

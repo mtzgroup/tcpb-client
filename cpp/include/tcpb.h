@@ -170,7 +170,7 @@ class TCPBClient {
     /**
      * \brief Checks whether the server is available
      *
-     * Does not reserve the server, only returns the current availability
+     * Does not reserve the server, only returns the current availability.
      *
      * @return True if server has no running job, False otherwise
      **/

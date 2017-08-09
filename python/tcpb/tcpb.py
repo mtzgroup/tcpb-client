@@ -44,18 +44,6 @@ class TCProtobufClient(object):
             self.intracefile = open('client_recv.bin', 'wb')
             self.outtracefile = open('client_sent.bin', 'wb')
 
-        # Sanity checks
-        if method is None:
-            raise SyntaxError("TeraChem method is required by client")
-        elif not isinstance(method, basestring):
-            raise TypeError("TeraChem method must be a string")
-        elif method.upper() not in pb.JobInput.MethodType.keys():
-            raise ValueError("Method specified is not available in this version of the TeraChem Protobuf server")
-        if basis is None:
-            raise SyntaxError("TeraChem basis is required by client")
-        elif not isinstance(basis, basestring):
-            raise TypeError("TeraChem basis must be a string")
-
         # Socket options
         self.update_address(host, port)
         self.tcsock = None
@@ -123,6 +111,7 @@ class TCProtobufClient(object):
             **kwargs:   Additional TeraChem keywords. Passing None as the value will wipe that keyword
                         from the options of all future jobs
                         Keywords that will be handled by the client:
+                        geom will set the coordinates of the client
                         bond_order=True will return Meyer bond order matrix
         """
         # Sanity checks
@@ -287,7 +276,8 @@ class TCProtobufClient(object):
             jobType:    Job type as defined in the pb.JobInput.RunType enum (defaults to RunType.ENERGY)
             geom:       Cartesian geometry of the new point
             units:      Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
-            **kwargs:   Additional TeraChem keywords, overriding the default job options. For more info, look at update_options()
+            **kwargs:   Additional TeraChem keywords, overriding the default job options.
+                        For more info, look at update_options()
 
         Returns True on job acceptance, False on server busy, and errors out if communication fails
         """
@@ -354,7 +344,8 @@ class TCProtobufClient(object):
     def check_job_complete(self):
         """Pack and send a Status message to the TeraChem Protobuf server asynchronously.
         This function expects a Status message back with either working or completed set.
-        Errors out if just busy message returned, implying the job we are checking was not submitted or had some other issue
+        Errors out if just busy message returned, implying the job we are checking was not submitted
+        or had some other issue
 
         Returns True if job is completed, False otherwise
         """
@@ -379,7 +370,8 @@ class TCProtobufClient(object):
 
     def recv_job_async(self):
         """Recv and unpack a JobOutput message from the TeraChem Protobuf server asynchronously.
-        This function expects the job to be ready (i.e. check_job_complete() returned true), so will error out on timeout.
+        This function expects the job to be ready (i.e. check_job_complete() returned true),
+        so will error out on timeout.
 
         Returns a results dictionary that mirrors the JobOutput message, using NumPy arrays when possible
         """
@@ -427,7 +419,8 @@ class TCProtobufClient(object):
             jobType:    Job type as defined in the pb.JobInput.RunType enum (defaults to RunType.ENERGY)
             geom:       Cartesian geometry of the new point
             units:      Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
-            **kwargs:   Additional TeraChem keywords, overriding the default job options. For more info, look at update_options()
+            **kwargs:   Additional TeraChem keywords, overriding the default job options.
+                        For more info, look at update_options()
 
         Returns a results dictionary that mirrors the JobOutput message, using NumPy arrays when possible
         """
