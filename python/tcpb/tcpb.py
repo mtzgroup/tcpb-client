@@ -1,5 +1,6 @@
-# Simple Python socket client class
-# Used for communicating with TeraChem over protocol buffers
+"""tcpb.py:
+Simple Python socket client for communicating with TeraChem Protocol Buffer servers
+"""
 
 import sys
 import numpy as np
