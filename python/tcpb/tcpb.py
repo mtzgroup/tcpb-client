@@ -440,7 +440,7 @@ class TCProtobufClient(object):
 
     # CONVENIENCE FUNCTIONS #
     def compute_energy(self, geom=None, units=pb.Mol.BOHR):
-        """Compute energy of a new geometry, but with the same atoms/charge/spin
+        """Compute energy of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
@@ -453,7 +453,7 @@ class TCProtobufClient(object):
         return results['energy']
 
     def compute_gradient(self, geom=None, units=pb.Mol.BOHR):
-        """Compute gradient of a new geometry, but with the same atoms/charge/spin
+        """Compute gradient of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
@@ -467,7 +467,7 @@ class TCProtobufClient(object):
 
     # Convenience to maintain compatibility with NanoReactor2
     def compute_forces(self, geom=None, units=pb.Mol.BOHR):
-        """Compute forces of a new geometry, but with the same atoms/charge/spin
+        """Compute forces of a new geometry, but with the same atoms labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
