@@ -22,7 +22,7 @@ h2o_system = {
     'basis': '6-31g',
     'charge': 0,
     'spinmult': 1,
-    'closed': True,
+    'closed_shell': True,
     'restricted': True,
     }
 
