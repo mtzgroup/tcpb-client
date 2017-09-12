@@ -148,6 +148,8 @@ message JobOutput {
 
   //Job directory, so the user can go get more info if they want
   string job_dir = 9;
+  string job_scr_dir = 10;
+  int32 server_job_id = 11;
 
   //Job specific output
   // CI_VEC_OVERLAP

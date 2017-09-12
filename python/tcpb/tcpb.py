@@ -113,6 +113,7 @@ class TCProtobufClient(object):
                         from the options of all future jobs
                         Keywords that will be handled by the client:
                         geom will set the coordinates of the client
+                        geom2 will set the coordinates of a second geometry for ci_vec_overlap jobs
                         bond_order=True will return Meyer bond order matrix
         """
         # Sanity checks
@@ -327,8 +328,12 @@ class TCProtobufClient(object):
                 job_options.return_bond_order = value
             elif key == 'geom2':
                 # Second geometry for ci_vec_overlap job
-                del self.tc_options.xyz2
-                self.tc_options.xyz2.extend(value)
+                if isinstance(value, np.ndarray):
+                    value = value.flatten()
+                if len(self.tc_options.mol.atoms) != len(value)/3.0:
+                    raise ValueError("Geometry does not match atom list in send_job_async()")
+
+                job_options.xyz2.extend(value)
             elif key in job_options.user_options:
                 # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)
@@ -402,6 +407,8 @@ class TCProtobufClient(object):
             'dipole_moment' : output.dipoles[3],
             'dipole_vector' : np.array(output.dipoles[:3]),
             'job_dir'       : output.job_dir,
+            'job_scr_dir'   : output.job_scr_dir,
+            'server_job_id' : output.server_job_id
         }
 
         nOrbs = int(np.sqrt(len(output.mo_coeffs_a)))
