@@ -21,7 +21,7 @@ class TCProtobufClient(object):
     (i.e. TeraChem was started with the -s|--server flag)
     """
     def __init__(self, host, port, debug=False, trace=False,
-                 atoms=None, charge=0, spinmult=1, closed=None, restricted=None,
+                 atoms=None, charge=0, spinmult=1, closed_shell=None, restricted=None,
                  method=None, basis=None, **kwargs):
         """Initialize a TCProtobufClient object.
 
@@ -33,7 +33,7 @@ class TCProtobufClient(object):
             atoms: List of atoms types as strings
             charge: Total charge (int)
             spinmult: Spin multiplicity (int)
-            closed: Whether to run as closed-shell (bool)
+            closed_shell: Whether to run as closed-shell (bool)
             restricted: Whether to run as restricted (bool)
             method: TeraChem method (string)
             basis: TeraChem basis (string)
@@ -57,11 +57,11 @@ class TCProtobufClient(object):
         self.atoms_set = False
         self.charge_set = False
         self.spinmult_set = False
-        self.closed_set = False
+        self.closed_shell_set = False
         self.restricted_set = False
         self.method_set = False
         self.basis_set = False
-        self.update_options(atoms, charge, spinmult, closed, restricted, method, basis, **kwargs)
+        self.update_options(atoms, charge, spinmult, closed_shell, restricted, method, basis, **kwargs)
 
         self.prev_results = None
 
@@ -81,7 +81,7 @@ class TCProtobufClient(object):
         """
         self.disconnect() 
 
-    def setup(self, mol, closed=None, restricted=None):
+    def setup(self, mol, closed_shell=None, restricted=None):
         """Convenience routine to setup molecular parameters using a molecule object.
 
         Args:
@@ -93,9 +93,9 @@ class TCProtobufClient(object):
             raise AttributeError("Invalid argument to setup(). "
                                  "Attributes atoms, charge and multiplicity are required")
 
-        self.update_options(mol.atoms, mol.charge, mol.multiplicity, closed, restricted)
+        self.update_options(mol.atoms, mol.charge, mol.multiplicity, closed_shell, restricted)
 
-    def update_options(self, atoms=None, charge=None, spinmult=None, closed=None, restricted=None,
+    def update_options(self, atoms=None, charge=None, spinmult=None, closed_shell=None, restricted=None,
                        method=None, basis=None, **kwargs):
         """Update the TeraChem options of a TCProtobufClient object.
         If an argument is passed as None, the value does not change.
@@ -105,7 +105,7 @@ class TCProtobufClient(object):
             atoms:      List of atoms types as strings
             charge:     Total charge (int)
             spinmult:   Spin multiplicity (int)
-            closed:     Whether to run as closed-shell (bool)
+            closed_shell:     Whether to run as closed-shell (bool)
             restricted: Whether to run as restricted (bool)
             method:     TeraChem method (string)
             basis:      TeraChem basis (string)
@@ -128,25 +128,25 @@ class TCProtobufClient(object):
         if spinmult is not None:
             if not isinstance(spinmult, int):
                 raise TypeError("Spin multiplicity must be an integer")
-            if closed is None and self.tc_options.mol.closed is True and spinmult != 1:
-                print("WARNING: Spin multiplicity greater than 1 but molecule set as closed, setting closed to False")
-                closed = False
-            if closed is True and spinmult != 1:
-                print("WARNING: Molecule cannot be closed with a spin multiplicity greater than 1, setting closed to False")
-                closed = False
+            if closed_shell is None and self.tc_options.mol.closed is True and spinmult != 1:
+                print("WARNING: Spin multiplicity greater than 1 but molecule set as closed, setting closed_shell to False")
+                closed_shell = False
+            if closed_shell is True and spinmult != 1:
+                print("WARNING: Molecule cannot be closed with a spin multiplicity greater than 1, setting closed_shell to False")
+                closed_shell = False
             if restricted is None and self.tc_options.mol.restricted is True and spinmult != 1:
                 print("WARNING: Spin multiplicity greater than 1 but molecule set as restricted, setting restricted to False")
                 restricted = False
             if restricted is True and spinmult != 1:
                 print("WARNING: Cannot specify restricted with a spin multiplicity greater than 1, setting restricted to False")
                 restricted = False
-        if closed is not None and not isinstance(closed, bool):
+        if closed_shell is not None and not isinstance(closed_shell, bool):
             raise TypeError("Closed must be either True or False")
         if restricted is not None and not isinstance(restricted, bool):
             raise TypeError("Closed must be either True or False")
-        if closed is True and restricted is False:
-            print("WARNING: Cannot have a closed unrestricted system, setting to closed to False")
-            closed = False
+        if closed_shell is True and restricted is False:
+            print("WARNING: Cannot have a closed unrestricted system, setting to closed_shell to False")
+            closed_shell = False
 
         if method is not None:
             if not isinstance(method, basestring):
@@ -168,9 +168,9 @@ class TCProtobufClient(object):
         if spinmult is not None:
             self.tc_options.mol.multiplicity = spinmult
             self.spinmult_set = True
-        if closed is not None:
-            self.tc_options.mol.closed = closed
-            self.closed_set = True
+        if closed_shell is not None:
+            self.tc_options.mol.closed = closed_shell
+            self.closed_shell_set = True
         if restricted is not None:
             self.tc_options.mol.restricted = restricted
             self.restricted_set = True
@@ -184,7 +184,7 @@ class TCProtobufClient(object):
             self.basis_set = True
 
         if atoms is not None or charge is not None or spinmult is not None or \
-           closed is not None or restricted is not None or method is not None or basis is not None:
+           closed_shell is not None or restricted is not None or method is not None or basis is not None:
             del self.tc_options.guess_mo_coeffs_a[:]
             del self.tc_options.guess_mo_coeffs_b[:]
 
@@ -289,8 +289,8 @@ class TCProtobufClient(object):
             raise LookupError("send_job_async() called before charge was set.")
         if self.spinmult_set is False:
             raise LookupError("send_job_async() called before spin multiplicity was set.")
-        if self.closed_set is False:
-            raise LookupError("send_job_async() called before closed was set.")
+        if self.closed_shell_set is False:
+            raise LookupError("send_job_async() called before closed_shell was set.")
         if self.restricted_set is False:
             raise LookupError("send_job_async() called before restricted was set.")
         if self.method_set is False:
@@ -323,14 +323,21 @@ class TCProtobufClient(object):
 
         for key, value in kwargs.iteritems():
             if key == 'bond_order':
+                # Request Meyer bond order matrix
                 job_options.return_bond_order = value
+            elif key == 'geom2':
+                # Second geometry for ci_vec_overlap job
+                del self.tc_options.xyz2
+                self.tc_options.xyz2.extend(value)
             elif key in job_options.user_options:
+                # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)
                 if value is None:
                     del job_options.user_options[index:(index+1)]
                 else:
                     job_options.user_options[index+1] = str(value)
             elif key not in job_options.user_options and value is not None:
+                # New custom user option
                 job_options.user_options.extend([key, str(value)])
 
         self._send_msg(pb.JOBINPUT, job_options)
@@ -408,6 +415,9 @@ class TCProtobufClient(object):
             nAtoms = len(output.mol.atoms)
             results['bond_order'] = np.array(output.bond_order).reshape(nAtoms, nAtoms)
 
+        if len(output.ci_overlap_file):
+            results['ci_overlap_file'] = output.ci_overlap_file
+
         # Save results for user access later
         self.prev_results = results
 
@@ -479,6 +489,49 @@ class TCProtobufClient(object):
         """
         results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units)
         return results['energy'], -1.0*results['gradient']
+
+    def compute_ci_overlap(self, geom=None, geom2=None, cvec1file=None, cvec2file=None,
+        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, units=pb.Mol.BOHR):
+        """Compute wavefunction overlap given two different geometries, CI vectors, and orbitals,
+        using the same atom labels/charge/spin multiplicity as the previous calculation.
+        
+        To run a closed shell calculation, only populate orb1afile/orb2afile, leaving orb1bfile/orb2bfile blank.
+
+        Args:
+            geom:       Cartesian geometry of the first point
+            geom2:      Cartesian geometry of the second point
+            cvec1file:  Binary file of CI vector for first geometry (row-major, double64)
+            cvec2file:  Binary file of CI vector for second geometry (row-major, double64)
+            orb1afile:  Binary file of alpha MO coefficients for first geometry (row-major, double64)
+            orb1bfile:  Binary file of beta MO coefficients for first geometry (row-major, double64)
+            orb2afile:  Binary file of alpha MO coefficients for second geometry (row-major, double64)
+            orb2bfile:  Binary file of beta MO coefficients for second geometry (row-major, double64)
+            units:  Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
+
+        Returns the name of the binary file containing the wavefunction overlap (row-major, double64)
+        """
+        if geom is None or geom2 is None:
+            raise SyntaxError("Did not provide two geometries to compute_ci_overlap()")
+        if cvec1file is None or cvec2file is None:
+            raise SyntaxError("Did not provide two CI vectors to compute_ci_overlap()")
+        if orb1afile is None or orb1bfile is None:
+            raise SyntaxError("Did not provide two sets of orbitals to compute_ci_overlap()")
+        if (orb1bfile is not None and orb2bfile is None) or (orb1bfile is None and orb2bfile is not None) and self.tc_options.mol.closed is False:
+            raise SyntaxError("Did not provide two sets of open-shell orbitals to compute_ci_overlap()")
+        elif orb1bfile is not None and orb2bfile is not None and self.tc_options.mol.closed is True:
+            print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
+            
+        if self.tc_options.mol.closed:
+            results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units, geom2=geom2,
+                cvec1file=cvec1file, cvec2file=cvec2file,
+                orb1afile=orb1afile, orb2afile=orb2afile)
+        else:
+            results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units, geom2=geom2,
+                cvec1file=cvec1file, cvec2file=cvec2file,
+                orb1afile=orb1afile, orb1bfile=orb1bfile,
+                orb2afile=orb1bfile, orb2bfile=orb2bfile)
+            
+        return results['ci_overlap_file']
 
     # Private send/recv functions
     def _send_msg(self, msg_type, msg_pb):
