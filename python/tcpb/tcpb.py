@@ -98,23 +98,19 @@ class TCProtobufClient(object):
     def update_options(self, atoms=None, charge=None, spinmult=None, closed_shell=None, restricted=None,
                        method=None, basis=None, **kwargs):
         """Update the TeraChem options of a TCProtobufClient object.
+
         If an argument is passed as None, the value does not change.
         If a molecule option or basis is changed, TeraChem will regenerate MOs on next job.
 
         Args:
-            atoms:      List of atoms types as strings
-            charge:     Total charge (int)
-            spinmult:   Spin multiplicity (int)
-            closed_shell:     Whether to run as closed-shell (bool)
-            restricted: Whether to run as restricted (bool)
-            method:     TeraChem method (string)
-            basis:      TeraChem basis (string)
-            **kwargs:   Additional TeraChem keywords. Passing None as the value will wipe that keyword
-                        from the options of all future jobs
-                        Keywords that will be handled by the client:
-                        geom will set the coordinates of the client
-                        geom2 will set the coordinates of a second geometry for ci_vec_overlap jobs
-                        bond_order=True will return Meyer bond order matrix
+            atoms:          List of atoms types as strings
+            charge:         Total charge (int)
+            spinmult:       Spin multiplicity (int)
+            closed_shell:   Whether to run as closed-shell (bool)
+            restricted:     Whether to run as restricted (bool)
+            method:         TeraChem method (string)
+            basis:          TeraChem basis (string)
+            **kwargs:       Additional TeraChem keywords, see _process_kwargs for details
         """
         # Sanity checks
         if atoms is not None:
@@ -153,10 +149,12 @@ class TCProtobufClient(object):
             if not isinstance(method, basestring):
                 raise TypeError("TeraChem method must be a string")
             elif method.upper() not in pb.JobInput.MethodType.keys():
-                raise ValueError("Method specified is not available in this version of the TeraChem Protobuf server")
+                raise ValueError("Method specified is not available in this version of the TCPB client\n" \
+                                 "Allowed methods: {}".format(pb.JobInput.MethodType.keys()))
         if basis is not None:
             if not isinstance(basis, basestring):
                 raise TypeError("TeraChem basis must be a string")
+                # TODO: Check like method
 
         # Molecule options
         if atoms is not None:
@@ -189,20 +187,7 @@ class TCProtobufClient(object):
             del self.tc_options.guess_mo_coeffs_a[:]
             del self.tc_options.guess_mo_coeffs_b[:]
 
-        for key, value in kwargs.iteritems():
-            if key == 'geom':
-                del self.tc_options.mol.xyz[:]
-                self.tc_options.mol.xyz.extend(value)
-            elif key == 'bond_order':
-                self.tc_options.return_bond_order = value
-            elif key in self.tc_options.user_options:
-                index = self.tc_options.user_options.index(key)
-                if value is None:
-                    del self.tc_options.user_options[index:(index+1)]
-                else:
-                    self.tc_options.user_options[index+1] = str(value)
-            elif key not in self.tc_options.user_options and value is not None:
-                self.tc_options.user_options.extend([key, str(value)])
+        self._process_kwargs(self.tc_options, **kwargs)
 
     def update_address(self, host, port):
         """Update the host and port of a TCProtobufClient object.
@@ -270,16 +255,15 @@ class TCProtobufClient(object):
 
         return not status.busy
 
-    def send_job_async(self, jobType=pb.JobInput.ENERGY, geom=None, units=pb.Mol.BOHR, **kwargs):
+    def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
         This function expects a Status message back that either tells us whether the job was accepted.
 
         Args:
-            jobType:    Job type as defined in the pb.JobInput.RunType enum (defaults to RunType.ENERGY)
+            jobType:    Job type key, as defined in the pb.JobInput.RunType enum (defaults to "energy")
             geom:       Cartesian geometry of the new point
-            units:      Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
-            **kwargs:   Additional TeraChem keywords, overriding the default job options.
-                        For more info, look at update_options()
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to "bohr")
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
         Returns True on job acceptance, False on server busy, and errors out if communication fails
         """
@@ -298,52 +282,34 @@ class TCProtobufClient(object):
             raise LookupError("send_job_async() called before method was set.")
         if self.basis_set is False:
             raise LookupError("send_job_async() called before basis was set.")
+
+        if jobType.upper() not in pb.JobInput.RunType.keys():
+            raise ValueError("Job type specified is not available in this version of the TCPB client\n" \
+                             "Allowed run types: {}".format(pb.JobInput.RunType.keys()))
         if geom is None:
             raise SyntaxError("Did not provide geometry to send_job_async()")
         if isinstance(geom, np.ndarray):
             geom = geom.flatten()
         if len(self.tc_options.mol.atoms) != len(geom)/3.0:
             raise ValueError("Geometry does not match atom list in send_job_async()")
-        if units not in pb.Mol.UnitType.values():
-            # TODO: Could actually check real enum values here, would be more future proof that way
-            raise ValueError("Not allowed unit type. Only Angstrom (0) and Bohr (1) are allowed")
+        if unitType.upper() not in pb.Mol.UnitType.keys():
+            raise ValueError("Unit type specified is not available in this version of the TCPB client\n" \
+                             "Allowed unit types: {}".format(pb.Mol.UnitType.keys()))
 
         if self.debug:
             logging.info("in debug mode - assume job completed")
             return True
 
         # Job setup
+        self.tc_options.run = pb.JobInput.RunType.Value(jobType.upper())
         del self.tc_options.mol.xyz[:]
         self.tc_options.mol.xyz.extend(geom)
-        self.tc_options.mol.units = units
-        self.tc_options.run = jobType
+        self.tc_options.mol.units = pb.Mol.UnitType.Value(unitType.upper())
 
         # Handle kwargs for this specific job
         job_options = pb.JobInput()
         job_options.CopyFrom(self.tc_options)
-
-        for key, value in kwargs.iteritems():
-            if key == 'bond_order':
-                # Request Meyer bond order matrix
-                job_options.return_bond_order = value
-            elif key == 'geom2':
-                # Second geometry for ci_vec_overlap job
-                if isinstance(value, np.ndarray):
-                    value = value.flatten()
-                if len(self.tc_options.mol.atoms) != len(value)/3.0:
-                    raise ValueError("Geometry does not match atom list in send_job_async()")
-
-                job_options.xyz2.extend(value)
-            elif key in job_options.user_options:
-                # Overwrite currently defined custom user option
-                index = job_options.user_options.index(key)
-                if value is None:
-                    del job_options.user_options[index:(index+1)]
-                else:
-                    job_options.user_options[index+1] = str(value)
-            elif key not in job_options.user_options and value is not None:
-                # New custom user option
-                job_options.user_options.extend([key, str(value)])
+        self._process_kwargs(job_options, **kwargs)
 
         self._send_msg(pb.JOBINPUT, job_options)
 
@@ -430,25 +396,24 @@ class TCProtobufClient(object):
 
         return results
 
-    def compute_job_sync(self, jobType=pb.JobInput.ENERGY, geom=None, units=pb.Mol.BOHR, **kwargs):
+    def compute_job_sync(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Wrapper for send_job_async() and recv_job_async(), using check_job_complete() to poll the server.
 
         Args:
-            jobType:    Job type as defined in the pb.JobInput.RunType enum (defaults to RunType.ENERGY)
+            jobType:    Job type key, as defined in the pb.JobInput.RunType enum (defaults to 'energy')
             geom:       Cartesian geometry of the new point
-            units:      Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
-            **kwargs:   Additional TeraChem keywords, overriding the default job options.
-                        For more info, look at update_options()
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a results dictionary that mirrors the JobOutput message, using NumPy arrays when possible
+        Returns a results dictionary that mirrors the JobOutput message, using reshaped NumPy arrays when possible
         """
         if self.debug:
             logging.info("in debug mode - assume compute_job_sync completed successfully")
             return True
 
-        accepted = self.send_job_async(jobType, geom, units, **kwargs)
+        accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
         while accepted is False:
-            accepted = self.send_job_async(jobType, geom, units, **kwargs)
+            accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
 
         completed = self.check_job_complete()
         while completed is False:
@@ -457,52 +422,53 @@ class TCProtobufClient(object):
         return self.recv_job_async()
 
     # CONVENIENCE FUNCTIONS #
-    def compute_energy(self, geom=None, units=pb.Mol.BOHR):
+    def compute_energy(self, geom=None, unitType="bohr"):
         """Compute energy of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
-            geom:   Cartesian geometry of the new point
-            units:  Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
+            geom:       Cartesian geometry of the new point
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
 
         Returns energy
         """
-        results = self.compute_job_sync(pb.JobInput.ENERGY, geom, units)
+        results = self.compute_job_sync("energy", geom, unitType)
         return results['energy']
 
-    def compute_gradient(self, geom=None, units=pb.Mol.BOHR):
+    def compute_gradient(self, geom=None, unitType="bohr"):
         """Compute gradient of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
-            geom:   Cartesian geometry of the new point
-            units:  Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
+            geom:       Cartesian geometry of the new point
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
 
         Returns a tuple of (energy, gradient)
         """
-        results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units)
+        results = self.compute_job_sync("gradient", geom, unitType)
         return results['energy'], results['gradient']
 
     # Convenience to maintain compatibility with NanoReactor2
-    def compute_forces(self, geom=None, units=pb.Mol.BOHR):
+    def compute_forces(self, geom=None, unitType="bohr"):
         """Compute forces of a new geometry, but with the same atoms labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
-            geom:   Cartesian geometry of the new point
-            units:  Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
+            geom:       Cartesian geometry of the new point
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
 
         Returns a tuple of (energy, forces), which is really (energy, -gradient)
         """
-        results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units)
+        results = self.compute_job_sync("gradient", geom, unitType)
         return results['energy'], -1.0*results['gradient']
 
     def compute_ci_overlap(self, geom=None, geom2=None, cvec1file=None, cvec2file=None,
-        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, units=pb.Mol.BOHR):
+        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, unitType="bohr"):
         """Compute wavefunction overlap given two different geometries, CI vectors, and orbitals,
         using the same atom labels/charge/spin multiplicity as the previous calculation.
         
         To run a closed shell calculation, only populate orb1afile/orb2afile, leaving orb1bfile/orb2bfile blank.
+        Currently, open-shell overlap calculations are not supported by TeraChem.
 
         Args:
             geom:       Cartesian geometry of the first point
@@ -513,7 +479,7 @@ class TCProtobufClient(object):
             orb1bfile:  Binary file of beta MO coefficients for first geometry (row-major, double64)
             orb2afile:  Binary file of alpha MO coefficients for second geometry (row-major, double64)
             orb2bfile:  Binary file of beta MO coefficients for second geometry (row-major, double64)
-            units:  Units as defined in the pb.Mol.UnitType enum (defaults to UnitType.BOHR)
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
 
         Returns the name of the binary file containing the wavefunction overlap (row-major, double64)
         """
@@ -529,16 +495,73 @@ class TCProtobufClient(object):
             print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
             
         if self.tc_options.mol.closed:
-            results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units, geom2=geom2,
+            results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
                 cvec1file=cvec1file, cvec2file=cvec2file,
                 orb1afile=orb1afile, orb2afile=orb2afile)
         else:
-            results = self.compute_job_sync(pb.JobInput.GRADIENT, geom, units, geom2=geom2,
+            raise RuntimeError("WARNING: Open-shell systems are currently not supported for overlaps")
+            
+            results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
                 cvec1file=cvec1file, cvec2file=cvec2file,
                 orb1afile=orb1afile, orb1bfile=orb1bfile,
                 orb2afile=orb1bfile, orb2bfile=orb2bfile)
             
+        # TODO: Actually pass overlap
+
         return results['ci_overlap_file']
+
+    # Private kwarg helper function
+    def _process_kwargs(self, job_options, **kwargs):
+        """Process user-provided keyword arguments into a JobInput object
+        
+        Several keywords are processed by the client to set more complex fields
+        in the Protobuf messages. These are:
+            geom:       Sets job_options.mol.xyz from a list or NumPy array
+            geom2:      Sets job_options.xyz2 from a list or NumPy array
+            bond_order: Sets job_options.return_bond_order to True or False
+        All others are passed through as key-value pairs to the server, which will
+        place them in the start file.
+        Passing None to a previously set option will remove it from job_options
+
+        Args:
+            job_options: Target JobInput object
+            **kwargs: Keyword arguments passed by user
+        """
+        for key, value in kwargs.iteritems():
+            if key == 'geom':
+                # Standard geometry, usually handled in other calling functions but here just in case
+                if isinstance(value, np.ndarray):
+                    value = value.flatten()
+                if len(self.tc_options.mol.atoms) != len(value)/3.0:
+                    raise ValueError("Geometry provided to geom does not match atom list")
+
+                del job_options.mol.xyz[:]
+                job_options.mol.xyz.extend(value)
+            elif key == 'geom2':
+                # Second geometry for ci_vec_overlap job
+                if isinstance(value, np.ndarray):
+                    value = value.flatten()
+                if len(self.tc_options.mol.atoms) != len(value)/3.0:
+                    raise ValueError("Geometry provided to geom2 does not match atom list")
+
+                del job_options.xyz2[:]
+                job_options.xyz2.extend(value)
+            elif key == 'bond_order':
+                # Request Meyer bond order matrix
+                if value is not True and value is not False:
+                    raise ValueError("Bond order request must be True or False")
+
+                job_options.return_bond_order = value
+            elif key in job_options.user_options:
+                # Overwrite currently defined custom user option
+                index = job_options.user_options.index(key)
+                if value is None:
+                    del job_options.user_options[index:(index+1)]
+                else:
+                    job_options.user_options[index+1] = str(value)
+            elif key not in job_options.user_options and value is not None:
+                # New custom user option
+                job_options.user_options.extend([key, str(value)])
 
     # Private send/recv functions
     def _send_msg(self, msg_type, msg_pb):
