@@ -153,7 +153,8 @@ message JobOutput {
 
   //Job specific output
   // CI_VEC_OVERLAP
-  string ci_overlap_file = 17;
+  repeated double ci_overlaps = 17;
+  int32 ci_overlap_size = 18;
 
   //Bond order matrix
   repeated double bond_order = 16;

@@ -388,8 +388,8 @@ class TCProtobufClient(object):
             nAtoms = len(output.mol.atoms)
             results['bond_order'] = np.array(output.bond_order).reshape(nAtoms, nAtoms)
 
-        if len(output.ci_overlap_file):
-            results['ci_overlap_file'] = output.ci_overlap_file
+        if len(output.ci_overlaps):
+            results['ci_overlap'] = np.array(output.ci_overlaps).reshape(output.ci_overlap_size, output.ci_overlap_size)
 
         # Save results for user access later
         self.prev_results = results
@@ -481,7 +481,7 @@ class TCProtobufClient(object):
             orb2bfile:  Binary file of beta MO coefficients for second geometry (row-major, double64)
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
 
-        Returns the name of the binary file containing the wavefunction overlap (row-major, double64)
+        Returns a NumPy array of state overlaps
         """
         if geom is None or geom2 is None:
             raise SyntaxError("Did not provide two geometries to compute_ci_overlap()")
@@ -493,22 +493,23 @@ class TCProtobufClient(object):
             raise SyntaxError("Did not provide two sets of open-shell orbitals to compute_ci_overlap()")
         elif orb1bfile is not None and orb2bfile is not None and self.tc_options.mol.closed is True:
             print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
-            
+
+        # Wipe MO coefficients
+        del self.tc_options.guess_mo_coeffs_a[:]
+        del self.tc_options.guess_mo_coeffs_b[:]
+
         if self.tc_options.mol.closed:
             results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
                 cvec1file=cvec1file, cvec2file=cvec2file,
                 orb1afile=orb1afile, orb2afile=orb2afile)
         else:
             raise RuntimeError("WARNING: Open-shell systems are currently not supported for overlaps")
+            #results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
+            #    cvec1file=cvec1file, cvec2file=cvec2file,
+            #    orb1afile=orb1afile, orb1bfile=orb1bfile,
+            #    orb2afile=orb1bfile, orb2bfile=orb2bfile)
             
-            results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
-                cvec1file=cvec1file, cvec2file=cvec2file,
-                orb1afile=orb1afile, orb1bfile=orb1bfile,
-                orb2afile=orb1bfile, orb2bfile=orb2bfile)
-            
-        # TODO: Actually pass overlap
-
-        return results['ci_overlap_file']
+        return results['ci_overlap']
 
     # Private kwarg helper function
     def _process_kwargs(self, job_options, **kwargs):

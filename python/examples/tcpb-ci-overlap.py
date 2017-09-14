@@ -44,7 +44,7 @@ with TCPBClient('localhost', 54321, method='hf', basis='6-31g**') as TC:
         "directci":     "yes",
         "caswritevecs": "yes"
     }
-    results = TC.compute_job_sync("energy", geom, **options)
+    results = TC.compute_job_sync("energy", geom, "angstrom", **options)
 
     # Run ci_vec_overlap job based on last job
     options = {
@@ -54,6 +54,6 @@ with TCPBClient('localhost', 54321, method='hf', basis='6-31g**') as TC:
         "orb1afile":    path.join(results['job_scr_dir'], "c0"),
         "orb2afile":    path.join(results['job_scr_dir'], "c0")
     }
-    results = TC.compute_job_sync("ci_vec_overlap", geom, **options)
+    results = TC.compute_job_sync("ci_vec_overlap", geom, "angstrom", **options)
 
-    print("Overlap file written to: {}".format(results['ci_overlap_file']))
+    print("Overlap:\n{}".format(results['ci_overlap']))
