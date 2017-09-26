@@ -184,8 +184,8 @@ class TCProtobufClient(object):
 
         if atoms is not None or charge is not None or spinmult is not None or \
            closed_shell is not None or restricted is not None or method is not None or basis is not None:
-            del self.tc_options.guess_mo_coeffs_a[:]
-            del self.tc_options.guess_mo_coeffs_b[:]
+            self.tc_options.orb1afile = ""
+            self.tc_options.orb1bfile = ""
 
         self._process_kwargs(self.tc_options, **kwargs)
 
@@ -357,17 +357,14 @@ class TCProtobufClient(object):
         output = self._recv_msg(pb.JOBOUTPUT)
 
         # Set MOs for next job
-        del self.tc_options.guess_mo_coeffs_a[:]
-        del self.tc_options.guess_mo_coeffs_b[:]
-        self.tc_options.guess_mo_coeffs_a.extend(output.mo_coeffs_a)
-        self.tc_options.guess_mo_coeffs_b.extend(output.mo_coeffs_b)
+        self.tc_options.orb1afile = output.orb1afile
+        self.tc_options.orb1bfile = output.orb1bfile
 
         # Parse output into normal python dictionary
         results = {
             'atoms'         : np.array(output.mol.atoms, dtype='S2'),
             'geom'          : np.array(output.mol.xyz).reshape(-1, 3),
             'energy'        : output.energy,
-            'gradient'      : np.array(output.gradient).reshape(-1, 3),
             'charges'       : np.array(output.charges),
             'spins'         : np.array(output.spins),
             'dipole_moment' : output.dipoles[3],
@@ -377,12 +374,14 @@ class TCProtobufClient(object):
             'server_job_id' : output.server_job_id
         }
 
-        nOrbs = int(np.sqrt(len(output.mo_coeffs_a)))
         if output.mol.restricted is True:
-            results['mo_coeffs'] = np.array(output.mo_coeffs_a).reshape(nOrbs, nOrbs)
+            results['mo_coeffs'] = read_orbfile(output.orb1afile)
         else:
-            results['mo_coeffs_a'] = np.array(output.mo_coeffs_a).reshape(nOrbs, nOrbs)
-            results['mo_coeffs_b'] = np.array(output.mo_coeffs_b).reshape(nOrbs, nOrbs)
+            results['mo_coeffs_a'] = read_orbfile(output.orb1afile)
+            results['mo_coeffs_b'] = read_orbfile(output.orb1bfile)
+
+        if len(output.gradient):
+            results['gradient'] = np.array(output.gradient).reshape(-1, 3)
 
         if len(output.bond_order):
             nAtoms = len(output.mol.atoms)
@@ -390,6 +389,7 @@ class TCProtobufClient(object):
 
         if len(output.ci_overlaps):
             results['ci_overlap'] = np.array(output.ci_overlaps).reshape(output.ci_overlap_size, output.ci_overlap_size)
+            results['ci_overlap_size'] = output.ci_overlap_size
 
         # Save results for user access later
         self.prev_results = results
@@ -495,8 +495,8 @@ class TCProtobufClient(object):
             print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
 
         # Wipe MO coefficients
-        del self.tc_options.guess_mo_coeffs_a[:]
-        del self.tc_options.guess_mo_coeffs_b[:]
+        self.tc_options.orb1afile = ""
+        self.tc_options.orb1bfile = ""
 
         if self.tc_options.mol.closed:
             results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
@@ -510,6 +510,34 @@ class TCProtobufClient(object):
             #    orb2afile=orb1bfile, orb2bfile=orb2bfile)
             
         return results['ci_overlap']
+
+    # Serialization helper functions
+    def read_orbfile(self, orbfile, num_rows, num_cols):
+        """Deserialize a TeraChem binary orbital file of doubles.
+
+        Args:
+            orbfile: Filename of orbital file to read
+            num_rows: Rows in MO coefficient matrix
+            num_cols: Columns in MO coefficient matrix
+        Returns a (num_rows, num_cols) NumPy array of MO coefficients
+        """
+        orbs = np.fromfile(orbfile, dtype=np.float64)
+
+        return orbs.reshape((num_rows, num_cols))
+
+    def write_orbfile(self, orbs, orbfile):
+        """Serialize a TeraChem binary orbital file of doubles.
+
+        Args:
+            orbs: NumPy array or list of MO coefficients
+            orbfile: Filename of orbital file to write 
+        """
+        if isinstance(orbs, np.ndarray):
+            orbs = orbs.flatten().astype(np.float64)
+        else:
+            orbs = np.asarray(orbs, dtype=np.float64)
+
+        orbs.tofile(orbfile)
 
     # Private kwarg helper function
     def _process_kwargs(self, job_options, **kwargs):

@@ -104,8 +104,7 @@ message JobInput {
   string basis = 4;
 
   // MO Guess
-  repeated double guess_mo_coeffs_a = 5; //If restricted, only fill this one
-  repeated double guess_mo_coeffs_b = 6;
+  // Tags 5&6 were used for guess_mo_coeffs_a/b in r0.2.0 and earlier
   string orb1afile = 8; // If restricted, only fill this one
   string orb1bfile = 9;
 
@@ -116,8 +115,8 @@ message JobInput {
   // Job specific inputs
   // CI_VEC_OVERLAP
   // Requires a second geometry
-  // Also requires 2 CI vectors, a second set of orbital files, and all CAS options
-  // The latter are not explicitly defined, and are handled by user_options
+  // Also requires 2 CI vector files, a second set of orbital files, and all CAS options
+  // The latter are not explicitly defined since they are just strings (handled by user_options)
   repeated double xyz2 = 17;
 
   // OUTPUT REQUESTS
@@ -129,8 +128,7 @@ message JobOutput {
   Mol mol = 1;
 
   // Energy (run dependent)
-  // TODO: Do we want to use oneof and have many explicit energy parameters?
-  double energy = 2;
+  repeated double energy = 2;
 
   // Gradient
   repeated double gradient = 3;
@@ -143,8 +141,10 @@ message JobOutput {
   repeated double dipoles = 6;
 
   //MO coefficients
-  repeated double mo_coeffs_a = 7; //If restricted, only check this for full guess
-  repeated double mo_coeffs_b = 8; //If restricted, this should be empty
+  // Tags 7 & 8 were used for mo_coeffs_a/b in r0.2.0 and earlier
+  string orb1afile = 12; //If restricted, only fill this one
+  string orb1bfile = 13;
+  int32 orb_size = 14;
 
   //Job directory, so the user can go get more info if they want
   string job_dir = 9;

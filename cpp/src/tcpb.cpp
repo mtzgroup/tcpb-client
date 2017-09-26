@@ -70,8 +70,8 @@ void TCPBClient::SetAtoms(const char** atoms,
   atomsSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 void TCPBClient::SetCharge(const int charge) {
@@ -80,8 +80,8 @@ void TCPBClient::SetCharge(const int charge) {
   chargeSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 void TCPBClient::SetSpinMult(const int spinMult) {
@@ -90,8 +90,8 @@ void TCPBClient::SetSpinMult(const int spinMult) {
   spinMultSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 void TCPBClient::SetClosed(const bool closed) {
@@ -100,8 +100,8 @@ void TCPBClient::SetClosed(const bool closed) {
   closedSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 void TCPBClient::SetRestricted(const bool restricted) {
@@ -110,8 +110,8 @@ void TCPBClient::SetRestricted(const bool restricted) {
   restrictedSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 void TCPBClient::SetMethod(const char* method) {
@@ -138,8 +138,8 @@ void TCPBClient::SetMethod(const char* method) {
   methodSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 
   free(methodUpper);
 }
@@ -150,8 +150,8 @@ void TCPBClient::SetBasis(const char* basis) {
   basisSet = true;
 
   // Clear MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
+  jobInput_.clear_orb1afile();
+  jobInput_.clear_orb1bfile();
 }
 
 /***********************
@@ -159,7 +159,7 @@ void TCPBClient::SetBasis(const char* basis) {
  ***********************/
 
 void TCPBClient::GetEnergy(double& energy) {
-  energy = jobOutput_.energy();
+  energy = jobOutput_.energy(0);
 }
 
 void TCPBClient::GetGradient(double* gradient) {
@@ -398,22 +398,8 @@ void TCPBClient::RecvJobAsync() {
   //printf("Received job output:\n%s\n", jobOutput_.DebugString().c_str());
 
   // Save MO coeffs
-  jobInput_.clear_guess_mo_coeffs_a();
-  jobInput_.clear_guess_mo_coeffs_b();
-  aSize = jobOutput_.mo_coeffs_a_size();
-  bSize = jobOutput_.mo_coeffs_b_size();
-  if (aSize) {
-    jobInput_.mutable_guess_mo_coeffs_a()->Resize(aSize, 0.0);
-    memcpy(jobInput_.mutable_guess_mo_coeffs_a()->mutable_data(),
-           jobOutput_.mutable_mo_coeffs_a()->mutable_data(),
-           aSize*sizeof(double));
-  }
-  if (bSize) {
-    jobInput_.mutable_guess_mo_coeffs_b()->Resize(bSize, 0.0);
-    memcpy(jobInput_.mutable_guess_mo_coeffs_b()->mutable_data(),
-           jobOutput_.mutable_mo_coeffs_b()->mutable_data(),
-           bSize*sizeof(double));
-  }
+  jobInput_.set_orb1afile(jobOutput_.orb1afile());
+  jobInput_.set_orb1bfile(jobOutput_.orb1bfile());
 }
 
 void TCPBClient::ComputeJobSync(const terachem_server::JobInput_RunType runType,
