@@ -375,10 +375,13 @@ class TCProtobufClient(object):
         }
 
         if output.mol.restricted is True:
-            results['mo_coeffs'] = read_orbfile(output.orb1afile)
+            results['orbfile'] = output.orb1afile
+            results['mo_coeffs'] = self.read_orbfile(output.orb1afile, output.orb_size, output.orb_size)
         else:
-            results['mo_coeffs_a'] = read_orbfile(output.orb1afile)
-            results['mo_coeffs_b'] = read_orbfile(output.orb1bfile)
+            results['orbfile_a'] = output.orb1afile
+            results['orbfile_b'] = output.orb1bfile
+            results['mo_coeffs_a'] = self.read_orbfile(output.orb1afile, output.orb_size, output.orb_size)
+            results['mo_coeffs_b'] = self.read_orbfile(output.orb1bfile, output.orb_size, output.orb_size)
 
         if len(output.gradient):
             results['gradient'] = np.array(output.gradient).reshape(-1, 3)
@@ -389,7 +392,6 @@ class TCProtobufClient(object):
 
         if len(output.ci_overlaps):
             results['ci_overlap'] = np.array(output.ci_overlaps).reshape(output.ci_overlap_size, output.ci_overlap_size)
-            results['ci_overlap_size'] = output.ci_overlap_size
 
         # Save results for user access later
         self.prev_results = results
