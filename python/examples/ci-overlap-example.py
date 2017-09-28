@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 # Test of ci_vec_overlap job through TCPB
 
-from os import path
-
-from tcpb.tcpb import TCProtobufClient as TCPBClient
+from tcpb import TCProtobufClient as TCPBClient
 
 # Ethylene system
 atoms = ['C', 'C', 'H', 'H', 'H', 'H']

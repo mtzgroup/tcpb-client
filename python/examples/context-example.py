@@ -1,8 +1,7 @@
-#
-# Simple example of how to use python and protobuf to interface with a terachem instance, not for general use, too brittle.
-#
+#!/usr/bin/env python
+# Basic TCProtobufClient usage using with context
 
-from tcpb.tcpb import TCProtobufClient
+from tcpb import TCProtobufClient
 
 # Water system
 atoms = ['O', 'H', 'H']
@@ -15,7 +14,6 @@ geom = [0.00000,  0.00000, -0.06852,
 # Most parameters can be passed into constructor, but you can also use update_options to reset options later
 with TCProtobufClient(host='localhost', port=54321) as TC:
     TC.update_options(atoms=atoms, charge=0, spinmult=1, closed_shell=True, restricted=True, method='pbe0', basis='6-31g')
-
     print TC.tc_options
 
     # Check if the server is available

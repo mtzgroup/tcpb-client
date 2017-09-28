@@ -119,6 +119,11 @@ message JobInput {
   // The latter are not explicitly defined since they are just strings (handled by user_options)
   repeated double xyz2 = 17;
 
+  // CAS specific options
+  // Target state and mult must come in pairs
+  repeated int32 cas_energy_states = 18;
+  repeated int32 cas_energy_mults = 19;
+
   // OUTPUT REQUESTS
   bool return_bond_order = 16; // Want Meyer bond order matrix in output
 }
@@ -155,6 +160,11 @@ message JobOutput {
   // CI_VEC_OVERLAP
   repeated double ci_overlaps = 17;
   int32 ci_overlap_size = 18;
+
+  // CAS specific output
+  // States/mult will just match input
+  repeated int32 cas_energy_states = 19;
+  repeated int32 cas_energy_mults = 20;
 
   //Bond order matrix
   repeated double bond_order = 16;

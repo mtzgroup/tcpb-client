@@ -352,7 +352,30 @@ class TCProtobufClient(object):
         This function expects the job to be ready (i.e. check_job_complete() returned true),
         so will error out on timeout.
 
-        Returns a results dictionary that mirrors the JobOutput message, using NumPy arrays when possible
+        Creates a results dictionary that mirrors the JobOutput message, using NumPy arrays when appropriate.
+        Results are also saved in the prev_results class member.
+        An inclusive list of the results members (with types):
+            atoms:              Flat # of atoms NumPy array of 2-character strings
+            geom:               # of atoms by 3 NumPy array of doubles
+            energy:             Either empty, single energy, or flat # of cas_energy_labels of NumPy array of doubles
+            charges:            Flat # of atoms NumPy array of doubles
+            spins:              Flat # of atoms NumPy array of doubles
+            dipole_moment:      Single element
+            dipole_vector:      Flat 3-element NumPy array of doubles
+            job_dir:            String
+            job_scr_dir:        String
+            server_job_id:      Int
+            orbfile:            String (if restricted is True, otherwise not included)
+            orbfile_a:          String (if restricted is False, otherwise not included)
+            orbfile_b:          String (if restricted is False, otherwise not included)
+        Additional (optional) members of results:
+            gradient:           # of atoms by 3 NumPy array of doubles (if available)
+            cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
+            bond_order:         # of atoms by # of atoms NumPy array of doubles
+            ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles
+        Also sets the orbital files from the JobOutput message into the next JobInput message.
+
+        Returns the results dictionary.
         """
         output = self._recv_msg(pb.JOBOUTPUT)
 
@@ -363,35 +386,38 @@ class TCProtobufClient(object):
         # Parse output into normal python dictionary
         results = {
             'atoms'         : np.array(output.mol.atoms, dtype='S2'),
-            'geom'          : np.array(output.mol.xyz).reshape(-1, 3),
-            'energy'        : output.energy,
-            'charges'       : np.array(output.charges),
-            'spins'         : np.array(output.spins),
+            'geom'          : np.array(output.mol.xyz, dtype=np.float64).reshape(-1, 3),
+            'charges'       : np.array(output.charges, dtype=np.float64),
+            'spins'         : np.array(output.spins, dtype=np.float64),
             'dipole_moment' : output.dipoles[3],
-            'dipole_vector' : np.array(output.dipoles[:3]),
+            'dipole_vector' : np.array(output.dipoles[:3], dtype=np.float64),
             'job_dir'       : output.job_dir,
             'job_scr_dir'   : output.job_scr_dir,
             'server_job_id' : output.server_job_id
         }
 
+        if len(output.energy):
+            results['energy'] = output.energy[0]
+
         if output.mol.restricted is True:
             results['orbfile'] = output.orb1afile
-            results['mo_coeffs'] = self.read_orbfile(output.orb1afile, output.orb_size, output.orb_size)
         else:
             results['orbfile_a'] = output.orb1afile
             results['orbfile_b'] = output.orb1bfile
-            results['mo_coeffs_a'] = self.read_orbfile(output.orb1afile, output.orb_size, output.orb_size)
-            results['mo_coeffs_b'] = self.read_orbfile(output.orb1bfile, output.orb_size, output.orb_size)
 
         if len(output.gradient):
-            results['gradient'] = np.array(output.gradient).reshape(-1, 3)
+            results['gradient'] = np.array(output.gradient, dtype=np.float64).reshape(-1, 3)
+
+        if len(output.cas_energy_states):
+            results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)
+            results['cas_energy_labels'] = zip(output.cas_energy_states, output.cas_energy_mults)
 
         if len(output.bond_order):
             nAtoms = len(output.mol.atoms)
-            results['bond_order'] = np.array(output.bond_order).reshape(nAtoms, nAtoms)
+            results['bond_order'] = np.array(output.bond_order, dtype=np.float64).reshape(nAtoms, nAtoms)
 
         if len(output.ci_overlaps):
-            results['ci_overlap'] = np.array(output.ci_overlaps).reshape(output.ci_overlap_size, output.ci_overlap_size)
+            results['ci_overlap'] = np.array(output.ci_overlaps, dtype=np.float64).reshape(output.ci_overlap_size, output.ci_overlap_size)
 
         # Save results for user access later
         self.prev_results = results
@@ -547,9 +573,10 @@ class TCProtobufClient(object):
         
         Several keywords are processed by the client to set more complex fields
         in the Protobuf messages. These are:
-            geom:       Sets job_options.mol.xyz from a list or NumPy array
-            geom2:      Sets job_options.xyz2 from a list or NumPy array
-            bond_order: Sets job_options.return_bond_order to True or False
+            geom:               Sets job_options.mol.xyz from a list or NumPy array
+            geom2:              Sets job_options.xyz2 from a list or NumPy array
+            bond_order:         Sets job_options.return_bond_order to True or False
+            cas_energy_labels:  Sets job_options.cas_energy_states and job_options.cas_energy_mults from a list of (state, mult) tuples
         All others are passed through as key-value pairs to the server, which will
         place them in the start file.
         Passing None to a previously set option will remove it from job_options
@@ -583,6 +610,14 @@ class TCProtobufClient(object):
                     raise ValueError("Bond order request must be True or False")
 
                 job_options.return_bond_order = value
+            elif key == 'cas_energy_labels':
+                state_labels = [label[0] for label in value]
+                mult_labels = [label[1] for label in value]
+
+                del job_options.cas_energy_states[:]
+                del job_options.cas_energy_mults[:]
+                job_options.cas_energy_states.extend(state_labels)
+                job_options.cas_energy_mults.extend(mult_labels)
             elif key in job_options.user_options:
                 # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)

@@ -1,8 +1,7 @@
-#
-# Simple example of how to use python and protobuf to interface with a terachem instance, not for general use, too brittle.
-#
+#!/usr/bin/env python
+# Basic TCProtobufClient usage
 
-from tcpb.tcpb import TCProtobufClient
+from tcpb import TCProtobufClient
 
 # Water system
 atoms = ['O', 'H', 'H']
