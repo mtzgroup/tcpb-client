@@ -408,6 +408,9 @@ class TCProtobufClient(object):
         if len(output.gradient):
             results['gradient'] = np.array(output.gradient, dtype=np.float64).reshape(-1, 3)
 
+        if len(output.nacme):
+            results['nacme'] = np.array(output.nacme, dtype=np.float64).reshape(-1, 3)
+
         if len(output.cas_energy_states):
             results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)
             results['cas_energy_labels'] = zip(output.cas_energy_states, output.cas_energy_mults)
@@ -450,48 +453,66 @@ class TCProtobufClient(object):
         return self.recv_job_async()
 
     # CONVENIENCE FUNCTIONS #
-    def compute_energy(self, geom=None, unitType="bohr"):
+    def compute_energy(self, geom=None, unitType="bohr", **kwargs):
         """Compute energy of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
         Returns energy
         """
-        results = self.compute_job_sync("energy", geom, unitType)
+        results = self.compute_job_sync("energy", geom, unitType, **kwargs)
         return results['energy']
 
-    def compute_gradient(self, geom=None, unitType="bohr"):
+    def compute_gradient(self, geom=None, unitType="bohr", **kwargs):
         """Compute gradient of a new geometry, but with the same atom labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
         Returns a tuple of (energy, gradient)
         """
-        results = self.compute_job_sync("gradient", geom, unitType)
+        results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
         return results['energy'], results['gradient']
 
     # Convenience to maintain compatibility with NanoReactor2
-    def compute_forces(self, geom=None, unitType="bohr"):
+    def compute_forces(self, geom=None, unitType="bohr", **kwargs):
         """Compute forces of a new geometry, but with the same atoms labels/charge/spin
         multiplicity and wave function format as the previous calculation.
 
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
         Returns a tuple of (energy, forces), which is really (energy, -gradient)
         """
-        results = self.compute_job_sync("gradient", geom, unitType)
+        results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
         return results['energy'], -1.0*results['gradient']
 
+    def compute_coupling(self, geom=None, unitType="bohr", **kwargs):
+        """Compute nonadiabatic coupling of a new geometry, but with the same atoms labels/charge/spin
+        multiplicity and wave function format as the previous calculation.
+
+        Args:
+            geom:       Cartesian geometry of the new point
+            unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+
+        Returns a len(atoms) by 3 NumPy array of doubles of the nonadiabatic coupling vector
+        """
+        results = self.compute_job_sync("coupling", geom, unitType, **kwargs)
+        return results['nacme']
+
+
     def compute_ci_overlap(self, geom=None, geom2=None, cvec1file=None, cvec2file=None,
-        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, unitType="bohr"):
+        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, unitType="bohr", **kwargs):
         """Compute wavefunction overlap given two different geometries, CI vectors, and orbitals,
         using the same atom labels/charge/spin multiplicity as the previous calculation.
         
@@ -508,6 +529,7 @@ class TCProtobufClient(object):
             orb2afile:  Binary file of alpha MO coefficients for second geometry (row-major, double64)
             orb2bfile:  Binary file of beta MO coefficients for second geometry (row-major, double64)
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
+            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
         Returns a NumPy array of state overlaps
         """
@@ -529,13 +551,13 @@ class TCProtobufClient(object):
         if self.tc_options.mol.closed:
             results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
                 cvec1file=cvec1file, cvec2file=cvec2file,
-                orb1afile=orb1afile, orb2afile=orb2afile)
+                orb1afile=orb1afile, orb2afile=orb2afile, **kwargs)
         else:
             raise RuntimeError("WARNING: Open-shell systems are currently not supported for overlaps")
             #results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
             #    cvec1file=cvec1file, cvec2file=cvec2file,
             #    orb1afile=orb1afile, orb1bfile=orb1bfile,
-            #    orb2afile=orb1bfile, orb2bfile=orb2bfile)
+            #    orb2afile=orb1bfile, orb2bfile=orb2bfile, **kwargs)
             
         return results['ci_overlap']
 
@@ -553,7 +575,7 @@ class TCProtobufClient(object):
         """
         orbs = np.fromfile(orbfile, dtype=np.float64)
 
-        orbs = orbs.reshape((num_rows, num_cols)
+        orbs = orbs.reshape((num_rows, num_cols))
 
         if orbfile.endswith('c0') or orbfile.endswith('ca0') or orbfile.endswith('cb0'):
             orbs = orbs.transpose()

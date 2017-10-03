@@ -13,8 +13,8 @@ geom = [0.00000,  0.00000, -0.06852,
 # Set up client for h2o job
 # Most parameters can be passed into constructor, but you can also use update_options to reset options later
 TC = TCProtobufClient(host='localhost', port=54321)
-TC.update_options(atoms=atoms, charge=0, spinmult=1, closed_shell=True, restricted=True, method='pbe0', basis='6-31g')
 
+TC.update_options(atoms=atoms, charge=0, spinmult=1, closed_shell=True, restricted=True, method='pbe0', basis='6-31g')
 print TC.tc_options
 
 TC.connect()
