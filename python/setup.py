@@ -17,5 +17,6 @@ setup(name="tcpb",
       packages=["tcpb"],
       test_suite="tcpb",
       long_description="""Python client for TeraChem Protocol Buffer server""",
-      install_requires=['google>=1.9.3','protobuf>=3.2.0','numpy>=1.13']
+      # Test with google>=2 and could not import google.protobuf.internal
+      install_requires=['google==1.9.3','protobuf>=3.2.0','numpy>=1.13']
       )
