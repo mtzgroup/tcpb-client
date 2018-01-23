@@ -369,10 +369,12 @@ class TCProtobufClient(object):
             orbfile_a:          String (if restricted is False, otherwise not included)
             orbfile_b:          String (if restricted is False, otherwise not included)
         Additional (optional) members of results:
-            gradient:           # of atoms by 3 NumPy array of doubles (if available)
+            gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
+            nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
+            transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
             cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
             bond_order:         # of atoms by # of atoms NumPy array of doubles
-            ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles
+            ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
         Also sets the orbital files from the JobOutput message into the next JobInput message.
 
         Returns the results dictionary.
@@ -410,6 +412,9 @@ class TCProtobufClient(object):
 
         if len(output.nacme):
             results['nacme'] = np.array(output.nacme, dtype=np.float64).reshape(-1, 3)
+
+        if len(output.cas_transition_dipole):
+            results['transition_dipole'] = np.array(output.cas_transition_dipole, dtype=np.float64)
 
         if len(output.cas_energy_states):
             results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)

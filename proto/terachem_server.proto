@@ -169,6 +169,7 @@ message JobOutput {
   // States/mult will just match input
   repeated int32 cas_energy_states = 19;
   repeated int32 cas_energy_mults = 20;
+  repeated double cas_transition_dipole = 22;
 
   //Bond order matrix
   repeated double bond_order = 16;
