@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Simple example showing a SA-CASSCF calculation and getting excited state energies
+# Simple example showing a SA-CASSCF calculation
 
 from tcpb import TCProtobufClient
 
@@ -32,11 +32,8 @@ with TCProtobufClient(host='localhost', port=54321) as TC:
         'closed':       7,
         'active':       2,
         'cassinglets':  2,
-
-        # Client options to get all energies
-        # Passed as a list of (state, mult) tuples
-        'cas_energy_labels':    [(0, 1), (1, 1)]
     }
+
     # Energy calculation
     results = TC.compute_job_sync("energy", geom, "bohr", **options)
     print results

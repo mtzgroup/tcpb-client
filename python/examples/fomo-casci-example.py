@@ -34,14 +34,9 @@ with TCProtobufClient(host='localhost', port=54321) as TC:
         'active':       2,
         'cassinglets':  2,
 
-        # Client options to get all energies
-        # Passed as a list of (state, mult) tuples
-        'cas_energy_labels':    [(0, 1), (1, 1)]
+        'nacstate1':    0,
+        'nacstate2':    1
     }
-
-    # Energy calculation
-    results = TC.compute_energy(geom, "angstrom", **options)
-    print results
 
     # NACME calculation
     results = TC.compute_coupling(geom, "angstrom", **options)

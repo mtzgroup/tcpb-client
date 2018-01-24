@@ -37,10 +37,6 @@ with TCProtobufClient(host='localhost', port=54321) as TC:
         'cassinglets':  2,
 
         'dcimaxiter':   100,
-
-        # Client options to get all energies
-        # Passed as a list of (state, mult) tuples
-        'cas_energy_labels':    [(0, 1), (1, 1)]
     }
     # Energy calculation
     results = TC.compute_job_sync("energy", geom, "bohr", **options)
