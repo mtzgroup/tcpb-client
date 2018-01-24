@@ -7,7 +7,7 @@ def readme():
 
 __title__ = "tcpb"
 __copyright__ = "Martinez Group, Stanford University, CA, USA, Planet Earth"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __status__ = "dev"
 
 
