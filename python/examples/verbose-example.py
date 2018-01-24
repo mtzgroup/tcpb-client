@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Basic TCProtobufClient usage
 
+import sys
 from tcpb import TCProtobufClient
 
 # Water system
@@ -10,9 +11,14 @@ geom = [0.00000,  0.00000, -0.06852,
         0.00000,  0.79069,  0.54370]
 # Default geom is bohr, but this in angstrom
 
+if len(sys.argv) != 3:
+    print('Usage: {} host port'.format(sys.argv[0]))
+    exit(1)
+
 # Set up client for h2o job
 # Most parameters can be passed into constructor, but you can also use update_options to reset options later
-TC = TCProtobufClient(host='localhost', port=54321)
+
+TC = TCProtobufClient(host=sys.argv[1], port=sys.argv[2])
 
 TC.update_options(atoms=atoms, charge=0, spinmult=1, closed_shell=True, restricted=True, method='pbe0', basis='6-31g')
 print TC.tc_options

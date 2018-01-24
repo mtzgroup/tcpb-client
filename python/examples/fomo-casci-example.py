@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-# Simple example showing a FOMO-CASCI calculation and getting excited state energies
+# Simple example showing a FOMO-CASCI calculation
 
-from tcpb import TCProtobufClient
+import sys
+from tcpb import TCProtobufClient as TCPBClient
 
 # Ethene system
 atoms = ['C', 'C', 'H', 'H', 'H', 'H']
@@ -12,7 +13,11 @@ geom = [ 0.35673483, -0.05087227, -0.47786734,
          2.15270896,  0.84221076,  0.19314809,
          2.16553127, -0.97886933,  0.15232587]
 
-with TCProtobufClient(host='localhost', port=54321) as TC:
+if len(sys.argv) != 3:
+    print('Usage: {} host port'.format(sys.argv[0]))
+    exit(1)
+
+with TCPBClient(host=sys.argv[1], port=sys.argv[2]) as TC:
     base_options = {
         'method':       'hf',
         'basis':        '6-31g**',
@@ -39,5 +44,5 @@ with TCProtobufClient(host='localhost', port=54321) as TC:
     }
 
     # NACME calculation
-    results = TC.compute_coupling(geom, "angstrom", **options)
+    results = TC.compute_job_sync('coupling', geom, 'angstrom', **options)
     print results

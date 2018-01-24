@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # Test of ci_vec_overlap job through TCPB
 
+import sys
 from tcpb import TCProtobufClient as TCPBClient
 
 # Ethylene system
@@ -18,8 +19,11 @@ geom2 = [ 0.35673483, -0.05087227, -0.47786734,
           2.15270896,  0.84221076,  0.19314809,
           2.16553127, -0.97886933,  0.15232587]
 
+if len(sys.argv) != 3:
+    print('Usage: {} host port'.format(sys.argv[0]))
+    exit(1)
 
-with TCPBClient('localhost', 54321, method='hf', basis='6-31g**') as TC:
+with TCPBClient(host=sys.argv[1], port=sys.argv[2], method='hf', basis='6-31g**') as TC:
     base_options = {
         "atoms":        atoms,
         "charge":       0,
