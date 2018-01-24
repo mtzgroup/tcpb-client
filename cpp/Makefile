@@ -3,7 +3,7 @@ PROTOC=protoc
 INCDIR=./include
 CXXFLAGS=-I$(INCDIR) -fPIC
 LIBS=-lprotobuf
-VER=0.2.0
+VER=0.3.0
 
 # Subdirectories
 SRCDIR=./src
@@ -39,8 +39,8 @@ libtcpb.so.$(VER): $(OBJDIR)/tcpb.o $(OBJDIR)/terachem_server.pb.o
 
 .PHONY: clean
 clean:
-	@rm -r $(OBJDIR)/*.o $(BUILDDIR)/libtcpb.so.$(VER)
-	@rm -r $(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h
+	@rm -rf $(OBJDIR) $(BUILDDIR)
+	@rm -f $(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h
 
 .PHONY: install
 install:
