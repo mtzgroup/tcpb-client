@@ -20,9 +20,7 @@ class TCProtobufClient(object):
     """Connect and communicate with a TeraChem instance running in Protocol Buffer server mode
     (i.e. TeraChem was started with the -s|--server flag)
     """
-    def __init__(self, host, port, debug=False, trace=False,
-                 atoms=None, charge=0, spinmult=1, closed_shell=None, restricted=None,
-                 method=None, basis=None, **kwargs):
+    def __init__(self, host, port, debug=False, trace=False):
         """Initialize a TCProtobufClient object.
 
         Args:
@@ -30,14 +28,6 @@ class TCProtobufClient(object):
             port: Integer of port number (must be above 1023)
             debug: If True, assumes connections work (used for testing with no server)
             trace: If True, packets are saved to .bin files (which can then be used for testing)
-            atoms: List of atoms types as strings
-            charge: Total charge (int)
-            spinmult: Spin multiplicity (int)
-            closed_shell: Whether to run as closed-shell (bool)
-            restricted: Whether to run as restricted (bool)
-            method: TeraChem method (string)
-            basis: TeraChem basis (string)
-            **kwargs: Additional TeraChem keywords (dict of key-value pairs as strings)
         """
         self.debug = debug
         self.trace = trace
@@ -50,18 +40,6 @@ class TCProtobufClient(object):
         self.tcsock = None
         # Would like to not hard code this, but the truth is I am expecting exactly 8 bytes, not whatever Python thinks 2 ints is
         self.header_size = 8
-
-        # Store options directly in Protobufs
-        self.tc_options = pb.JobInput()
-        # Since protobuf defaults to not None ([], 0, False, etc.), I have to explicitly check whether things were set by the user
-        self.atoms_set = False
-        self.charge_set = False
-        self.spinmult_set = False
-        self.closed_shell_set = False
-        self.restricted_set = False
-        self.method_set = False
-        self.basis_set = False
-        self.update_options(atoms, charge, spinmult, closed_shell, restricted, method, basis, **kwargs)
 
         self.prev_results = None
 
@@ -80,114 +58,6 @@ class TCProtobufClient(object):
         Disconnect in automatic context management.
         """
         self.disconnect() 
-
-    def setup(self, mol, closed_shell=None, restricted=None):
-        """Convenience routine to setup molecular parameters using a molecule object.
-
-        Args:
-            mol:    A molecule object similar to core.molecule.Molecule that have fields
-                    `atoms`, `charge` and `multiplicity`
-        """
-        # Check if mol contains all proper fields
-        if not set(['atoms', 'charge', 'multiplicity']).issubset(set(dir(mol))):
-            raise AttributeError("Invalid argument to setup(). "
-                                 "Attributes atoms, charge and multiplicity are required")
-
-        self.update_options(mol.atoms, mol.charge, mol.multiplicity, closed_shell, restricted)
-
-    def update_options(self, atoms=None, charge=None, spinmult=None, closed_shell=None, restricted=None,
-                       method=None, basis=None, **kwargs):
-        """Update the TeraChem options of a TCProtobufClient object.
-
-        If an argument is passed as None, the value does not change.
-        If a molecule option or basis is changed, TeraChem will regenerate MOs on next job.
-
-        Args:
-            atoms:          List of atoms types as strings
-            charge:         Total charge (int)
-            spinmult:       Spin multiplicity (int)
-            closed_shell:   Whether to run as closed-shell (bool)
-            restricted:     Whether to run as restricted (bool)
-            method:         TeraChem method (string)
-            basis:          TeraChem basis (string)
-            **kwargs:       Additional TeraChem keywords, see _process_kwargs for details
-        """
-        # Sanity checks
-        if atoms is not None:
-            # if not isinstance(atoms, list):
-            #    raise TypeError("Atoms must be given as a list")
-            for atom in atoms:
-                # TODO: Convert integers to string by element number
-                if not isinstance(atom, basestring):
-                    raise TypeError("Atom type must be given as a string")
-        if charge is not None and not isinstance(charge, int):
-            raise TypeError("Charge must be an integer")
-        if spinmult is not None:
-            if not isinstance(spinmult, int):
-                raise TypeError("Spin multiplicity must be an integer")
-            if closed_shell is None and self.tc_options.mol.closed is True and spinmult != 1:
-                print("WARNING: Spin multiplicity greater than 1 but molecule set as closed, setting closed_shell to False")
-                closed_shell = False
-            if closed_shell is True and spinmult != 1:
-                print("WARNING: Molecule cannot be closed with a spin multiplicity greater than 1, setting closed_shell to False")
-                closed_shell = False
-            if restricted is None and self.tc_options.mol.restricted is True and spinmult != 1:
-                print("WARNING: Spin multiplicity greater than 1 but molecule set as restricted, setting restricted to False")
-                restricted = False
-            if restricted is True and spinmult != 1:
-                print("WARNING: Cannot specify restricted with a spin multiplicity greater than 1, setting restricted to False")
-                restricted = False
-        if closed_shell is not None and not isinstance(closed_shell, bool):
-            raise TypeError("Closed must be either True or False")
-        if restricted is not None and not isinstance(restricted, bool):
-            raise TypeError("Closed must be either True or False")
-        if closed_shell is True and restricted is False:
-            print("WARNING: Cannot have a closed unrestricted system, setting to closed_shell to False")
-            closed_shell = False
-
-        if method is not None:
-            if not isinstance(method, basestring):
-                raise TypeError("TeraChem method must be a string")
-            elif method.upper() not in pb.JobInput.MethodType.keys():
-                raise ValueError("Method specified is not available in this version of the TCPB client\n" \
-                                 "Allowed methods: {}".format(pb.JobInput.MethodType.keys()))
-        if basis is not None:
-            if not isinstance(basis, basestring):
-                raise TypeError("TeraChem basis must be a string")
-                # TODO: Check like method
-
-        # Molecule options
-        if atoms is not None:
-            del self.tc_options.mol.atoms[:]
-            self.tc_options.mol.atoms.extend(atoms)
-            self.atoms_set = True
-        if charge is not None:
-            self.tc_options.mol.charge = charge
-            self.charge_set = True
-        if spinmult is not None:
-            self.tc_options.mol.multiplicity = spinmult
-            self.spinmult_set = True
-        if closed_shell is not None:
-            self.tc_options.mol.closed = closed_shell
-            self.closed_shell_set = True
-        if restricted is not None:
-            self.tc_options.mol.restricted = restricted
-            self.restricted_set = True
-
-        # TeraChem options
-        if method is not None:
-            self.tc_options.method = pb.JobInput.MethodType.Value(method.upper())
-            self.method_set = True
-        if basis is not None:
-            self.tc_options.basis = basis
-            self.basis_set = True
-
-        if atoms is not None or charge is not None or spinmult is not None or \
-           closed_shell is not None or restricted is not None or method is not None or basis is not None:
-            self.tc_options.orb1afile = ""
-            self.tc_options.orb1bfile = ""
-
-        self._process_kwargs(self.tc_options, **kwargs)
 
     def update_address(self, host, port):
         """Update the host and port of a TCProtobufClient object.
@@ -267,22 +137,6 @@ class TCProtobufClient(object):
 
         Returns True on job acceptance, False on server busy, and errors out if communication fails
         """
-        # Check if previous molecule setup is available
-        if self.atoms_set is False:
-            raise LookupError("send_job_async() called before atoms were set.")
-        if self.charge_set is False:
-            raise LookupError("send_job_async() called before charge was set.")
-        if self.spinmult_set is False:
-            raise LookupError("send_job_async() called before spin multiplicity was set.")
-        if self.closed_shell_set is False:
-            raise LookupError("send_job_async() called before closed_shell was set.")
-        if self.restricted_set is False:
-            raise LookupError("send_job_async() called before restricted was set.")
-        if self.method_set is False:
-            raise LookupError("send_job_async() called before method was set.")
-        if self.basis_set is False:
-            raise LookupError("send_job_async() called before basis was set.")
-
         if jobType.upper() not in pb.JobInput.RunType.keys():
             raise ValueError("Job type specified is not available in this version of the TCPB client\n" \
                              "Allowed run types: {}".format(pb.JobInput.RunType.keys()))
@@ -290,8 +144,6 @@ class TCProtobufClient(object):
             raise SyntaxError("Did not provide geometry to send_job_async()")
         if isinstance(geom, np.ndarray):
             geom = geom.flatten()
-        if len(self.tc_options.mol.atoms) != len(geom)/3.0:
-            raise ValueError("Geometry does not match atom list in send_job_async()")
         if unitType.upper() not in pb.Mol.UnitType.keys():
             raise ValueError("Unit type specified is not available in this version of the TCPB client\n" \
                              "Allowed unit types: {}".format(pb.Mol.UnitType.keys()))
@@ -301,14 +153,11 @@ class TCProtobufClient(object):
             return True
 
         # Job setup
-        self.tc_options.run = pb.JobInput.RunType.Value(jobType.upper())
-        del self.tc_options.mol.xyz[:]
-        self.tc_options.mol.xyz.extend(geom)
-        self.tc_options.mol.units = pb.Mol.UnitType.Value(unitType.upper())
-
-        # Handle kwargs for this specific job
         job_options = pb.JobInput()
-        job_options.CopyFrom(self.tc_options)
+        job_options.run = pb.JobInput.RunType.Value(jobType.upper())
+        job_options.mol.xyz.extend(geom)
+        job_options.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+
         self._process_kwargs(job_options, **kwargs)
 
         self._send_msg(pb.JOBINPUT, job_options)
@@ -380,10 +229,6 @@ class TCProtobufClient(object):
         Returns the results dictionary.
         """
         output = self._recv_msg(pb.JOBOUTPUT)
-
-        # Set MOs for next job
-        self.tc_options.orb1afile = output.orb1afile
-        self.tc_options.orb1bfile = output.orb1bfile
 
         # Parse output into normal python dictionary
         results = {
@@ -544,16 +389,12 @@ class TCProtobufClient(object):
             raise SyntaxError("Did not provide two CI vectors to compute_ci_overlap()")
         if orb1afile is None or orb1bfile is None:
             raise SyntaxError("Did not provide two sets of orbitals to compute_ci_overlap()")
-        if (orb1bfile is not None and orb2bfile is None) or (orb1bfile is None and orb2bfile is not None) and self.tc_options.mol.closed is False:
+        if (orb1bfile is not None and orb2bfile is None) or (orb1bfile is None and orb2bfile is not None) and kwargs['closed_shell'] is False:
             raise SyntaxError("Did not provide two sets of open-shell orbitals to compute_ci_overlap()")
-        elif orb1bfile is not None and orb2bfile is not None and self.tc_options.mol.closed is True:
+        elif orb1bfile is not None and orb2bfile is not None and kwargs['closed_shell'] is True:
             print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
 
-        # Wipe MO coefficients
-        self.tc_options.orb1afile = ""
-        self.tc_options.orb1bfile = ""
-
-        if self.tc_options.mol.closed:
+        if kwargs['closed_shell']:
             results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
                 cvec1file=cvec1file, cvec2file=cvec2file,
                 orb1afile=orb1afile, orb2afile=orb2afile, **kwargs)
@@ -566,69 +407,6 @@ class TCProtobufClient(object):
             
         return results['ci_overlap']
 
-    # Serialization helper functions
-    def read_orbfile(self, orbfile, num_rows, num_cols):
-        """Deserialize a TeraChem binary orbital file of doubles.
-
-        HF/DFT orbitals (which are stored column-major for TeraChem) are transposed on deserialization.
-
-        Args:
-            orbfile: Filename of orbital file to read
-            num_rows: Rows in MO coefficient matrix
-            num_cols: Columns in MO coefficient matrix
-        Returns a (num_rows, num_cols) NumPy array of MO coefficients
-        """
-        orbs = np.fromfile(orbfile, dtype=np.float64)
-
-        orbs = orbs.reshape((num_rows, num_cols))
-
-        if orbfile.endswith('c0') or orbfile.endswith('ca0') or orbfile.endswith('cb0'):
-            orbs = orbs.transpose()
-
-        return orbs
-
-    def write_orbfile(self, orbs, orbfile):
-        """Serialize a TeraChem binary orbital file of doubles.
-
-        HF/DFT orbitals (which are stored column-major for TeraChem) are transposed on serialization.
-
-        Args:
-            orbs: Non-flat NumPy array of MO coefficients
-            orbfile: Filename of orbital file to write 
-        """
-        if not isinstance(orbs, np.ndarray) or len(orbs.shape) != 2:
-            raise SyntaxError("Need a shaped NumPy array for write_orbfile to do proper serialization for TeraChem.")
-
-        if orbfile.endswith('c0') or orbfile.endswith('ca0') or orbfile.endswith('cb0'):
-            orbs = orbs.transpose()
-
-        orbs.astype(np.float64).tofile(orbfile)
-
-    def read_ci_vector(self, cvecfile, num_rows, num_cols):
-        """Deserialize a TeraChem binary CI vector file of doubles.
-
-        Args:
-            cvecfile: Filename of CI vector file to read
-            num_rows: Rows in CI vector 
-            num_cols: Columns in CI vector matrix
-        Returns a (num_rows, num_cols) NumPy array of MO coefficients
-        """
-        ci_vector = np.fromfile(cvecfile, dtype=np.float64)
-
-        return ci_vector.reshape((num_rows, num_cols))
-
-    def write_ci_vector(self, ci_vector, orbfile):
-        """Serialize a TeraChem binary CI vector file of doubles.
-
-        Args:
-            ci_vector: Non-flat NumPy array of CI vector
-            cvecfile: Filename of CI vector file to write 
-        """
-        if not isinstance(orbs, np.ndarray) or len(orbs.shape) != 2:
-            raise SyntaxError("Need a shaped NumPy array for write_cvecfile to do proper serialization for TeraChem.")
-
-        ci_vector.astype(np.float64).tofile(orbfile)
-
     # Private kwarg helper function
     def _process_kwargs(self, job_options, **kwargs):
         """Process user-provided keyword arguments into a JobInput object
@@ -638,7 +416,6 @@ class TCProtobufClient(object):
             geom:               Sets job_options.mol.xyz from a list or NumPy array
             geom2:              Sets job_options.xyz2 from a list or NumPy array
             bond_order:         Sets job_options.return_bond_order to True or False
-            cas_energy_labels:  Sets job_options.cas_energy_states and job_options.cas_energy_mults from a list of (state, mult) tuples
         All others are passed through as key-value pairs to the server, which will
         place them in the start file.
         Passing None to a previously set option will remove it from job_options
@@ -647,12 +424,47 @@ class TCProtobufClient(object):
             job_options: Target JobInput object
             **kwargs: Keyword arguments passed by user
         """
+        # Validate all options are here
+        # TODO: Replace with mtzutils.Options
+        required = ['atoms', 'charge', 'spinmult', 'closed_shell', 'restricted', 'method', 'basis']
+        types = [basestring, int, int, bool, bool, basestring, basestring]
+
+        for r, t in zip(required, types):
+            if kwargs.get(r, None) is None:
+                raise SyntaxError("Keyword %s must be specified in options" % r)
+            elif r == 'atoms':
+                for a in kwargs['atoms']:
+                    if not isinstance(a, t):
+                        raise TypeError("Each atom must have type: basestring")
+            elif r == 'method':
+                if not isinstance(kwargs['method'], t):
+                    raise TypeError("%s must have type: %s" % (r, t))
+                elif kwargs['method'].upper() not in pb.JobInput.MethodType.keys():
+                    raise ValueError("Method specified is not available in this version of the TCPB client\n" \
+                                     "Allowed methods: {}".format(pb.JobInput.MethodType.keys()))
+            elif not isinstance(kwargs[r], t):
+                raise TypeError("%s must have type: %s" % (r, t))
+
         for key, value in kwargs.iteritems():
-            if key == 'geom':
+            if key == 'atoms':
+                job_options.mol.atoms.extend(value)
+            elif key == 'charge':
+                job_options.mol.charge = value
+            elif key == 'spinmult':
+                job_options.mol.multiplicity = value
+            elif key == 'closed_shell':
+                job_options.mol.closed = value
+            elif key == 'restricted':
+                job_options.mol.restricted = value
+            elif key == 'method':
+                job_options.method = pb.JobInput.MethodType.Value(value.upper())
+            elif key == 'basis':
+                job_options.basis = value
+            elif key == 'geom':
                 # Standard geometry, usually handled in other calling functions but here just in case
                 if isinstance(value, np.ndarray):
                     value = value.flatten()
-                if len(self.tc_options.mol.atoms) != len(value)/3.0:
+                if len(kwargs['atoms']) != len(value)/3.0:
                     raise ValueError("Geometry provided to geom does not match atom list")
 
                 del job_options.mol.xyz[:]
@@ -661,7 +473,7 @@ class TCProtobufClient(object):
                 # Second geometry for ci_vec_overlap job
                 if isinstance(value, np.ndarray):
                     value = value.flatten()
-                if len(self.tc_options.mol.atoms) != len(value)/3.0:
+                if len(kwargs['atoms']) != len(value)/3.0:
                     raise ValueError("Geometry provided to geom2 does not match atom list")
 
                 del job_options.xyz2[:]
@@ -672,14 +484,6 @@ class TCProtobufClient(object):
                     raise ValueError("Bond order request must be True or False")
 
                 job_options.return_bond_order = value
-            elif key == 'cas_energy_labels':
-                state_labels = [label[0] for label in value]
-                mult_labels = [label[1] for label in value]
-
-                del job_options.cas_energy_states[:]
-                del job_options.cas_energy_mults[:]
-                job_options.cas_energy_states.extend(state_labels)
-                job_options.cas_energy_mults.extend(mult_labels)
             elif key in job_options.user_options:
                 # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)

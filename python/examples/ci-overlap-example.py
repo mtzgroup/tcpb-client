@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # Test of ci_vec_overlap job through TCPB
 
+from copy import deepcopy
+import os
 import sys
 from tcpb import TCProtobufClient as TCPBClient
 
@@ -23,13 +25,16 @@ if len(sys.argv) != 3:
     print('Usage: {} host port'.format(sys.argv[0]))
     exit(1)
 
-with TCPBClient(host=sys.argv[1], port=sys.argv[2], method='hf', basis='6-31g**') as TC:
+with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     base_options = {
         "atoms":        atoms,
         "charge":       0,
         "spinmult":     1,
         "closed_shell": True,
         "restricted":   True,
+
+        "method":       'hf',
+        "basis":        '6-31g**',
 
         "precision":    "double",
         "threall":      1.0e-20,
@@ -39,23 +44,24 @@ with TCPBClient(host=sys.argv[1], port=sys.argv[2], method='hf', basis='6-31g**'
         "active":       6,
         "cassinglets":  10
     }
-    TC.update_options(**base_options)
 
     # First run CASCI to get some test CI vectors
-    options = {
+    casci_options = {
         "directci":     "yes",
         "caswritevecs": "yes"
     }
+    options = dict(base_options, **casci_options)
     results = TC.compute_job_sync("energy", geom, "angstrom", **options)
 
     # Run ci_vec_overlap job based on last job
-    options = {
+    overlap_options = {
         "geom2":        geom2,
-        "cvec1file":    path.join(results['job_scr_dir'], "CIvecs.Singlet.dat"),
-        "cvec2file":    path.join(results['job_scr_dir'], "CIvecs.Singlet.dat"),
-        "orb1afile":    path.join(results['job_scr_dir'], "c0"),
-        "orb2afile":    path.join(results['job_scr_dir'], "c0")
+        "cvec1file":    os.path.join(results['job_scr_dir'], "CIvecs.Singlet.dat"),
+        "cvec2file":    os.path.join(results['job_scr_dir'], "CIvecs.Singlet.dat"),
+        "orb1afile":    os.path.join(results['job_scr_dir'], "c0"),
+        "orb2afile":    os.path.join(results['job_scr_dir'], "c0")
     }
+    options = dict(base_options, **overlap_options)
     results = TC.compute_job_sync("ci_vec_overlap", geom, "angstrom", **options)
 
     print("Overlap:\n{}".format(results['ci_overlap']))

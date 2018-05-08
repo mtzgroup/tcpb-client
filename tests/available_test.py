@@ -22,7 +22,7 @@ def run_py_test(port=56789, run_real_server=False):
     if not run_real_server:
         mock = MockServer(port, 'available/client_recv.bin', 'available/client_sent.bin')
 
-    with TCProtobufClient(host='localhost', port=port, trace=run_real_server, method='hf', basis='sto-3g') as TC:
+    with TCProtobufClient(host='localhost', port=port, trace=run_real_server) as TC:
         count = 0
         while not TC.is_available():
             if run_real_server is True:
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     print("Running Python test...")
     run_py_test()
 
-    print("Running C++ test...")
-    run_cpp_test()
+    #print("Running C++ test...")
+    #run_cpp_test()
 
 

@@ -18,10 +18,18 @@ if len(sys.argv) != 3:
 # Set up client for h2o job
 # Most parameters can be passed into constructor, but you can also use update_options to reset options later
 
-TC = TCProtobufClient(host=sys.argv[1], port=sys.argv[2])
+TC = TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2]))
 
-TC.update_options(atoms=atoms, charge=0, spinmult=1, closed_shell=True, restricted=True, method='pbe0', basis='6-31g')
-print TC.tc_options
+tc_opts = {
+    'atoms':        atoms,
+    'charge':       0,
+    'spinmult':     1,
+    'closed_shell': True,
+    'restricted':   True,
+
+    'method':       'pbe0',
+    'basis':        '6-31g',
+    }
 
 TC.connect()
 
@@ -30,27 +38,19 @@ avail = TC.is_available()
 print "TCPB Server available: {}".format(avail)
 
 # Energy calculation
-energy = TC.compute_energy(geom, "angstrom")  # Default is BOHR
+energy = TC.compute_energy(geom, "angstrom", **tc_opts)  # Default is BOHR
 print "H2O Energy: {}".format(energy)
 
 # Gradient calculation
-energy, gradient = TC.compute_gradient(geom, "angstrom")
+energy, gradient = TC.compute_gradient(geom, "angstrom", **tc_opts)
 print "H2O Gradient:\n{}".format(gradient)
 
 # Forces calculation (just like gradient call with -1*gradient)
-energy, forces = TC.compute_forces(geom, "angstrom")
+energy, forces = TC.compute_forces(geom, "angstrom", **tc_opts)
 print "H2O Forces:\n{}".format(forces)
 
 # General calculation
-options = {
-    # TeraChem options as key-value pairs
-    'maxit':    100,
-    'purify':   'no',
-
-    # Some additional keywords are handled by the client
-    'bond_order': True,
-}
-results = TC.compute_job_sync("gradient", geom, "angstrom", **options)
+results = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
 print("H2O Results:\n{}".format(results))
 
 # Can get information from last calculation

@@ -29,9 +29,9 @@ h2o_system = {
 # JOB OUTPUT
 tol = 1e-5
 h2o_energy = -76.300505
-h2o_gradient = [[  0.0000002903,    0.0000000722,   -0.033101313],
-                [ -0.0000000608,   -0.0141756697,    0.016550727],
-                [ -0.0000002294,    0.0141755976,    0.016550585]]
+h2o_gradient = [[  0.0000033590,   -0.0000021343,   -0.0331173999],
+                [ -0.0000006941,   -0.0141806788,    0.0165585893],
+                [ -0.0000026649,    0.0141828094,    0.0165588269]]
 
 def run_py_test(port=56789, run_real_server=False):
     """Run the test using Python client
@@ -46,25 +46,25 @@ def run_py_test(port=56789, run_real_server=False):
     if not run_real_server:
         mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
 
-    with TCProtobufClient(host='localhost', port=port, trace=run_real_server, **h2o_system) as TC:
+    with TCProtobufClient(host='localhost', port=port, trace=run_real_server) as TC:
         if run_real_server:
             print('TCPB Client Protobuf:')
-            print(TC.tc_options)
+            print(h2o_system)
 
         # Energy calculation
-        energy = TC.compute_energy(h2o_system['geom'])
+        energy = TC.compute_energy(**h2o_system)
         if not np.allclose([h2o_energy], [energy], atol=tol):
             print('Failed energy test')
             return False
 
         # Gradient calculation
-        energy, gradient = TC.compute_gradient(h2o_system['geom'])
+        energy, gradient = TC.compute_gradient(**h2o_system)
         if not np.allclose([h2o_energy], [energy], atol=tol) or not np.allclose(h2o_gradient, gradient, atol=tol):
             print('Failed gradient test')
             return False
 
         # Force calculation
-        energy, force = TC.compute_forces(h2o_system['geom'])
+        energy, force = TC.compute_forces(**h2o_system)
         if not np.allclose([h2o_energy], [energy], atol=tol) or not np.allclose(h2o_gradient, -force, atol=tol):
             print('Failed force test')
             return False
@@ -97,6 +97,6 @@ if __name__ == '__main__':
     print("Running Python test...")
     run_py_test()
 
-    print("Running C++ test...")
-    run_cpp_test()
+    #print("Running C++ test...")
+    #run_cpp_test()
 

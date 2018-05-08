@@ -17,8 +17,8 @@ if len(sys.argv) != 3:
     print('Usage: {} host port'.format(sys.argv[0]))
     exit(1)
 
-with TCPBClient(host=sys.argv[1], port=sys.argv[2]) as TC:
-    base_options = {
+with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
+    options = {
         'method':       'hf',
         'basis':        '6-31g**',
         'atoms':        atoms,
@@ -29,10 +29,7 @@ with TCPBClient(host=sys.argv[1], port=sys.argv[2]) as TC:
         
         'precision':    'double',
         'threall':      1e-20,
-    }
-    TC.update_options(**base_options)
 
-    options = {
         'casci':        'yes',
         'fon':          'yes',
         'closed':       7,

@@ -17,7 +17,7 @@ if len(sys.argv) != 3:
     print('Usage: {} host port'.format(sys.argv[0]))
     exit(1)
 
-with TCPBClient(host=sys.argv[1], port=sys.argv[2]) as TC:
+with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     base_options = {
         'method':       'hf',
         'basis':        '6-31g**',
@@ -30,15 +30,14 @@ with TCPBClient(host=sys.argv[1], port=sys.argv[2]) as TC:
         'precision':    'double',
         'threall':      1e-20,
     }
-    TC.update_options(**base_options)
 
-    options = {
+    casscf_options = {
         'casscf':       'yes',
         'closed':       7,
         'active':       2,
         'cassinglets':  2,
     }
 
-    # Energy calculation
+    options = dict(base_options, **casscf_options)
     results = TC.compute_job_sync("energy", geom, "bohr", **options)
     print results

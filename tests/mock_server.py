@@ -9,6 +9,7 @@
 import numpy as np
 import socket
 import struct
+import sys
 from threading import Thread
 from Queue import Queue
 
@@ -150,8 +151,11 @@ class MockServer(object):
                 print("MockServer: Expected protobuf did not match received protobuf")
                 print("EXPECTED PROTOBUF:")
                 print(expected_pb)
+                print(expected_pb.SerializeToString())
                 print("\nRECEIVED PROTOBUF:")
                 print(recvd_pb)
+                print(recvd_pb.SerializeToString())
+                sys.stdout.flush()
                 return
 
             del self.expected_msgs[0]
