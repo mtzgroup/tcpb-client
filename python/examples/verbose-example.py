@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Basic TCProtobufClient usage
 
+import os
 import sys
 from tcpb import TCProtobufClient
 
@@ -55,5 +56,9 @@ print("H2O Results:\n{}".format(results))
 
 # Can get information from last calculation
 print("Last H2O Energy: {}".format(TC.prev_results['energy']))
+
+# We can also pull the orbital path from the previous job to feed in as a guess
+orb_path = os.path.join(results['job_scr_dir'], 'c0')
+results = TC.compute_job_sync("gradient", geom, "angstrom", guess=orb_path, **tc_opts)
 
 TC.disconnect()
