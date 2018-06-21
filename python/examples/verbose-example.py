@@ -17,8 +17,6 @@ if len(sys.argv) != 3:
     exit(1)
 
 # Set up client for h2o job
-# Most parameters can be passed into constructor, but you can also use update_options to reset options later
-
 TC = TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2]))
 
 tc_opts = {
@@ -56,9 +54,5 @@ print("H2O Results:\n{}".format(results))
 
 # Can get information from last calculation
 print("Last H2O Energy: {}".format(TC.prev_results['energy']))
-
-# We can also pull the orbital path from the previous job to feed in as a guess
-orb_path = os.path.join(results['job_scr_dir'], 'c0')
-results = TC.compute_job_sync("gradient", geom, "angstrom", guess=orb_path, **tc_opts)
 
 TC.disconnect()
