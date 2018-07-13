@@ -154,6 +154,10 @@ message JobOutput {
   string orb1bfile = 13;
   int32 orb_size = 14;
 
+  //MO energies and coefficients
+  repeated double orb_energies = 23;
+  repeated double orb_occupations = 24;
+
   //Job directory, so the user can go get more info if they want
   string job_dir = 9;
   string job_scr_dir = 10;

@@ -40,5 +40,5 @@ with TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     results = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
 
     # TeraChem expects "guess <ca0 file> <cb0 file>"
-    orb_paths = "{0}/ca0 {0}/cb0".format(os.path.join(results['job_scr_dir']))
+    orb_paths = "{0}/ca0 {0}/cb0".format(results['job_scr_dir'])
     results = TC.compute_job_sync("gradient", geom, "angstrom", guess=orb_paths, **tc_opts)

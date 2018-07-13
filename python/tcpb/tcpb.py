@@ -217,6 +217,8 @@ class TCProtobufClient(object):
             orbfile:            String (if restricted is True, otherwise not included)
             orbfile_a:          String (if restricted is False, otherwise not included)
             orbfile_b:          String (if restricted is False, otherwise not included)
+            orb_energies:       Flat # of orbitals NumPy array of doubles
+            orb_occupations:    Flat # of orbitals NumPy array of doubles
         Additional (optional) members of results:
             gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
             nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
@@ -232,15 +234,17 @@ class TCProtobufClient(object):
 
         # Parse output into normal python dictionary
         results = {
-            'atoms'         : np.array(output.mol.atoms, dtype='S2'),
-            'geom'          : np.array(output.mol.xyz, dtype=np.float64).reshape(-1, 3),
-            'charges'       : np.array(output.charges, dtype=np.float64),
-            'spins'         : np.array(output.spins, dtype=np.float64),
-            'dipole_moment' : output.dipoles[3],
-            'dipole_vector' : np.array(output.dipoles[:3], dtype=np.float64),
-            'job_dir'       : output.job_dir,
-            'job_scr_dir'   : output.job_scr_dir,
-            'server_job_id' : output.server_job_id
+            'atoms'           : np.array(output.mol.atoms, dtype='S2'),
+            'geom'            : np.array(output.mol.xyz, dtype=np.float64).reshape(-1, 3),
+            'charges'         : np.array(output.charges, dtype=np.float64),
+            'spins'           : np.array(output.spins, dtype=np.float64),
+            'dipole_moment'   : output.dipoles[3],
+            'dipole_vector'   : np.array(output.dipoles[:3], dtype=np.float64),
+            'job_dir'         : output.job_dir,
+            'job_scr_dir'     : output.job_scr_dir,
+            'server_job_id'   : output.server_job_id,
+            'orb_energies'    : np.array(output.orb_energies),
+            'orb_occupations' : np.array(output.orb_occupations),
         }
 
         if len(output.energy):
