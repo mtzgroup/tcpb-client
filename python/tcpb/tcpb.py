@@ -217,8 +217,12 @@ class TCProtobufClient(object):
             orbfile:            String (if restricted is True, otherwise not included)
             orbfile_a:          String (if restricted is False, otherwise not included)
             orbfile_b:          String (if restricted is False, otherwise not included)
-            orb_energies:       Flat # of orbitals NumPy array of doubles
-            orb_occupations:    Flat # of orbitals NumPy array of doubles
+            orb_energies:       Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+            orb_occupations:    Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+            orb_energies_a:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+            orb_occupations_a:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+            orb_energies_b:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+            orb_occupations_b:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
         Additional (optional) members of results:
             gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
             nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
@@ -226,7 +230,6 @@ class TCProtobufClient(object):
             cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
             bond_order:         # of atoms by # of atoms NumPy array of doubles
             ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
-        Also sets the orbital files from the JobOutput message into the next JobInput message.
 
         Returns the results dictionary.
         """
@@ -243,8 +246,6 @@ class TCProtobufClient(object):
             'job_dir'         : output.job_dir,
             'job_scr_dir'     : output.job_scr_dir,
             'server_job_id'   : output.server_job_id,
-            'orb_energies'    : np.array(output.orb_energies),
-            'orb_occupations' : np.array(output.orb_occupations),
         }
 
         if len(output.energy):
@@ -252,9 +253,17 @@ class TCProtobufClient(object):
 
         if output.mol.restricted is True:
             results['orbfile'] = output.orb1afile
+
+            results['orb_energies'] = np.array(output.orba_energies)
+            results['orb_occupations'] = np.array(output.orba_occupations)
         else:
             results['orbfile_a'] = output.orb1afile
             results['orbfile_b'] = output.orb1bfile
+
+            results['orb_energies_a'] = np.array(output.orba_energies)
+            results['orb_occupations_a'] = np.array(output.orba_occupations)
+            results['orb_energies_b'] = np.array(output.orbb_energies)
+            results['orb_occupations_b'] = np.array(output.orbb_occupations)
 
         if len(output.gradient):
             results['gradient'] = np.array(output.gradient, dtype=np.float64).reshape(-1, 3)

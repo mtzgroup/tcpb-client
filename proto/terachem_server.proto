@@ -130,7 +130,7 @@ message JobInput {
 }
 
 message JobOutput {
-  // RETIRED TAGS: 7, 8
+  // RETIRED TAGS: 7, 8, 23, 24
 
   // Send molecule back
   Mol mol = 1;
@@ -155,8 +155,11 @@ message JobOutput {
   int32 orb_size = 14;
 
   //MO energies and coefficients
-  repeated double orb_energies = 23;
-  repeated double orb_occupations = 24;
+  // Tags 23 & 24 were used for orb_energies/occupations in an earlier commit
+  repeated double orba_energies = 25;
+  repeated double orbb_energies = 26;
+  repeated double orba_occupations = 27;
+  repeated double orbb_occupations = 28;
 
   //Job directory, so the user can go get more info if they want
   string job_dir = 9;
