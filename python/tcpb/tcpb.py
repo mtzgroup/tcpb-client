@@ -1,5 +1,4 @@
-"""tcpb.py:
-Simple Python socket client for communicating with TeraChem Protocol Buffer servers
+"""Simple Python socket client for communicating with TeraChem Protocol Buffer servers
 """
 
 import sys
@@ -24,10 +23,10 @@ class TCProtobufClient(object):
         """Initialize a TCProtobufClient object.
 
         Args:
-            host: String of hostname
-            port: Integer of port number (must be above 1023)
-            debug: If True, assumes connections work (used for testing with no server)
-            trace: If True, packets are saved to .bin files (which can then be used for testing)
+            host (str): Hostname
+            port (int): Port number (must be above 1023)
+            debug (bool): If True, assumes connections work (used for testing with no server)
+            trace (bool): If True, packets are saved to .bin files (which can then be used for testing)
         """
         self.debug = debug
         self.trace = trace
@@ -65,8 +64,8 @@ class TCProtobufClient(object):
         yourself to actually connect to the new server.
 
         Args:
-            host: String of hostname
-            port: Integer of port number (must be above 1023)
+            host (str): Hostname
+            port (int): Port number (must be above 1023)
         """
         # Sanity checks
         if not isinstance(host, basestring):
@@ -111,7 +110,8 @@ class TCProtobufClient(object):
         """Asks the TeraChem Protobuf server whether it is available or busy through the Status protobuf message.
         Note that this does not reserve the server, and the status could change after this function is called.
 
-        Returns true if the TeraChem PB server is currently available (no running job)
+        Returns:
+            bool: True if the TeraChem PB server is currently available (no running job)
         """
         if self.debug:
             logging.info('in debug mode - assume terachem server is available')
@@ -135,7 +135,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to "bohr")
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns True on job acceptance, False on server busy, and errors out if communication fails
+        Returns:
+            bool: True on job acceptance, False on server busy, and errors out if communication fails
         """
         if jobType.upper() not in pb.JobInput.RunType.keys():
             raise ValueError("Job type specified is not available in this version of the TCPB client\n" \
@@ -175,7 +176,8 @@ class TCProtobufClient(object):
         Errors out if just busy message returned, implying the job we are checking was not submitted
         or had some other issue
 
-        Returns True if job is completed, False otherwise
+        Returns:
+            bool: True if job is completed, False otherwise
         """
 
         if self.debug:
@@ -204,34 +206,38 @@ class TCProtobufClient(object):
         Creates a results dictionary that mirrors the JobOutput message, using NumPy arrays when appropriate.
         Results are also saved in the prev_results class member.
         An inclusive list of the results members (with types):
-            atoms:              Flat # of atoms NumPy array of 2-character strings
-            geom:               # of atoms by 3 NumPy array of doubles
-            energy:             Either empty, single energy, or flat # of cas_energy_labels of NumPy array of doubles
-            charges:            Flat # of atoms NumPy array of doubles
-            spins:              Flat # of atoms NumPy array of doubles
-            dipole_moment:      Single element
-            dipole_vector:      Flat 3-element NumPy array of doubles
-            job_dir:            String
-            job_scr_dir:        String
-            server_job_id:      Int
-            orbfile:            String (if restricted is True, otherwise not included)
-            orbfile_a:          String (if restricted is False, otherwise not included)
-            orbfile_b:          String (if restricted is False, otherwise not included)
-            orb_energies:       Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
-            orb_occupations:    Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
-            orb_energies_a:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
-            orb_occupations_a:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
-            orb_energies_b:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
-            orb_occupations_b:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
-        Additional (optional) members of results:
-            gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
-            nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
-            transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
-            cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
-            bond_order:         # of atoms by # of atoms NumPy array of doubles
-            ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
 
-        Returns the results dictionary.
+        * atoms:              Flat # of atoms NumPy array of 2-character strings
+        * geom:               # of atoms by 3 NumPy array of doubles
+        * energy:             Either empty, single energy, or flat # of cas_energy_labels of NumPy array of doubles
+        * charges:            Flat # of atoms NumPy array of doubles
+        * spins:              Flat # of atoms NumPy array of doubles
+        * dipole_moment:      Single element
+        * dipole_vector:      Flat 3-element NumPy array of doubles
+        * job_dir:            String
+        * job_scr_dir:        String
+        * server_job_id:      Int
+        * orbfile:            String (if restricted is True, otherwise not included)
+        * orbfile_a:          String (if restricted is False, otherwise not included)
+        * orbfile_b:          String (if restricted is False, otherwise not included)
+        * orb_energies:       Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+        * orb_occupations:    Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+        * orb_energies_a:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_occupations_a:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_energies_b:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_occupations_b:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+
+        Additional (optional) members of results:
+
+        * gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
+        * nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
+        * transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
+        * cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
+        * bond_order:         # of atoms by # of atoms NumPy array of doubles
+        * ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
+
+        Returns:
+            dict: Results as described above 
         """
         output = self._recv_msg(pb.JOBOUTPUT)
 
@@ -299,7 +305,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a results dictionary that mirrors the JobOutput message, using reshaped NumPy arrays when possible
+        Returns:
+            dict: Results mirroring recv_job_async
         """
         if self.debug:
             logging.info("in debug mode - assume compute_job_sync completed successfully")
@@ -325,7 +332,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns energy
+        Returns:
+            float: Energy
         """
         results = self.compute_job_sync("energy", geom, unitType, **kwargs)
         return results['energy']
@@ -339,7 +347,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a tuple of (energy, gradient)
+        Returns:
+            tuple: Tuple of (energy, gradient)
         """
         results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
         return results['energy'], results['gradient']
@@ -354,7 +363,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a tuple of (energy, forces), which is really (energy, -gradient)
+        Returns:
+            tuple: Tuple of (energy, forces), which is really (energy, -gradient)
         """
         results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
         return results['energy'], -1.0*results['gradient']
@@ -368,7 +378,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a len(atoms) by 3 NumPy array of doubles of the nonadiabatic coupling vector
+        Returns:
+            (num_atoms, 3) ndarray: Nonadiabatic coupling vector
         """
         results = self.compute_job_sync("coupling", geom, unitType, **kwargs)
         return results['nacme']
@@ -394,7 +405,8 @@ class TCProtobufClient(object):
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
             **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
 
-        Returns a NumPy array of state overlaps
+        Returns:
+            (num_states, num_states) ndarray: CI vector overlaps
         """
         if geom is None or geom2 is None:
             raise SyntaxError("Did not provide two geometries to compute_ci_overlap()")
@@ -426,9 +438,11 @@ class TCProtobufClient(object):
         
         Several keywords are processed by the client to set more complex fields
         in the Protobuf messages. These are:
-            geom:               Sets job_options.mol.xyz from a list or NumPy array
-            geom2:              Sets job_options.xyz2 from a list or NumPy array
-            bond_order:         Sets job_options.return_bond_order to True or False
+
+        * geom:               Sets job_options.mol.xyz from a list or NumPy array
+        * geom2:              Sets job_options.xyz2 from a list or NumPy array
+        * bond_order:         Sets job_options.return_bond_order to True or False
+
         All others are passed through as key-value pairs to the server, which will
         place them in the start file.
         Passing None to a previously set option will remove it from job_options
@@ -546,7 +560,9 @@ class TCProtobufClient(object):
 
         Args:
             msg_type: Expected message type (defined as enum in protocol buffer)
-        Returns Protocol Buffer of type msg_type (or None if no PB was sent)
+
+        Returns:
+            protobuf: Protocol Buffer of type msg_type (or None if no PB was sent)
         """
         # Receive header
         try:

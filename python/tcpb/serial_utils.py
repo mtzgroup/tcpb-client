@@ -12,7 +12,9 @@ def read_orbfile(orbfile, num_rows, num_cols):
         orbfile: Filename of orbital file to read
         num_rows: Rows in MO coefficient matrix
         num_cols: Columns in MO coefficient matrix
-    Returns a (num_rows, num_cols) NumPy array of MO coefficients
+
+    Returns:
+        (num_rows, num_cols): NumPy array of MO coefficients
     """
     orbs = np.fromfile(orbfile, dtype=np.float64)
 
