@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = python
+SPHINXPROJ    = tcpb_client
 SOURCEDIR     = .
 BUILDDIR      = _build
 

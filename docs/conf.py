@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = u'TCPB'
+project = u'tcpb_client'
 copyright = u'2018, Martinez Group'
 author = u'Martinez Group'
 
@@ -109,7 +109,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'TCPBdoc'
+htmlhelp_basename = 'tcpb_clientdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -136,7 +136,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'TCPB.tex', u'TCPB Documentation',
+    (master_doc, 'tcpb_client.tex', u'tcpb\\_client Documentation',
      u'Martinez Group', 'manual'),
 ]
 
@@ -146,7 +146,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'TCPB', u'TCPB Documentation',
+    (master_doc, 'tcpb_client', u'tcpb_client Documentation',
      [author], 1)
 ]
 
@@ -157,8 +157,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TCPB', u'TCPB Documentation',
-     author, 'TCPB', 'One line description of project.',
+    (master_doc, 'tcpb_client', u'tcpb_client Documentation',
+     author, 'tcpb_client', 'One line description of project.',
      'Miscellaneous'),
 ]
 

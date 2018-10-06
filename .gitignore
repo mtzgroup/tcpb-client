@@ -1,18 +1,12 @@
 *.pyc
 *.swp
 
-python/tcpb/terachem_server_pb2.py
-python/build/
-python/dist/
-python/tcpb.egg-info/
-python/docs/build/
-
-cpp/src/terachem_server.pb.c*
-cpp/include/terachem_server.pb.h
-cpp/obj/
-cpp/build/
-cpp/examples/tcpb-example
-client.log
+tcpb/terachem_server_pb2.py
+build/
+dist/
+tcpb.egg-info/
 
 tests/available/available_test
 tests/energy_grad_force/energy_grad_force_test
+
+docs/_build
