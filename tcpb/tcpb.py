@@ -12,7 +12,7 @@ import logging
 # ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
 # First 4 bytes: int32 of protocol buffer message type (check the MessageType enum in the protobuf file)
 # Second 4 bytes: int32 of packet size (not including the header)
-from . import terachem_server_pb2 as pb
+import terachem_server_pb2 as pb
 
 
 class TCProtobufClient(object):
