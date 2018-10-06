@@ -8,7 +8,8 @@ pipelines:
         script:
           # Set up Python
           - cd proto/
-          - protoc terachem_server.proto --python_out=../python/tcpb
+          - protoc terachem_server.proto --python_out=../tcpb
+          - cd ../
           - pip install .
           # Test Python
           - cd ../tests
