@@ -14,14 +14,14 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = u'TCPB Client'
-copyright = u'2018, Stefan Seritan'
-author = u'Stefan Seritan'
+project = u'TCPB'
+copyright = u'2018, Martinez Group'
+author = u'Martinez Group'
 
 # The short X.Y version
 version = u''
@@ -40,12 +40,13 @@ release = u''
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.viewcode',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,8 +55,8 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
-#source_suffix = '.rst'
+# source_suffix = ['.rst', '.md']
+source_suffix = ['.rst','.md']
 
 # The master toctree document.
 master_doc = 'index'
@@ -70,7 +71,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = []
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -108,7 +109,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'TCPBClientdoc'
+htmlhelp_basename = 'TCPBdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -135,8 +136,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'TCPBClient.tex', u'TCPB Client Documentation',
-     u'Stefan Seritan', 'manual'),
+    (master_doc, 'TCPB.tex', u'TCPB Documentation',
+     u'Martinez Group', 'manual'),
 ]
 
 
@@ -145,7 +146,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'tcpbclient', u'TCPB Client Documentation',
+    (master_doc, 'TCPB', u'TCPB Documentation',
      [author], 1)
 ]
 
@@ -156,18 +157,14 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TCPBClient', u'TCPB Client Documentation',
-     author, 'TCPBClient', 'One line description of project.',
+    (master_doc, 'TCPB', u'TCPB Documentation',
+     author, 'TCPB', 'One line description of project.',
      'Miscellaneous'),
 ]
 
 
 # -- Extension configuration -------------------------------------------------
-
-# Napoleon options
 napoleon_include_init_with_doc = True
-napoleon_include_private_with_doc = True
-napoleon_include_special_with_doc = True
 napoleon_use_ivar = True
 
 # -- Options for intersphinx extension ---------------------------------------

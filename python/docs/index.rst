@@ -1,14 +1,15 @@
-.. TCPB Client documentation master file, created by
-   sphinx-quickstart on Wed Oct  3 10:50:07 2018.
+.. python documentation master file, created by
+   sphinx-quickstart on Fri Oct  5 17:32:22 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to TCPB Client's documentation!
-=======================================
+Welcome to python's documentation!
+==================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+.. include:: 
 
 
 
