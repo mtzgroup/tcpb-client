@@ -12,5 +12,4 @@ pipelines:
           - cd ../
           - pip install .
           # Test Python
-          - cd ../tests
           - python test_tcpb.py
