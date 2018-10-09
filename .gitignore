@@ -1,7 +1,6 @@
 *.pyc
 *.swp
 
-tcpb/terachem_server_pb2.py
 build/
 dist/
 tcpb.egg-info/
