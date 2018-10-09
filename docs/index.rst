@@ -9,9 +9,9 @@ Welcome to tcpb_client's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-.. include:: ../README.md
 
-
+   readme
+   modules
 
 Indices and tables
 ==================
