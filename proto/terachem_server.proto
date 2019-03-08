@@ -31,6 +31,11 @@ message Status {
     bool working = 3;
     bool completed = 4;
   }
+
+  // Server job information
+  string job_dir = 5;
+  string job_scr_dir = 6;
+  int32 server_job_id = 7;
 }
 
 // Molecule message

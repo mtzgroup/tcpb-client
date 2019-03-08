@@ -7,6 +7,7 @@ import socket
 import struct
 import logging
 
+from exceptions import TCPBError, ServerError
 # Import the Protobuf messages generated from the .proto file
 # Note that I have implemented a small protocol on top of the protobufs since we send them in binary over TCP
 # ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
@@ -41,6 +42,10 @@ class TCProtobufClient(object):
         self.header_size = 8
 
         self.prev_results = None
+
+        self.curr_job_dir = None
+        self.curr_job_scr_dir = None
+        self.curr_job_id = None
 
     def __enter__(self):
         """
@@ -90,7 +95,7 @@ class TCProtobufClient(object):
             self.tcsock.settimeout(60.0)  # Timeout of 1 minute
             self.tcsock.connect(self.tcaddr)
         except socket.error as msg:
-            raise RuntimeError("TCProtobufClient: Problem connecting to {}. Error: {}".format(self.tcaddr, msg))
+            raise ServerError("Problem connecting to server: {}".format(msg), self)
 
     def disconnect(self):
         """Disconnect from the TeraChem Protobuf server
@@ -104,7 +109,7 @@ class TCProtobufClient(object):
             self.tcsock.close()
             self.tcsock = None
         except socket.error as msg:
-            raise RuntimeError("TCProtobufClient: Problem disconnecting from {}. Error: {}".format(self.tcaddr, msg))
+            raise ServerError("Problem disconnecting from server: {}".format(msg), self)
 
     def is_available(self):
         """Asks the TeraChem Protobuf server whether it is available or busy through the Status protobuf message.
@@ -166,6 +171,10 @@ class TCProtobufClient(object):
         status = self._recv_msg(pb.STATUS)
 
         if status.WhichOneof("job_status") == "accepted":
+            self.curr_job_dir = status.job_dir
+            self.curr_job_scr_dir = status.job_scr_dir
+            self.curr_job_id = status.server_job_id
+
             return True
         else:
             return False
@@ -195,8 +204,7 @@ class TCProtobufClient(object):
         elif status.WhichOneof("job_status") == "working":
             return False
         else:
-            raise RuntimeError("TCProtobufClient: No valid job status received in check_job_complete(),\
-                                either no job submitted or major issue with server.")
+            raise ServerError("Invalid or no job status received, either no job submitted before check_job_complete() or major server issue", self)
 
     def recv_job_async(self):
         """Recv and unpack a JobOutput message from the TeraChem Protobuf server asynchronously.
@@ -293,6 +301,11 @@ class TCProtobufClient(object):
 
         # Save results for user access later
         self.prev_results = results
+
+        # Wipe state
+        self.curr_job_dir = None
+        self.curr_job_scr_dir = None
+        self.curr_job_id = None
 
         return results
 
@@ -541,7 +554,7 @@ class TCProtobufClient(object):
         try:
             self.tcsock.sendall(header)
         except socket.error as msg:
-            raise RuntimeError("TCProtobufClient: Could not send header to {}. Error: {}".format(self.tcaddr, msg))
+            raise ServerError("Could not send header: {}".format(msg), self)
 
         msg_str = ''
         if msg_pb is not None:
@@ -549,7 +562,7 @@ class TCProtobufClient(object):
                 msg_str = msg_pb.SerializeToString()
                 self.tcsock.sendall(msg_str)
             except socket.error as msg:
-                raise RuntimeError("TCProtobufClient: Could not send protobuf to {}. Error: {}".format(self.tcaddr, msg))
+                raise ServerError("Could not send protobuf: {}".format(msg), self)
 
         if self.trace:
             packet = header + msg_str
@@ -577,16 +590,16 @@ class TCProtobufClient(object):
 
             # Check we got full message
             if nleft == self.header_size and data == '':
-                raise RuntimeError("TCProtobufClient: Could not recv header from {} because socket was closed from server".format(self.tcaddr))
+                raise ServerError("Could not recv header because socket was closed from server", self)
             elif nleft:
-                raise RuntimeError("TCProtobufClient: Got {} of {} expected bytes for header from {}".format(nleft, self.header_size, self.tcaddr))
+                raise ServerError("Recv'd {} of {} expected bytes for header".format(nleft, self.header_size), self)
         except socket.error as msg:
-            raise RuntimeError("TCProtobufClient: Could not recv header from {}. Error: {}".format(self.tcaddr, msg))
+            raise ServerError("Could not recv header: {}".format(msg), self)
 
         msg_info = struct.unpack_from(">II", header)
 
         if msg_info[0] != msg_type:
-            raise RuntimeError("TCProtobufClient: Received header for incorrect packet type. Expecting {} and got {}".format(msg_type, msg_info[0]))
+            raise ServerError("Received header for incorrect packet type (expecting {} and got {})".format(msg_type, msg_info[0]), self)
 
         # Receive Protocol Buffer (if one was sent)
         if msg_info[1] >= 0:
@@ -602,11 +615,11 @@ class TCProtobufClient(object):
 
                 # Check we got full message
                 if nleft == self.header_size and data == '':
-                    raise RuntimeError("TCProtobufClient: Could not recv message from {} because socket was closed from server".format(self.tcaddr))
+                    raise ServerError("Could not recv message because socket was closed from server", self)
                 elif nleft:
-                    raise RuntimeError("TCProtobufClient: Got {} of {} expected bytes for header from {}".format(nleft, self.header_size, self.tcaddr))
+                    raise ServerError("Recv'd {} of {} expected bytes for protobuf".format(nleft, msg_info[1]), self)
             except socket.error as msg:
-                raise RuntimeError("TCProtobufClient: Could not recv protobuf from {}. Error: {}".format(self.tcaddr, msg))
+                raise ServerError("Could not recv protobuf: {}".format(msg), self)
 
         if msg_type == pb.STATUS:
             recv_pb = pb.Status()
@@ -617,7 +630,7 @@ class TCProtobufClient(object):
         elif msg_type == pb.JOBOUTPUT:
             recv_pb = pb.JobOutput()
         else:
-            raise RuntimeError("TCProtobufClient: Unknown message type {} for received message.".format(msg_type))
+            raise ServerError("Unknown message type {} for received message.".format(msg_type), self)
 
         recv_pb.ParseFromString(msg_str)
 
