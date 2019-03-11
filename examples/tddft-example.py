@@ -31,7 +31,7 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
 
         'cis':          'yes',
         'cistarget':    1,
-        'cisnumstates': 1,
+        'cisnumstates': 3,
         'cisrelaxdipole': 'yes',
         }
 

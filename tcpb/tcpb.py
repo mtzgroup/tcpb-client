@@ -253,7 +253,7 @@ class TCProtobufClient(object):
         * cis_unrelaxed_dipoles:    # of excited states list of flat 3-element NumPy arrays (default included with 'cis yes', or explicitly with 'cisunrelaxdipole yes', units a.u.)
         * cis_relaxed_dipoles:      # of excited states list of flat 3-element NumPy arrays (included with 'cisrelaxdipole yes', units a.u.)
         * cis_transition_dipoles:   # of excited state combinations (N(N-1)/2) list of flat 3-element NumPy arrays (default includeded with 'cis yes', or explicitly with 'cistransdipole yes', units a.u.)
-                                    Order given as compound index with lower state on rows (e.g. 0->1, 0->2, 1->2 for 2 states)
+                                    Order given lexically (e.g. 0->1, 0->2, 1->2 for 2 states)
 
         Returns:
             dict: Results as described above 
@@ -314,7 +314,6 @@ class TCProtobufClient(object):
             results['cis_states'] = output.cis_states
 
             if len(output.cis_unrelaxed_dipoles):
-                print output.cis_unrelaxed_dipoles
                 uDips = []
                 for i in range(output.cis_states):
                     uDips.append(np.array(output.cis_unrelaxed_dipoles[4*i:4*i+3], dtype=np.float64))
@@ -328,7 +327,7 @@ class TCProtobufClient(object):
 
             if len(output.cis_transition_dipoles):
                 tDips = []
-                for i in range(output.cis_states*(output.cis_states-1)/2):
+                for i in range((output.cis_states+1)*output.cis_states/2):
                     tDips.append(np.array(output.cis_transition_dipoles[4*i:4*i+3], dtype=np.float64))
                 results['cis_transition_dipoles'] = tDips
 
