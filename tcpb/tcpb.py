@@ -220,8 +220,8 @@ class TCProtobufClient(object):
         * energy:             Either empty, single energy, or flat # of cas_energy_labels of NumPy array of doubles
         * charges:            Flat # of atoms NumPy array of doubles
         * spins:              Flat # of atoms NumPy array of doubles
-        * dipole_moment:      Single element
-        * dipole_vector:      Flat 3-element NumPy array of doubles
+        * dipole_moment:      Single element (units Debye)
+        * dipole_vector:      Flat 3-element NumPy array of doubles (units Debye)
         * job_dir:            String
         * job_scr_dir:        String
         * server_job_id:      Int
@@ -237,12 +237,23 @@ class TCProtobufClient(object):
 
         Additional (optional) members of results:
 
+        * bond_order:         # of atoms by # of atoms NumPy array of doubles
+
+        Available per job type:
         * gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
         * nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
-        * transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
-        * cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
-        * bond_order:         # of atoms by # of atoms NumPy array of doubles
         * ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
+
+        Available for CAS jobs:
+        * cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
+        * cas_transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
+
+        Available for CIS jobs:
+        * cis_states:         Number of excited states for reported properties
+        * cis_unrelaxed_dipoles:    # of excited states list of flat 3-element NumPy arrays (default included with 'cis yes', or explicitly with 'cisunrelaxdipole yes', units a.u.)
+        * cis_relaxed_dipoles:      # of excited states list of flat 3-element NumPy arrays (included with 'cisrelaxdipole yes', units a.u.)
+        * cis_transition_dipoles:   # of excited state combinations (N(N-1)/2) list of flat 3-element NumPy arrays (default includeded with 'cis yes', or explicitly with 'cistransdipole yes', units a.u.)
+                                    Order given as compound index with lower state on rows (e.g. 0->1, 0->2, 1->2 for 2 states)
 
         Returns:
             dict: Results as described above 
@@ -286,7 +297,7 @@ class TCProtobufClient(object):
             results['nacme'] = np.array(output.nacme, dtype=np.float64).reshape(-1, 3)
 
         if len(output.cas_transition_dipole):
-            results['transition_dipole'] = np.array(output.cas_transition_dipole, dtype=np.float64)
+            results['cas_transition_dipole'] = np.array(output.cas_transition_dipole, dtype=np.float64)
 
         if len(output.cas_energy_states):
             results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)
@@ -298,6 +309,28 @@ class TCProtobufClient(object):
 
         if len(output.ci_overlaps):
             results['ci_overlap'] = np.array(output.ci_overlaps, dtype=np.float64).reshape(output.ci_overlap_size, output.ci_overlap_size)
+
+        if output.cis_states > 0:
+            results['cis_states'] = output.cis_states
+
+            if len(output.cis_unrelaxed_dipoles):
+                print output.cis_unrelaxed_dipoles
+                uDips = []
+                for i in range(output.cis_states):
+                    uDips.append(np.array(output.cis_unrelaxed_dipoles[4*i:4*i+3], dtype=np.float64))
+                results['cis_unrelaxed_dipoles'] = uDips
+
+            if len(output.cis_relaxed_dipoles):
+                rDips = []
+                for i in range(output.cis_states):
+                    rDips.append(np.array(output.cis_relaxed_dipoles[4*i:4*i+3], dtype=np.float64))
+                results['cis_relaxed_dipoles'] = rDips
+
+            if len(output.cis_transition_dipoles):
+                tDips = []
+                for i in range(output.cis_states*(output.cis_states-1)/2):
+                    tDips.append(np.array(output.cis_transition_dipoles[4*i:4*i+3], dtype=np.float64))
+                results['cis_transition_dipoles'] = tDips
 
         # Save results for user access later
         self.prev_results = results

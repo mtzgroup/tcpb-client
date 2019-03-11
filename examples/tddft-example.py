@@ -32,10 +32,8 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         'cis':          'yes',
         'cistarget':    1,
         'cisnumstates': 1,
+        'cisrelaxdipole': 'yes',
         }
 
-    try:
-        results = TC.compute_job_sync("energy", geom, "bohr", **tddft_options)
-    except:
-        print TC.curr_job_dir
+    results = TC.compute_job_sync("energy", geom, "bohr", **tddft_options)
     print results

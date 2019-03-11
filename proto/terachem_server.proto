@@ -185,6 +185,12 @@ message JobOutput {
   repeated int32 cas_energy_mults = 20;
   repeated double cas_transition_dipole = 22;
 
+  // CIS specific output
+  int32 cis_states = 29;
+  repeated double cis_unrelaxed_dipoles = 30;
+  repeated double cis_relaxed_dipoles = 31;
+  repeated double cis_transition_dipoles = 32;
+
   //Bond order matrix
   repeated double bond_order = 16;
 }
