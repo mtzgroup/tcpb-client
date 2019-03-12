@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Simple example showing a SA-CASSCF calculation
+# Simple example showing a TDDFT calculation
 
 import sys
 from tcpb import TCProtobufClient as TCPBClient
@@ -29,11 +29,23 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         'rc_w':         0.2,
         'basis':        '6-31g',
 
-        'cis':          'yes',
-        'cistarget':    1,
-        'cisnumstates': 3,
-        'cisrelaxdipole': 'yes',
+        'cis':              'yes',
+        'cistarget':        1,
+        'cisnumstates':     3,
+        'cisrelaxdipole':   'yes',
         }
+    
+    # Gradient calculation
+    grad_results = TC.compute_job_sync("gradient", geom, "bohr", **tddft_options)
+    print("Grad Results:\n{}".format(grad_results))
 
-    results = TC.compute_job_sync("gradient", geom, "bohr", **tddft_options)
-    print(results)
+    # Coupling calculation
+    nac_options = tddft_options.copy()
+    nac_options['nacstate1'] = 0
+    nac_options['nacstate2'] = 1
+    # Try to seed as much guess as possible
+    # TODO: Update this one CI and Z vectors are passed through properly
+    nac_options['guess'] = '{}/{}'.format(grad_results['job_scr_dir'], 'c0')
+
+    nac_results = TC.compute_job_sync("coupling", geom, "bohr", **nac_options)
+    print("\nNAC Results:\n{}".format(nac_results))
