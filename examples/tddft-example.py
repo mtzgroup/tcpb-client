@@ -35,5 +35,5 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         'cisrelaxdipole': 'yes',
         }
 
-    results = TC.compute_job_sync("energy", geom, "bohr", **tddft_options)
-    print results
+    results = TC.compute_job_sync("gradient", geom, "bohr", **tddft_options)
+    print(results)

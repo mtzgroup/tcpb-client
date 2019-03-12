@@ -311,6 +311,7 @@ class TCProtobufClient(object):
             results['ci_overlap'] = np.array(output.ci_overlaps, dtype=np.float64).reshape(output.ci_overlap_size, output.ci_overlap_size)
 
         if output.cis_states > 0:
+            results['energy'] = np.array(output.energy[:output.cis_states+1], dtype=np.float64)
             results['cis_states'] = output.cis_states
 
             if len(output.cis_unrelaxed_dipoles):
