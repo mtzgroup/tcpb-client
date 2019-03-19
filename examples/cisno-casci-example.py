@@ -43,5 +43,5 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         'dcimaxiter':   100,
     }
     options = dict(base_options, **cisno_options)
-    results = TC.compute_job_sync("energy", geom, "bohr", **options)
+    results = TC.compute_job_sync("energy", geom, "angstrom", **options)
     print results

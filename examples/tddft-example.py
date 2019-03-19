@@ -36,7 +36,7 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         }
     
     # Gradient calculation
-    grad_results = TC.compute_job_sync("gradient", geom, "bohr", **tddft_options)
+    grad_results = TC.compute_job_sync("gradient", geom, "angstrom", **tddft_options)
     print("Grad Results:\n{}".format(grad_results))
 
     # Coupling calculation
@@ -47,5 +47,5 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     # TODO: Update this one CI and Z vectors are passed through properly
     nac_options['guess'] = '{}/{}'.format(grad_results['job_scr_dir'], 'c0')
 
-    nac_results = TC.compute_job_sync("coupling", geom, "bohr", **nac_options)
+    nac_results = TC.compute_job_sync("coupling", geom, "angstrom", **nac_options)
     print("\nNAC Results:\n{}".format(nac_results))

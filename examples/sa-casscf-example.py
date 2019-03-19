@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Simple example showing a SA-CASSCF calculation
+# Simple example showing an alpha-SA-CASSCF calculation
 
 import sys
 from tcpb import TCProtobufClient as TCPBClient
@@ -36,8 +36,19 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         'closed':       7,
         'active':       2,
         'cassinglets':  2,
+        'castarget':    1,
+        'alphacas':     'yes',
+        'alpha':        0.73,
     }
 
+    # Excited state gradient
     options = dict(base_options, **casscf_options)
-    results = TC.compute_job_sync("energy", geom, "bohr", **options)
+    results = TC.compute_job_sync("gradient", geom, "angstrom", **options)
     print results
+
+    # S0/S1 Coupling
+    options['nacstate1'] = 0
+    options['nacstate2'] = 1
+    results = TC.compute_job_sync('coupling', geom, 'angstrom', **options)
+    print results
+
