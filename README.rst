@@ -1,6 +1,6 @@
---------------------------------------
-TeraChem Protocol Buffer (TCPB) Client
---------------------------------------
+---------------------------------------------
+Python TeraChem Protocol Buffer (TCPB) Client
+---------------------------------------------
 
 This repository is designed to facilitate the development a Python client for communicating with TeraChem.
 
