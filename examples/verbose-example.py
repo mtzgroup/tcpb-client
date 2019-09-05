@@ -13,7 +13,7 @@ geom = [0.00000,  0.00000, -0.06852,
 # Default geom is bohr, but this in angstrom
 
 if len(sys.argv) != 3:
-    print('Usage: {} host port'.format(sys.argv[0]))
+    print(('Usage: {} host port'.format(sys.argv[0])))
     exit(1)
 
 # Set up client for h2o job
@@ -34,25 +34,25 @@ TC.connect()
 
 # Check if the server is available
 avail = TC.is_available()
-print "TCPB Server available: {}".format(avail)
+print("TCPB Server available: {}".format(avail))
 
 # Energy calculation
 energy = TC.compute_energy(geom, "angstrom", **tc_opts)  # Default is BOHR
-print "H2O Energy: {}".format(energy)
+print("H2O Energy: {}".format(energy))
 
 # Gradient calculation
 energy, gradient = TC.compute_gradient(geom, "angstrom", **tc_opts)
-print "H2O Gradient:\n{}".format(gradient)
+print("H2O Gradient:\n{}".format(gradient))
 
 # Forces calculation (just like gradient call with -1*gradient)
 energy, forces = TC.compute_forces(geom, "angstrom", **tc_opts)
-print "H2O Forces:\n{}".format(forces)
+print("H2O Forces:\n{}".format(forces))
 
 # General calculation
 results = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
-print("H2O Results:\n{}".format(results))
+print(("H2O Results:\n{}".format(results)))
 
 # Can get information from last calculation
-print("Last H2O Energy: {}".format(TC.prev_results['energy']))
+print(("Last H2O Energy: {}".format(TC.prev_results['energy'])))
 
 TC.disconnect()

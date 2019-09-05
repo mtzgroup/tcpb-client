@@ -33,7 +33,7 @@ h2o_gradient = [[  0.0000033590,   -0.0000021343,   -0.0331173999],
                 [ -0.0000006941,   -0.0141806788,    0.0165585893],
                 [ -0.0000026649,    0.0141828094,    0.0165588269]]
 
-def run_py_test(port=56789, run_real_server=False):
+def run_py_test(port=54321, run_real_server=False):
     """Run the test using Python client
 
     Args:

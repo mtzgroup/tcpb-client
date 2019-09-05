@@ -13,7 +13,7 @@ geom = [0.00000,  0.00000, -0.06852,
 # Default geom is bohr, but this in angstrom
 
 if len(sys.argv) != 3:
-    print('Usage: {} host port'.format(sys.argv[0]))
+    print(('Usage: {} host port'.format(sys.argv[0])))
     exit(1)
 
 with TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:

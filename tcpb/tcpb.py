@@ -7,13 +7,13 @@ import socket
 import struct
 import logging
 
-from exceptions import TCPBError, ServerError
+from .exceptions import TCPBError, ServerError
 # Import the Protobuf messages generated from the .proto file
 # Note that I have implemented a small protocol on top of the protobufs since we send them in binary over TCP
 # ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
 # First 4 bytes: int32 of protocol buffer message type (check the MessageType enum in the protobuf file)
 # Second 4 bytes: int32 of packet size (not including the header)
-import terachem_server_pb2 as pb
+from . import terachem_server_pb2 as pb
 
 
 class TCProtobufClient(object):
@@ -73,7 +73,7 @@ class TCProtobufClient(object):
             port (int): Port number (must be above 1023)
         """
         # Sanity checks
-        if not isinstance(host, basestring):
+        if not isinstance(host, str):
             raise TypeError("Hostname must be a string")
         if not isinstance(port, int):
             raise TypeError("Port number must be an integer")
@@ -143,16 +143,16 @@ class TCProtobufClient(object):
         Returns:
             bool: True on job acceptance, False on server busy, and errors out if communication fails
         """
-        if jobType.upper() not in pb.JobInput.RunType.keys():
+        if jobType.upper() not in list(pb.JobInput.RunType.keys()):
             raise ValueError("Job type specified is not available in this version of the TCPB client\n" \
-                             "Allowed run types: {}".format(pb.JobInput.RunType.keys()))
+                             "Allowed run types: {}".format(list(pb.JobInput.RunType.keys())))
         if geom is None:
             raise SyntaxError("Did not provide geometry to send_job_async()")
         if isinstance(geom, np.ndarray):
             geom = geom.flatten()
-        if unitType.upper() not in pb.Mol.UnitType.keys():
+        if unitType.upper() not in list(pb.Mol.UnitType.keys()):
             raise ValueError("Unit type specified is not available in this version of the TCPB client\n" \
-                             "Allowed unit types: {}".format(pb.Mol.UnitType.keys()))
+                             "Allowed unit types: {}".format(list(pb.Mol.UnitType.keys())))
 
         if self.debug:
             logging.info("in debug mode - assume job completed")
@@ -301,7 +301,7 @@ class TCProtobufClient(object):
 
         if len(output.cas_energy_states):
             results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)
-            results['cas_energy_labels'] = zip(output.cas_energy_states, output.cas_energy_mults)
+            results['cas_energy_labels'] = list(zip(output.cas_energy_states, output.cas_energy_mults))
 
         if len(output.bond_order):
             nAtoms = len(output.mol.atoms)
@@ -500,7 +500,7 @@ class TCProtobufClient(object):
         # Validate all options are here
         # TODO: Replace with mtzutils.Options
         required = ['atoms', 'charge', 'spinmult', 'closed_shell', 'restricted', 'method', 'basis']
-        types = [basestring, int, int, bool, bool, basestring, basestring]
+        types = [str, int, int, bool, bool, str, str]
 
         for r, t in zip(required, types):
             if kwargs.get(r, None) is None:
@@ -512,13 +512,13 @@ class TCProtobufClient(object):
             elif r == 'method':
                 if not isinstance(kwargs['method'], t):
                     raise TypeError("%s must have type: %s" % (r, t))
-                elif kwargs['method'].upper() not in pb.JobInput.MethodType.keys():
+                elif kwargs['method'].upper() not in list(pb.JobInput.MethodType.keys()):
                     raise ValueError("Method specified is not available in this version of the TCPB client\n" \
-                                     "Allowed methods: {}".format(pb.JobInput.MethodType.keys()))
+                                     "Allowed methods: {}".format(list(pb.JobInput.MethodType.keys())))
             elif not isinstance(kwargs[r], t):
                 raise TypeError("%s must have type: %s" % (r, t))
 
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key == 'atoms':
                 job_options.mol.atoms.extend(value)
             elif key == 'charge':
@@ -589,7 +589,7 @@ class TCProtobufClient(object):
         except socket.error as msg:
             raise ServerError("Could not send header: {}".format(msg), self)
 
-        msg_str = ''
+        msg_str = b''
         if msg_pb is not None:
             try:
                 msg_str = msg_pb.SerializeToString()
@@ -612,17 +612,17 @@ class TCProtobufClient(object):
         """
         # Receive header
         try:
-            header = ''
+            header = b''
             nleft = self.header_size
             while nleft:
                 data = self.tcsock.recv(nleft)
-                if data == '':
+                if data == b'':
                     break
                 header += data
                 nleft -= len(data)
 
             # Check we got full message
-            if nleft == self.header_size and data == '':
+            if nleft == self.header_size and data == b'':
                 raise ServerError("Could not recv header because socket was closed from server", self)
             elif nleft:
                 raise ServerError("Recv'd {} of {} expected bytes for header".format(nleft, self.header_size), self)
@@ -637,17 +637,17 @@ class TCProtobufClient(object):
         # Receive Protocol Buffer (if one was sent)
         if msg_info[1] >= 0:
             try:
-                msg_str = ''
+                msg_str = b''
                 nleft = msg_info[1] 
                 while nleft:
                     data = self.tcsock.recv(nleft)
-                    if data == '':
+                    if data == b'':
                         break
                     msg_str += data
                     nleft -= len(data)
 
                 # Check we got full message
-                if nleft == self.header_size and data == '':
+                if nleft == self.header_size and data == b'':
                     raise ServerError("Could not recv message because socket was closed from server", self)
                 elif nleft:
                     raise ServerError("Recv'd {} of {} expected bytes for protobuf".format(nleft, msg_info[1]), self)

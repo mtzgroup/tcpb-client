@@ -29,8 +29,9 @@ def run_py_test(port=56789, run_real_server=False):
                 print('Not available')
             count += 1
 
+        print('num cycles', count)
         if count != expected_cycles:
-            print('Expected {} cycles, but only got {}'.format(expected_cycles, count))
+            print(('Expected {} cycles, but only got {}'.format(expected_cycles, count)))
             return False
 
     return True
