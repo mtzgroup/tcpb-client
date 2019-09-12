@@ -12,10 +12,11 @@ RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v3.3.0/pr
 RUN tar xf protobuf-cpp-3.3.0.tar.gz -C /tmp
 WORKDIR /tmp/protobuf-3.3.0
 RUN ./configure && make && make install
-WORKDIR /
-RUN rm -rf /tmp/protobuf-3.3.0
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
 
 # Preinstall pip packages to cut down on pipeline time
+WORKDIR /
 RUN pip install google protobuf numpy tox
 
 ENTRYPOINT ["/bin/bash"]
