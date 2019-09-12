@@ -1,6 +1,6 @@
 # Since I want to test Python and C++, need to use a Linux container
 # Local debug line: docker run -it --volume=/Users/sseritan/Documents/Research/MartinezGroup/tcpb-client:/tcpb-client --workdir="/tcpb-client" sseritan/tcpb-client-docker
-image: sseritan/tcpb-client-docker
+image: sseritan/tcpb-client-docker:1.1
 
 pipelines:
   default:
