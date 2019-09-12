@@ -44,7 +44,10 @@ def run_py_test(port=54321, run_real_server=False):
     """
     # Set up MockServer for testing
     if not run_real_server:
-        mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
+        script_dir = os.path.dirname(__file__)
+        recv_file = os.path.join(script_dir, 'energy_grad_force/client_recv.bin')
+        sent_file = os.path.join(script_dir, 'energy_grad_force/client_sent.bin')
+        mock = MockServer(port, recv_file, sent_file)
 
     with TCProtobufClient(host='localhost', port=port, trace=run_real_server) as TC:
         if run_real_server:

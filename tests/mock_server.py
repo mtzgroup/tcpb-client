@@ -11,7 +11,10 @@ import socket
 import struct
 import sys
 from threading import Thread
-from queue import Queue
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
 
 from tcpb import terachem_server_pb2 as pb
 

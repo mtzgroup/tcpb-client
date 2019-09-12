@@ -6,11 +6,9 @@ pipelines:
   default:
     - step:
         script:
-          # Set up Python
+          # Generate protobuf
           - cd proto/
           - protoc terachem_server.proto --python_out=../tcpb
           - cd ../
-          - pip install .
-          # Test Python
-          - cd tests/
-          - python test_tcpb.py
+          # Test Python with tox
+          - tox
