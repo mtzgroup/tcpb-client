@@ -13,7 +13,7 @@ geom = [0.00000,  0.00000, -0.06852,
 # Default geom is bohr, but this in angstrom
 
 if len(sys.argv) != 3:
-    print(('Usage: {} host port'.format(sys.argv[0])))
+    print('Usage: {} host port'.format(sys.argv[0]))
     exit(1)
 
 # Set up client for h2o job
@@ -50,9 +50,9 @@ print("H2O Forces:\n{}".format(forces))
 
 # General calculation
 results = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
-print(("H2O Results:\n{}".format(results)))
+print("H2O Results:\n{}".format(results))
 
 # Can get information from last calculation
-print(("Last H2O Energy: {}".format(TC.prev_results['energy'])))
+print("Last H2O Energy: {}".format(TC.prev_results['energy']))
 
 TC.disconnect()

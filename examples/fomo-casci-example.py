@@ -14,7 +14,7 @@ geom = [ 0.35673483, -0.05087227, -0.47786734,
          2.16553127, -0.97886933,  0.15232587]
 
 if len(sys.argv) != 3:
-    print(('Usage: {} host port'.format(sys.argv[0])))
+    print('Usage: {} host port'.format(sys.argv[0]))
     exit(1)
 
 with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
