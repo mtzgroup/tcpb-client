@@ -44,11 +44,11 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     # Excited state gradient
     options = dict(base_options, **casscf_options)
     results = TC.compute_job_sync("gradient", geom, "angstrom", **options)
-    print results
+    print(results)
 
     # S0/S1 Coupling
     options['nacstate1'] = 0
     options['nacstate2'] = 1
     results = TC.compute_job_sync('coupling', geom, 'angstrom', **options)
-    print results
+    print(results)
 

@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function
+
 """Exception handling for tcpb package
 
 See https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
@@ -25,7 +27,7 @@ class ServerError(TCPBError):
             
             debuglines = ''.join(lines[-10:])
             msg += 'Last 10 lines from logfile ({}):\n{}'.format(logfile, debuglines)
-        except IOError, OSError:
+        except IOError as OSError:
            msg += 'Could not open logfile' 
 
         super(ServerError, self).__init__(msg)

@@ -11,7 +11,10 @@ import socket
 import struct
 import sys
 from threading import Thread
-from Queue import Queue
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
 
 from tcpb import terachem_server_pb2 as pb
 
@@ -111,7 +114,7 @@ class MockServer(object):
             try:
                 header = self._recv_header(client)
             except socket.error as msg:
-                print("MockServer: Problem receiving header from client. Error: {}".format(msg))
+                print(("MockServer: Problem receiving header from client. Error: {}".format(msg)))
                 return
 
             if header is None:
@@ -129,7 +132,7 @@ class MockServer(object):
             try:
                 msg_str = self._recv_message(client, msg_size)
             except socket.error as msg:
-                print("MockServer: Problem receiving message from client. Error: {}".format(msg))
+                print(("MockServer: Problem receiving message from client. Error: {}".format(msg)))
                 return
 
             if msg_type == pb.STATUS:
@@ -151,10 +154,10 @@ class MockServer(object):
                 print("MockServer: Expected protobuf did not match received protobuf")
                 print("EXPECTED PROTOBUF:")
                 print(expected_pb)
-                print(expected_pb.SerializeToString())
+                print((expected_pb.SerializeToString()))
                 print("\nRECEIVED PROTOBUF:")
                 print(recvd_pb)
-                print(recvd_pb.SerializeToString())
+                print((recvd_pb.SerializeToString()))
                 sys.stdout.flush()
                 return
 
@@ -165,13 +168,13 @@ class MockServer(object):
             try:
                 self._send_header(client, response_type, response_pb.ByteSize())
             except socket.error as msg:
-                print("MockServer: Problem sending header to client. Error: {}".format(msg))
+                print(("MockServer: Problem sending header to client. Error: {}".format(msg)))
                 return
 
             try:
                 self._send_message(client, response_pb.SerializeToString())
             except socket.error as msg:
-                print("MockServer: Problem sending message to client. Error: {}".format(msg))
+                print(("MockServer: Problem sending message to client. Error: {}".format(msg)))
                 return
 
             if response_type == pb.STATUS and response_pb.WhichOneof("job_status") == 'completed':
@@ -180,13 +183,13 @@ class MockServer(object):
                 try:
                     self._send_header(client, response_type, response_pb.ByteSize())
                 except socket.error as msg:
-                    print("MockServer: Problem sending header to client. Error: {}".format(msg))
+                    print(("MockServer: Problem sending header to client. Error: {}".format(msg)))
                     return
 
                 try:
                     self._send_message(client, response_pb.SerializeToString())
                 except socket.error as msg:
-                    print("MockServer: Problem sending message to client. Error: {}".format(msg))
+                    print(("MockServer: Problem sending message to client. Error: {}".format(msg)))
                     return
 
                 del self.response_msgs[1]
@@ -212,7 +215,7 @@ class MockServer(object):
         try:
             client.sendall(header)
         except socket.error as msg:
-            print("MockServer: Could not send header. Error: {}".format(msg))
+            print(("MockServer: Could not send header. Error: {}".format(msg)))
             return False
 
         return True
@@ -228,7 +231,7 @@ class MockServer(object):
         try:
             client.sendall(msg_str)
         except socket.error as msg:
-            print("MockServer: Could not send message. Error: {}".format(msg))
+            print(("MockServer: Could not send message. Error: {}".format(msg)))
             return False
 
         return True
@@ -240,21 +243,21 @@ class MockServer(object):
             client: Client socket
         Returns (msg_type, msg_size) on successful recv, None otherwise
         """
-        header = ''
+        header = b''
         nleft = self.header_size
         while nleft:
             data = client.recv(nleft)
-            if data == '':
+            if data == b'':
                 break
             header += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.header_size and data == '':
+        if nleft == self.header_size and data == b'':
             print("MockServer: Could not recv header because socket was closed from client")
             return None
         elif nleft:
-            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size))
+            print(("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)))
             return None
 
         msg_info = struct.unpack_from(">II", header)
@@ -269,23 +272,23 @@ class MockServer(object):
         Returns a string representation of the binary message if successful, None otherwise
         """
         if msg_size == 0:
-            return ""
+            return b""
 
-        msg_str = ''
+        msg_str = b''
         nleft = msg_size
         while nleft:
             data = client.recv(nleft)
-            if data == '':
+            if data == b'':
                 break
             msg_str += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.header_size and data == '':
+        if nleft == self.header_size and data == b'':
             print("MockServer: Could not recv message because socket was closed from client")
             return None
         elif nleft:
-            print("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size))
+            print(("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)))
             return None
 
         return msg_str

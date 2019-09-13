@@ -1,5 +1,6 @@
 # Test for is_available()
 
+import os
 import subprocess
 
 from tcpb import TCProtobufClient
@@ -20,7 +21,10 @@ def run_py_test(port=56789, run_real_server=False):
     """
     # Set up MockServer for testing
     if not run_real_server:
-        mock = MockServer(port, 'available/client_recv.bin', 'available/client_sent.bin')
+        script_dir = os.path.dirname(__file__)
+        recv_file = os.path.join(script_dir, 'available/client_recv.bin')
+        sent_file = os.path.join(script_dir, 'available/client_sent.bin')
+        mock = MockServer(port, recv_file, sent_file)
 
     with TCProtobufClient(host='localhost', port=port, trace=run_real_server) as TC:
         count = 0
@@ -29,8 +33,9 @@ def run_py_test(port=56789, run_real_server=False):
                 print('Not available')
             count += 1
 
+        print('num cycles', count)
         if count != expected_cycles:
-            print('Expected {} cycles, but only got {}'.format(expected_cycles, count))
+            print(('Expected {} cycles, but only got {}'.format(expected_cycles, count)))
             return False
 
     return True

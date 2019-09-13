@@ -5,6 +5,7 @@ build/
 dist/
 tcpb.egg-info/
 
+.tox
 tests/available/available_test
 tests/energy_grad_force/energy_grad_force_test
 

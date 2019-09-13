@@ -42,4 +42,4 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
 
     # NACME calculation
     results = TC.compute_job_sync('coupling', geom, 'angstrom', **options)
-    print results
+    print(results)

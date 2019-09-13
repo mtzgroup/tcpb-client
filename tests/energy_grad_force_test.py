@@ -33,7 +33,7 @@ h2o_gradient = [[  0.0000033590,   -0.0000021343,   -0.0331173999],
                 [ -0.0000006941,   -0.0141806788,    0.0165585893],
                 [ -0.0000026649,    0.0141828094,    0.0165588269]]
 
-def run_py_test(port=56789, run_real_server=False):
+def run_py_test(port=54321, run_real_server=False):
     """Run the test using Python client
 
     Args:
@@ -44,7 +44,10 @@ def run_py_test(port=56789, run_real_server=False):
     """
     # Set up MockServer for testing
     if not run_real_server:
-        mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
+        script_dir = os.path.dirname(__file__)
+        recv_file = os.path.join(script_dir, 'energy_grad_force/client_recv.bin')
+        sent_file = os.path.join(script_dir, 'energy_grad_force/client_sent.bin')
+        mock = MockServer(port, recv_file, sent_file)
 
     with TCProtobufClient(host='localhost', port=port, trace=run_real_server) as TC:
         if run_real_server:
