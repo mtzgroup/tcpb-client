@@ -1,6 +1,6 @@
 # Since I want to test Python and C++, need to use a Linux container
 # Local debug line: docker run -it --volume=/Users/sseritan/Documents/Research/MartinezGroup/tcpb-client:/tcpb-client --workdir="/tcpb-client" sseritan/tcpb-client-docker
-image: sseritan/tcpb-client-docker:1.1
+image: sseritan/tcpb-client-docker:1.2
 
 pipelines:
   default:
@@ -11,4 +11,6 @@ pipelines:
           - protoc terachem_server.proto --python_out=../tcpb
           - cd ../
           # Test Python with tox
+          - cd ../
+          - pyenv local 3.7.4 3.6.9 3.5.7 2.7.16
           - tox
