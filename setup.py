@@ -5,7 +5,7 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
-__title__ = "tcpb"
+__title__ = "TeraChem Protocol Buffer Client"
 __copyright__ = "Martinez Group, Stanford University, CA, USA, Planet Earth"
 __version__ = "0.5.2"
 __status__ = "beta"
@@ -15,9 +15,9 @@ setup(name="tcpb",
       version=__version__,
       description="Python client for TeraChem Protocol Buffer server",
       long_description=readme(),
-      packages=find_packages(exclude=['examples', 'proto', 'tests']),
+      packages=['tcpb'],
       test_suite="tcpb",
-      install_requires=['google==1.9.3','protobuf>=3.2.0','numpy>=1.13','future'],
+      install_requires=['protobuf>=3.2.0','numpy>=1.13','future'],
       python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4',
       url='https://bitbucket.org/mtzcloud/tcpb-python',
       project_urls={
