@@ -1,17 +1,18 @@
-.. tcpb_client documentation master file, created by
-   sphinx-quickstart on Fri Oct  5 17:47:22 2018.
+.. TCPB documentation master file, created by
+   sphinx-quickstart on Fri Dec 27 12:30:47 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to tcpb_client's documentation!
-=======================================
+Welcome to TCPB's documentation!
+================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   
    readme
-   modules
+   tcpb
+
 
 Indices and tables
 ==================

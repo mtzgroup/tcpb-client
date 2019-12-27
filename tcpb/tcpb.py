@@ -242,15 +242,18 @@ class TCProtobufClient(object):
         * bond_order:         # of atoms by # of atoms NumPy array of doubles
 
         Available per job type:
+
         * gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
         * nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
         * ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
 
         Available for CAS jobs:
+
         * cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
         * cas_transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
 
         Available for CIS jobs:
+        
         * cis_states:         Number of excited states for reported properties
         * cis_unrelaxed_dipoles:    # of excited states list of flat 3-element NumPy arrays (default included with 'cis yes', or explicitly with 'cisunrelaxdipole yes', units a.u.)
         * cis_relaxed_dipoles:      # of excited states list of flat 3-element NumPy arrays (included with 'cisrelaxdipole yes', units a.u.)
