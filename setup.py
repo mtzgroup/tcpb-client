@@ -17,7 +17,7 @@ setup(name="tcpb",
       long_description=readme(),
       packages=['tcpb'],
       test_suite="tcpb",
-      install_requires=['protobuf>=3.2.0','numpy>=1.13','future'],
+      install_requires=['google==1.9.3','protobuf>=3.2.0','numpy>=1.13','future'],
       python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4',
       url='https://bitbucket.org/mtzcloud/tcpb-python',
       project_urls={
