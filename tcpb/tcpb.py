@@ -278,7 +278,7 @@ class TCProtobufClient(object):
         if len(output.energy):
             results['energy'] = output.energy[0]
 
-        if output.mol.restricted is True:
+        if output.mol.closed is True:
             results['orbfile'] = output.orb1afile
 
             results['orb_energies'] = np.array(output.orba_energies)
