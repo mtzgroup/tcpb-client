@@ -7,7 +7,7 @@ def readme():
 
 __title__ = "TeraChem Protocol Buffer Client"
 __copyright__ = "Martinez Group, Stanford University, CA, USA, Planet Earth"
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 __status__ = "beta"
 
 
