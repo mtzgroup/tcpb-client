@@ -1,9 +1,6 @@
 tcpb package
 ============
 
-Submodules
-----------
-
 tcpb.tcpb module
 ----------------
 
@@ -12,10 +9,18 @@ tcpb.tcpb module
     :undoc-members:
     :show-inheritance:
 
-Module contents
----------------
+tcpb.exceptions module
+----------------------
 
-.. automodule:: tcpb
+.. automodule:: tcpb.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tcpb.serial_utils module
+------------------------
+
+.. automodule:: tcpb.serial_utils
     :members:
     :undoc-members:
     :show-inheritance:

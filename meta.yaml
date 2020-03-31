@@ -1,0 +1,27 @@
+package:
+  name: tcpb
+  version: 0.5.2
+
+source:
+  git_rev: r0.5.2
+  git_url: git@bitbucket.org:mtzcloud/tcpb-python.git
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - numpy 
+    - protobuf >=3.2.0
+    - future
+
+about:
+  home: https://bitbucket.org/mtzcloud/tcpb-python
+  summary: Python client for TeraChem Protocol Buffer server
+  license: MIT
