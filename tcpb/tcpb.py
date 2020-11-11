@@ -10,6 +10,7 @@ import struct
 import logging
 
 from .exceptions import TCPBError, ServerError
+from .molden_constructor import tcpb_imd_fields2molden_string
 # Import the Protobuf messages generated from the .proto file
 # Note that I have implemented a small protocol on top of the protobufs since we send them in binary over TCP
 # ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
@@ -337,6 +338,9 @@ class TCProtobufClient(object):
                     tDips.append(np.array(output.cis_transition_dipoles[4*i:4*i+3], dtype=np.float64))
                 results['cis_transition_dipoles'] = tDips
 
+        if len(output.compressed_mo_vector):
+            results['molden'] = tcpb_imd_fields2molden_string(output);
+
         # Save results for user access later
         self.prev_results = results
 
@@ -562,6 +566,10 @@ class TCProtobufClient(object):
                     raise ValueError("Bond order request must be True or False")
 
                 job_options.return_bond_order = value
+            elif key == 'mo_output':
+                # Request AO and MO information
+                if value is True:
+                    job_options.imd_orbital_type = pb.JobInput.ImdOrbitalType.Value("WHOLE_C")
             elif key in job_options.user_options:
                 # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)
