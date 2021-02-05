@@ -6,8 +6,8 @@
 import sys
 import unittest
 
-import available_test
-import energy_grad_force_test
+from . import available_test
+from . import energy_grad_force_test
 
 class TestPyTCPB(unittest.TestCase):
     def test_available(self):
