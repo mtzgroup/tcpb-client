@@ -9,7 +9,7 @@ import time
 
 from tcpb import TCProtobufClient
 
-from mock_server import MockServer
+from .mock_server import MockServer
 
 
 # JOB INPUT
