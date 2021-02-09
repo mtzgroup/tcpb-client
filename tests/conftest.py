@@ -3,10 +3,7 @@ import pytest
 
 @pytest.fixture
 def settings():
-    yield {
-        "tcpb_host": "localhost",
-        "tcpb_port": 111111,
-    }
+    yield {"tcpb_host": "localhost", "tcpb_port": 11111, "round_decimals": 6}
 
 
 @pytest.fixture

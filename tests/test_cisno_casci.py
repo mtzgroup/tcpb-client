@@ -1,19 +1,26 @@
-# Simple example showing a CISNO-CASCI calculation
-import sys
+from typing import List, Collection, Union
+
 from tcpb import TCProtobufClient as TCPBClient
 
-# Ethene system
 
-import pytest
+def _round(value: Union[Collection[float], float], places: int = 6):
+    """Round a value or Collection of values to a set precision"""
+    if isinstance(value, float):
+        return round(value, places)
+    elif isinstance(value, Collection):
+        return [_round(v, places) for v in value]
+    else:
+        raise ValueError("Cannot round values!")
 
-@pytest.mark.skip
+
 def test_cisno_casci(settings, ethylene):
+    from .answers import cisno_casci_example
 
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
         base_options = {
             "method": "hf",
             "basis": "6-31g**",
-            "atoms": ethylene['atoms'],
+            "atoms": ethylene["atoms"],
             "charge": 0,
             "spinmult": 1,
             "closed_shell": True,
@@ -34,4 +41,18 @@ def test_cisno_casci(settings, ethylene):
         }
         options = dict(base_options, **cisno_options)
         results = TC.compute_job_sync("energy", ethylene["geom"], "angstrom", **options)
-        print(results)
+
+        fields_to_check = [
+            "charges",
+            "dipole_moment",
+            "dipole_vector",
+            "energy",
+            "orb_energies",
+            "orb_occupations",
+            "cas_transition_dipole",
+            "bond_order",
+        ]
+        for field in fields_to_check:
+            assert _round(results[field]) == _round(
+                cisno_casci_example.correct_answer[field]
+            )

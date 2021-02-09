@@ -8,6 +8,11 @@ tcpb = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"
+black = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
