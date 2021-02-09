@@ -6,15 +6,10 @@
 # Communication is really over sockets, but responses are feed into the mock server beforehand
 # Threading model from https://stackoverflow.com/questions/23828264/how-to-make-a-simple-multithreaded-socket-server-in-python-that-remembers-client
 
-import numpy as np
 import socket
 import struct
 import sys
 from threading import Thread
-try:
-    from queue import Queue
-except ImportError:
-    from Queue import Queue
 
 from tcpb import terachem_server_pb2 as pb
 
@@ -28,6 +23,7 @@ class MockServer(object):
     - Response is sent back to client over socket (on listening thread)
     - Output of client function is tested for correctness
     """
+
     def __init__(self, port, intracefile, outtracefile):
         """Initialize the MockServer object.
 
@@ -40,12 +36,14 @@ class MockServer(object):
         if not isinstance(port, int):
             raise TypeError("Port number must be an integer")
         if port < 1023:
-            raise ValueError("Port number is not allowed to below 1023 (system reserved ports)")
+            raise ValueError(
+                "Port number is not allowed to below 1023 (system reserved ports)"
+            )
 
-        self.header_size = 8 #Expect exactly 2 ints of 4 bytes each
+        self.header_size = 8  # Expect exactly 2 ints of 4 bytes each
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(('localhost', port))
+        self.sock.bind(("localhost", port))
         self.listen_thread = Thread(target=self.listen)
 
         # Expected messages from client (out for client, in for server)
@@ -59,13 +57,13 @@ class MockServer(object):
 
     def load_trace(self, tracefile):
         """Load a packet trace from a TCPB client job run with trace=True
-        
+
         Args:
             tracefile: If True, append to outfile. If False, overwrite outfile.
         Returns:
             msgs: List of (msg_type, msg_pb) from tracefile
         """
-        f = open(tracefile, 'rb')
+        f = open(tracefile, "rb")
         data = f.read()
         f.close()
 
@@ -74,8 +72,8 @@ class MockServer(object):
         while packet_start < len(data):
             header_mid = packet_start + 4
             header_end = packet_start + 8
-            msg_type = struct.unpack_from('>I', data[packet_start:header_mid])[0]
-            msg_size = struct.unpack_from('>I', data[header_mid:header_end])[0]
+            msg_type = struct.unpack_from(">I", data[packet_start:header_mid])[0]
+            msg_size = struct.unpack_from(">I", data[header_mid:header_end])[0]
             msg_end = header_end + msg_size
 
             if msg_type == pb.STATUS:
@@ -87,7 +85,11 @@ class MockServer(object):
             elif msg_type == pb.JOBOUTPUT:
                 msg_pb = pb.JobOutput()
             else:
-                raise RuntimeError("PBHelper: Unknown message type {} for received message.".format(msg_type))
+                raise RuntimeError(
+                    "PBHelper: Unknown message type {} for received message.".format(
+                        msg_type
+                    )
+                )
 
             if len(data) < msg_end:
                 raise RuntimeError("PBHelper: Ran out of trace.")
@@ -95,7 +97,7 @@ class MockServer(object):
             msg_pb.ParseFromString(data[header_end:msg_end])
 
             msgs += [(msg_type, msg_pb)]
-            
+
             packet_start = msg_end
 
         return msgs
@@ -107,14 +109,20 @@ class MockServer(object):
         client.settimeout(5)
         self.testClient(client)
 
-    def testClient(self, client):    
+    def testClient(self, client):  # noqa NOTE: C901 too complex!
         # Handle getting message from client
         # Very brittle, but should be fine for testing because I control communication
         while len(self.expected_msgs) > 0:
             try:
                 header = self._recv_header(client)
             except socket.error as msg:
-                print(("MockServer: Problem receiving header from client. Error: {}".format(msg)))
+                print(
+                    (
+                        "MockServer: Problem receiving header from client. Error: {}".format(
+                            msg
+                        )
+                    )
+                )
                 return
 
             if header is None:
@@ -132,7 +140,13 @@ class MockServer(object):
             try:
                 msg_str = self._recv_message(client, msg_size)
             except socket.error as msg:
-                print(("MockServer: Problem receiving message from client. Error: {}".format(msg)))
+                print(
+                    (
+                        "MockServer: Problem receiving message from client. Error: {}".format(
+                            msg
+                        )
+                    )
+                )
                 return
 
             if msg_type == pb.STATUS:
@@ -168,28 +182,55 @@ class MockServer(object):
             try:
                 self._send_header(client, response_type, response_pb.ByteSize())
             except socket.error as msg:
-                print(("MockServer: Problem sending header to client. Error: {}".format(msg)))
+                print(
+                    (
+                        "MockServer: Problem sending header to client. Error: {}".format(
+                            msg
+                        )
+                    )
+                )
                 return
 
             try:
                 self._send_message(client, response_pb.SerializeToString())
             except socket.error as msg:
-                print(("MockServer: Problem sending message to client. Error: {}".format(msg)))
+                print(
+                    (
+                        "MockServer: Problem sending message to client. Error: {}".format(
+                            msg
+                        )
+                    )
+                )
                 return
 
-            if response_type == pb.STATUS and response_pb.WhichOneof("job_status") == 'completed':
+            if (
+                response_type == pb.STATUS
+                and response_pb.WhichOneof("job_status") == "completed"
+            ):
                 # Also need to send joboutput, which should be next message
                 response_type, response_pb = self.response_msgs[1]
                 try:
                     self._send_header(client, response_type, response_pb.ByteSize())
                 except socket.error as msg:
-                    print(("MockServer: Problem sending header to client. Error: {}".format(msg)))
+                    print(
+                        (
+                            "MockServer: Problem sending header to client. Error: {}".format(
+                                msg
+                            )
+                        )
+                    )
                     return
 
                 try:
                     self._send_message(client, response_pb.SerializeToString())
                 except socket.error as msg:
-                    print(("MockServer: Problem sending message to client. Error: {}".format(msg)))
+                    print(
+                        (
+                            "MockServer: Problem sending message to client. Error: {}".format(
+                                msg
+                            )
+                        )
+                    )
                     return
 
                 del self.response_msgs[1]
@@ -211,7 +252,7 @@ class MockServer(object):
         """
         # This will always pack integers as 4 bytes since I am requesting a standard packing (big endian)
         # Big endian is convention for network byte order (because IBM or someone)
-        header = struct.pack('>II', msg_type, msg_size)
+        header = struct.pack(">II", msg_type, msg_size)
         try:
             client.sendall(header)
         except socket.error as msg:
@@ -243,21 +284,29 @@ class MockServer(object):
             client: Client socket
         Returns (msg_type, msg_size) on successful recv, None otherwise
         """
-        header = b''
+        header = b""
         nleft = self.header_size
         while nleft:
             data = client.recv(nleft)
-            if data == b'':
+            if data == b"":
                 break
             header += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.header_size and data == b'':
-            print("MockServer: Could not recv header because socket was closed from client")
+        if nleft == self.header_size and data == b"":
+            print(
+                "MockServer: Could not recv header because socket was closed from client"
+            )
             return None
         elif nleft:
-            print(("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)))
+            print(
+                (
+                    "MockServer: Got {} of {} expected bytes for header".format(
+                        nleft, self.header_size
+                    )
+                )
+            )
             return None
 
         msg_info = struct.unpack_from(">II", header)
@@ -274,21 +323,29 @@ class MockServer(object):
         if msg_size == 0:
             return b""
 
-        msg_str = b''
+        msg_str = b""
         nleft = msg_size
         while nleft:
             data = client.recv(nleft)
-            if data == b'':
+            if data == b"":
                 break
             msg_str += data
             nleft -= len(data)
 
         # Check we got full message
-        if nleft == self.header_size and data == b'':
-            print("MockServer: Could not recv message because socket was closed from client")
+        if nleft == self.header_size and data == b"":
+            print(
+                "MockServer: Could not recv message because socket was closed from client"
+            )
             return None
         elif nleft:
-            print(("MockServer: Got {} of {} expected bytes for header".format(nleft, self.header_size)))
+            print(
+                (
+                    "MockServer: Got {} of {} expected bytes for header".format(
+                        nleft, self.header_size
+                    )
+                )
+            )
             return None
 
         return msg_str

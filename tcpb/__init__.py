@@ -1,1 +1,1 @@
-from .tcpb import TCProtobufClient
+from .tcpb import TCProtobufClient  # noqa

@@ -6,9 +6,10 @@
 import sys
 import unittest
 
-from . import available_test
-from . import energy_grad_force_test
 import pytest
+
+from . import available_test, energy_grad_force_test
+
 
 @pytest.mark.skip("Tests not working!")
 class TestPyTCPB(unittest.TestCase):
@@ -16,9 +17,10 @@ class TestPyTCPB(unittest.TestCase):
         self.assertTrue(available_test.run_py_test())
 
     def test_energy_grad_force(self):
-       self.assertTrue(energy_grad_force_test.run_py_test())
+        self.assertTrue(energy_grad_force_test.run_py_test())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     py_suite = unittest.TestLoader().loadTestsFromTestCase(TestPyTCPB)
     py_results = unittest.TextTestRunner(verbosity=2).run(py_suite)
 
