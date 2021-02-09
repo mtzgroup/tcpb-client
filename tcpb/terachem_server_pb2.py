@@ -18,6 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="terachem_server",
     syntax="proto3",
     serialized_options=b"\252\002\030Google.Protobuf.TeraChem",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n\x15terachem_server.proto\x12\x0fterachem_server"\x9d\x01\n\x06Status\x12\x0c\n\x04\x62usy\x18\x01 \x01(\x08\x12\x12\n\x08\x61\x63\x63\x65pted\x18\x02 \x01(\x08H\x00\x12\x11\n\x07working\x18\x03 \x01(\x08H\x00\x12\x13\n\tcompleted\x18\x04 \x01(\x08H\x00\x12\x0f\n\x07job_dir\x18\x05 \x01(\t\x12\x13\n\x0bjob_scr_dir\x18\x06 \x01(\t\x12\x15\n\rserver_job_id\x18\x07 \x01(\x05\x42\x0c\n\njob_status"\xbd\x01\n\x03Mol\x12\r\n\x05\x61toms\x18\x01 \x03(\t\x12\x0b\n\x03xyz\x18\x02 \x03(\x01\x12,\n\x05units\x18\x03 \x01(\x0e\x32\x1d.terachem_server.Mol.UnitType\x12\x0e\n\x06\x63harge\x18\x04 \x01(\x05\x12\x14\n\x0cmultiplicity\x18\x05 \x01(\x05\x12\x0e\n\x06\x63losed\x18\x06 \x01(\x08\x12\x12\n\nrestricted\x18\x07 \x01(\x08""\n\x08UnitType\x12\x0c\n\x08\x41NGSTROM\x10\x00\x12\x08\n\x04\x42OHR\x10\x01"\xf4\t\n\x08JobInput\x12!\n\x03mol\x18\x01 \x01(\x0b\x32\x14.terachem_server.Mol\x12.\n\x03run\x18\x02 \x01(\x0e\x32!.terachem_server.JobInput.RunType\x12\x34\n\x06method\x18\x03 \x01(\x0e\x32$.terachem_server.JobInput.MethodType\x12\r\n\x05\x62\x61sis\x18\x04 \x01(\t\x12\x14\n\x0cuser_options\x18\x07 \x03(\t\x12\x11\n\torb1afile\x18\x08 \x01(\t\x12\x11\n\torb1bfile\x18\t \x01(\t\x12\x19\n\x11return_bond_order\x18\x10 \x01(\x08\x12\x0c\n\x04xyz2\x18\x11 \x03(\x01\x12\x33\n\x08imd_type\x18\x14 \x01(\x0e\x32!.terachem_server.JobInput.ImdType\x12\x1b\n\x13imd_initial_orbital\x18\x15 \x01(\x05\x12\x42\n\x10imd_orbital_type\x18\x1b \x01(\x0e\x32(.terachem_server.JobInput.ImdOrbitalType\x12\x18\n\x10imd_xyz_previous\x18\x16 \x03(\x01\x12\x17\n\x0fimd_mo_previous\x18\x17 \x03(\x02\x12\x1b\n\x13imd_mmatom_position\x18\x18 \x03(\x02\x12\x17\n\x0fimd_mmatom_info\x18\x19 \x03(\x02\x12L\n\x15imd_additional_option\x18\x1a \x01(\x0e\x32-.terachem_server.JobInput.ImdAdditionalOption"O\n\x07RunType\x12\n\n\x06\x45NERGY\x10\x00\x12\x0c\n\x08GRADIENT\x10\x01\x12\x0c\n\x08\x43OUPLING\x10\x0e\x12\x08\n\x04TDCI\x10\x10\x12\x12\n\x0e\x43I_VEC_OVERLAP\x10\x13"\xbc\x02\n\nMethodType\x12\x06\n\x02HF\x10\x00\x12\x08\n\x04\x43\x41SE\x10\x02\x12\t\n\x05SVWN1\x10\x03\x12\t\n\x05SVWN3\x10\x04\x12\t\n\x05SVWN5\x10\x05\x12\x08\n\x04SVWN\x10\x05\x12\n\n\x06\x42\x33LYP1\x10\x06\x12\t\n\x05\x42\x33LYP\x10\x06\x12\n\n\x06\x42\x33LYP3\x10\x07\x12\n\n\x06\x42\x33LYP5\x10\x08\x12\x08\n\x04\x42LYP\x10\t\x12\r\n\tBHANDHLYP\x10\n\x12\x07\n\x03PBE\x10\x0b\x12\n\n\x06REVPBE\x10\x0c\x12\x08\n\x04PBE0\x10\r\x12\x0b\n\x07REVPBE0\x10\x0e\x12\x08\n\x04WPBE\x10\x0f\x12\t\n\x05WPBEH\x10\x10\x12\x07\n\x03\x42OP\x10\x11\x12\t\n\x05MUBOP\x10\x12\x12\x0c\n\x08\x43\x41MB3LYP\x10\x13\x12\x07\n\x03\x42\x39\x37\x10\x14\x12\x08\n\x04WB97\x10\x15\x12\t\n\x05WB97X\x10\x16\x12\x0b\n\x07WB97XD3\x10\x17\x12\n\n\x06GFNXTB\x10\x18\x12\x0b\n\x07GFN2XTB\x10\x19\x1a\x02\x10\x01"P\n\x07ImdType\x12\x0b\n\x07NOT_IMD\x10\x00\x12\x15\n\x11IMD_NEW_CONDITION\x10\x01\x12\x10\n\x0cIMD_CONTINUE\x10\x02\x12\x0f\n\x0bIMD_HESSIAN\x10\x03"w\n\x0eImdOrbitalType\x12\x0e\n\nNO_ORBITAL\x10\x00\x12\x11\n\rALPHA_ORBITAL\x10\x01\x12\x10\n\x0c\x42\x45TA_ORBITAL\x10\x02\x12\x11\n\rALPHA_DENSITY\x10\x03\x12\x10\n\x0c\x42\x45TA_DENSITY\x10\x04\x12\x0b\n\x07WHOLE_C\x10\x05"C\n\x13ImdAdditionalOption\x12\x11\n\rIMD_NORMAL_MD\x10\x00\x12\x19\n\x15IMD_MECI_OPT_GRADIENT\x10\x01"\xc8\x06\n\tJobOutput\x12!\n\x03mol\x18\x01 \x01(\x0b\x32\x14.terachem_server.Mol\x12\x0e\n\x06\x65nergy\x18\x02 \x03(\x01\x12\x10\n\x08gradient\x18\x03 \x03(\x01\x12\x0f\n\x07\x63harges\x18\x04 \x03(\x01\x12\r\n\x05spins\x18\x05 \x03(\x01\x12\x0f\n\x07\x64ipoles\x18\x06 \x03(\x01\x12\x0f\n\x07job_dir\x18\t \x01(\t\x12\x13\n\x0bjob_scr_dir\x18\n \x01(\t\x12\x15\n\rserver_job_id\x18\x0b \x01(\x05\x12\x11\n\torb1afile\x18\x0c \x01(\t\x12\x11\n\torb1bfile\x18\r \x01(\t\x12\x10\n\x08orb_size\x18\x0e \x01(\x05\x12\x12\n\nbond_order\x18\x10 \x03(\x01\x12\x13\n\x0b\x63i_overlaps\x18\x11 \x03(\x01\x12\x17\n\x0f\x63i_overlap_size\x18\x12 \x01(\x05\x12\x19\n\x11\x63\x61s_energy_states\x18\x13 \x03(\x05\x12\x18\n\x10\x63\x61s_energy_mults\x18\x14 \x03(\x05\x12\x1d\n\x15\x63\x61s_transition_dipole\x18\x16 \x03(\x01\x12\r\n\x05nacme\x18\x15 \x03(\x01\x12\x15\n\rorba_energies\x18\x19 \x03(\x01\x12\x15\n\rorbb_energies\x18\x1a \x03(\x01\x12\x18\n\x10orba_occupations\x18\x1b \x03(\x01\x12\x18\n\x10orbb_occupations\x18\x1c \x03(\x01\x12\x12\n\ncis_states\x18\x1d \x01(\x05\x12\x1d\n\x15\x63is_unrelaxed_dipoles\x18\x1e \x03(\x01\x12\x1b\n\x13\x63is_relaxed_dipoles\x18\x1f \x03(\x01\x12\x1e\n\x16\x63is_transition_dipoles\x18  \x03(\x01\x12\x11\n\tci_vec_re\x18! \x03(\x01\x12\x11\n\tci_vec_im\x18" \x03(\x01\x12\x1d\n\x15\x63ompressed_bond_order\x18# \x03(\r\x12\x1a\n\x12\x63ompressed_hessian\x18$ \x03(\x02\x12\x1a\n\x12\x63ompressed_ao_data\x18% \x03(\x02\x12!\n\x19\x63ompressed_primitive_data\x18& \x03(\x02\x12\x1c\n\x14\x63ompressed_mo_vector\x18\' \x03(\x02\x12\x1b\n\x13imd_mmatom_gradient\x18( \x03(\x02*?\n\x0bMessageType\x12\n\n\x06STATUS\x10\x00\x12\x07\n\x03MOL\x10\x01\x12\x0c\n\x08JOBINPUT\x10\x02\x12\r\n\tJOBOUTPUT\x10\x03\x42\x1b\xaa\x02\x18Google.Protobuf.TeraChemb\x06proto3',
 )
 
@@ -26,18 +27,39 @@ _MESSAGETYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.MessageType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="STATUS", index=0, number=0, serialized_options=None, type=None
+            name="STATUS",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="MOL", index=1, number=1, serialized_options=None, type=None
+            name="MOL",
+            index=1,
+            number=1,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="JOBINPUT", index=2, number=2, serialized_options=None, type=None
+            name="JOBINPUT",
+            index=2,
+            number=2,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="JOBOUTPUT", index=3, number=3, serialized_options=None, type=None
+            name="JOBOUTPUT",
+            index=3,
+            number=3,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -59,12 +81,23 @@ _MOL_UNITTYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.Mol.UnitType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="ANGSTROM", index=0, number=0, serialized_options=None, type=None
+            name="ANGSTROM",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BOHR", index=1, number=1, serialized_options=None, type=None
+            name="BOHR",
+            index=1,
+            number=1,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -79,18 +112,39 @@ _JOBINPUT_RUNTYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.JobInput.RunType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="ENERGY", index=0, number=0, serialized_options=None, type=None
+            name="ENERGY",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="GRADIENT", index=1, number=1, serialized_options=None, type=None
+            name="GRADIENT",
+            index=1,
+            number=1,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="COUPLING", index=2, number=14, serialized_options=None, type=None
+            name="COUPLING",
+            index=2,
+            number=14,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="TDCI", index=3, number=16, serialized_options=None, type=None
+            name="TDCI",
+            index=3,
+            number=16,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
             name="CI_VEC_OVERLAP",
@@ -98,6 +152,7 @@ _JOBINPUT_RUNTYPE = _descriptor.EnumDescriptor(
             number=19,
             serialized_options=None,
             type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -112,87 +167,223 @@ _JOBINPUT_METHODTYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.JobInput.MethodType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="HF", index=0, number=0, serialized_options=None, type=None
+            name="HF",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="CASE", index=1, number=2, serialized_options=None, type=None
+            name="CASE",
+            index=1,
+            number=2,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="SVWN1", index=2, number=3, serialized_options=None, type=None
+            name="SVWN1",
+            index=2,
+            number=3,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="SVWN3", index=3, number=4, serialized_options=None, type=None
+            name="SVWN3",
+            index=3,
+            number=4,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="SVWN5", index=4, number=5, serialized_options=None, type=None
+            name="SVWN5",
+            index=4,
+            number=5,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="SVWN", index=5, number=5, serialized_options=None, type=None
+            name="SVWN",
+            index=5,
+            number=5,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="B3LYP1", index=6, number=6, serialized_options=None, type=None
+            name="B3LYP1",
+            index=6,
+            number=6,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="B3LYP", index=7, number=6, serialized_options=None, type=None
+            name="B3LYP",
+            index=7,
+            number=6,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="B3LYP3", index=8, number=7, serialized_options=None, type=None
+            name="B3LYP3",
+            index=8,
+            number=7,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="B3LYP5", index=9, number=8, serialized_options=None, type=None
+            name="B3LYP5",
+            index=9,
+            number=8,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BLYP", index=10, number=9, serialized_options=None, type=None
+            name="BLYP",
+            index=10,
+            number=9,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BHANDHLYP", index=11, number=10, serialized_options=None, type=None
+            name="BHANDHLYP",
+            index=11,
+            number=10,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="PBE", index=12, number=11, serialized_options=None, type=None
+            name="PBE",
+            index=12,
+            number=11,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="REVPBE", index=13, number=12, serialized_options=None, type=None
+            name="REVPBE",
+            index=13,
+            number=12,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="PBE0", index=14, number=13, serialized_options=None, type=None
+            name="PBE0",
+            index=14,
+            number=13,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="REVPBE0", index=15, number=14, serialized_options=None, type=None
+            name="REVPBE0",
+            index=15,
+            number=14,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WPBE", index=16, number=15, serialized_options=None, type=None
+            name="WPBE",
+            index=16,
+            number=15,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WPBEH", index=17, number=16, serialized_options=None, type=None
+            name="WPBEH",
+            index=17,
+            number=16,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BOP", index=18, number=17, serialized_options=None, type=None
+            name="BOP",
+            index=18,
+            number=17,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="MUBOP", index=19, number=18, serialized_options=None, type=None
+            name="MUBOP",
+            index=19,
+            number=18,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="CAMB3LYP", index=20, number=19, serialized_options=None, type=None
+            name="CAMB3LYP",
+            index=20,
+            number=19,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="B97", index=21, number=20, serialized_options=None, type=None
+            name="B97",
+            index=21,
+            number=20,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WB97", index=22, number=21, serialized_options=None, type=None
+            name="WB97",
+            index=22,
+            number=21,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WB97X", index=23, number=22, serialized_options=None, type=None
+            name="WB97X",
+            index=23,
+            number=22,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WB97XD3", index=24, number=23, serialized_options=None, type=None
+            name="WB97XD3",
+            index=24,
+            number=23,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="GFNXTB", index=25, number=24, serialized_options=None, type=None
+            name="GFNXTB",
+            index=25,
+            number=24,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="GFN2XTB", index=26, number=25, serialized_options=None, type=None
+            name="GFN2XTB",
+            index=26,
+            number=25,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -207,9 +398,15 @@ _JOBINPUT_IMDTYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.JobInput.ImdType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="NOT_IMD", index=0, number=0, serialized_options=None, type=None
+            name="NOT_IMD",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
             name="IMD_NEW_CONDITION",
@@ -217,12 +414,23 @@ _JOBINPUT_IMDTYPE = _descriptor.EnumDescriptor(
             number=1,
             serialized_options=None,
             type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="IMD_CONTINUE", index=2, number=2, serialized_options=None, type=None
+            name="IMD_CONTINUE",
+            index=2,
+            number=2,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="IMD_HESSIAN", index=3, number=3, serialized_options=None, type=None
+            name="IMD_HESSIAN",
+            index=3,
+            number=3,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -237,24 +445,55 @@ _JOBINPUT_IMDORBITALTYPE = _descriptor.EnumDescriptor(
     full_name="terachem_server.JobInput.ImdOrbitalType",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="NO_ORBITAL", index=0, number=0, serialized_options=None, type=None
+            name="NO_ORBITAL",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="ALPHA_ORBITAL", index=1, number=1, serialized_options=None, type=None
+            name="ALPHA_ORBITAL",
+            index=1,
+            number=1,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BETA_ORBITAL", index=2, number=2, serialized_options=None, type=None
+            name="BETA_ORBITAL",
+            index=2,
+            number=2,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="ALPHA_DENSITY", index=3, number=3, serialized_options=None, type=None
+            name="ALPHA_DENSITY",
+            index=3,
+            number=3,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="BETA_DENSITY", index=4, number=4, serialized_options=None, type=None
+            name="BETA_DENSITY",
+            index=4,
+            number=4,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="WHOLE_C", index=5, number=5, serialized_options=None, type=None
+            name="WHOLE_C",
+            index=5,
+            number=5,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -269,9 +508,15 @@ _JOBINPUT_IMDADDITIONALOPTION = _descriptor.EnumDescriptor(
     full_name="terachem_server.JobInput.ImdAdditionalOption",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
-            name="IMD_NORMAL_MD", index=0, number=0, serialized_options=None, type=None
+            name="IMD_NORMAL_MD",
+            index=0,
+            number=0,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
             name="IMD_MECI_OPT_GRADIENT",
@@ -279,6 +524,7 @@ _JOBINPUT_IMDADDITIONALOPTION = _descriptor.EnumDescriptor(
             number=1,
             serialized_options=None,
             type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -295,6 +541,7 @@ _STATUS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="busy",
@@ -313,6 +560,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="accepted",
@@ -331,6 +579,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="working",
@@ -349,6 +598,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="completed",
@@ -367,6 +617,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="job_dir",
@@ -385,6 +636,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="job_scr_dir",
@@ -403,6 +655,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="server_job_id",
@@ -421,6 +674,7 @@ _STATUS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -436,6 +690,7 @@ _STATUS = _descriptor.Descriptor(
             full_name="terachem_server.Status.job_status",
             index=0,
             containing_type=None,
+            create_key=_descriptor._internal_create_key,
             fields=[],
         ),
     ],
@@ -450,6 +705,7 @@ _MOL = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="atoms",
@@ -468,6 +724,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="xyz",
@@ -486,6 +743,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="units",
@@ -504,6 +762,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="charge",
@@ -522,6 +781,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="multiplicity",
@@ -540,6 +800,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="closed",
@@ -558,6 +819,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="restricted",
@@ -576,6 +838,7 @@ _MOL = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -599,6 +862,7 @@ _JOBINPUT = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="mol",
@@ -617,6 +881,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="run",
@@ -635,6 +900,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="method",
@@ -653,6 +919,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="basis",
@@ -671,6 +938,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="user_options",
@@ -689,6 +957,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orb1afile",
@@ -707,6 +976,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orb1bfile",
@@ -725,6 +995,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="return_bond_order",
@@ -743,6 +1014,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="xyz2",
@@ -761,6 +1033,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_type",
@@ -779,6 +1052,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_initial_orbital",
@@ -797,6 +1071,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_orbital_type",
@@ -815,6 +1090,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_xyz_previous",
@@ -833,6 +1109,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_mo_previous",
@@ -851,6 +1128,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_mmatom_position",
@@ -869,6 +1147,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_mmatom_info",
@@ -887,6 +1166,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_additional_option",
@@ -905,6 +1185,7 @@ _JOBINPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -932,6 +1213,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="mol",
@@ -950,6 +1232,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="energy",
@@ -968,6 +1251,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="gradient",
@@ -986,6 +1270,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="charges",
@@ -1004,6 +1289,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="spins",
@@ -1022,6 +1308,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="dipoles",
@@ -1040,6 +1327,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="job_dir",
@@ -1058,6 +1346,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="job_scr_dir",
@@ -1076,6 +1365,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="server_job_id",
@@ -1094,6 +1384,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orb1afile",
@@ -1112,6 +1403,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orb1bfile",
@@ -1130,6 +1422,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orb_size",
@@ -1148,6 +1441,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="bond_order",
@@ -1166,6 +1460,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="ci_overlaps",
@@ -1184,6 +1479,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="ci_overlap_size",
@@ -1202,6 +1498,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cas_energy_states",
@@ -1220,6 +1517,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cas_energy_mults",
@@ -1238,6 +1536,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cas_transition_dipole",
@@ -1256,6 +1555,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="nacme",
@@ -1274,6 +1574,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orba_energies",
@@ -1292,6 +1593,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orbb_energies",
@@ -1310,6 +1612,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orba_occupations",
@@ -1328,6 +1631,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="orbb_occupations",
@@ -1346,6 +1650,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cis_states",
@@ -1364,6 +1669,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cis_unrelaxed_dipoles",
@@ -1382,6 +1688,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cis_relaxed_dipoles",
@@ -1400,6 +1707,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="cis_transition_dipoles",
@@ -1418,6 +1726,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="ci_vec_re",
@@ -1436,6 +1745,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="ci_vec_im",
@@ -1454,6 +1764,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="compressed_bond_order",
@@ -1472,6 +1783,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="compressed_hessian",
@@ -1490,6 +1802,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="compressed_ao_data",
@@ -1508,6 +1821,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="compressed_primitive_data",
@@ -1526,6 +1840,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="compressed_mo_vector",
@@ -1544,6 +1859,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="imd_mmatom_gradient",
@@ -1562,6 +1878,7 @@ _JOBOUTPUT = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -1657,5 +1974,5 @@ _sym_db.RegisterMessage(JobOutput)
 
 
 DESCRIPTOR._options = None
-_JOBINPUT_METHODTYPE._options = None  # type: ignore
+_JOBINPUT_METHODTYPE._options = None
 # @@protoc_insertion_point(module_scope)

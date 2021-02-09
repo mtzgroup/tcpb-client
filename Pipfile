@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-tcpb = {editable = true, path = "."}
 qcelemental = "*"
+tcpb = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"
