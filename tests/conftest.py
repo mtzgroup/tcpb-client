@@ -37,7 +37,7 @@ def ethylene():
 
 def _round(value: Union[Collection[float], float], places: int = 6):
     """Round a value or Collection of values to a set precision"""
-    if isinstance(value, float):
+    if isinstance(value, (float, int)):
         return round(value, places)
     elif isinstance(value, Collection):
         return [_round(v, places) for v in value]
