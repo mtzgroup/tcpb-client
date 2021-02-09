@@ -684,7 +684,7 @@ class TCProtobufClient(object):
                 job_options.user_options.extend([key, str(value)])
 
     # Private send/recv functions
-    def _send_msg(self, msg_type: pb.MessageType, msg_pb):
+    def _send_msg(self, msg_type: pb.MessageType, msg_pb=None):
         """Sends a header + PB to the TeraChem Protobuf server (must be connected)
 
         Args:

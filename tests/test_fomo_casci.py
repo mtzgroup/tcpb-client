@@ -1,13 +1,13 @@
 from tcpb import TCProtobufClient as TCPBClient
 
-from .answers import cisno_casci
+from .answers import fomo_casci
 from .conftest import _round
 
 
-def test_cisno_casci(settings, ethylene):
+def test_fomo_casci(settings, ethylene):
 
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
-        base_options = {
+        options = {
             "method": "hf",
             "basis": "6-31g**",
             "atoms": ethylene["atoms"],
@@ -16,21 +16,20 @@ def test_cisno_casci(settings, ethylene):
             "closed_shell": True,
             "restricted": True,
             "precision": "double",
-            "convthre": 1e-8,
             "threall": 1e-20,
-        }
-
-        cisno_options = {
-            "cisno": "yes",
-            "cisnostates": 2,
-            "cisnumstates": 2,
+            "casci": "yes",
+            "fon": "yes",
             "closed": 7,
             "active": 2,
             "cassinglets": 2,
-            "dcimaxiter": 100,
+            "nacstate1": 0,
+            "nacstate2": 1,
         }
-        options = dict(base_options, **cisno_options)
-        results = TC.compute_job_sync("energy", ethylene["geom"], "angstrom", **options)
+
+        # NACME calculation
+        results = TC.compute_job_sync(
+            "coupling", ethylene["geom"], "angstrom", **options
+        )
 
         fields_to_check = [
             "charges",
@@ -39,8 +38,14 @@ def test_cisno_casci(settings, ethylene):
             "energy",
             "orb_energies",
             "orb_occupations",
+            "nacme",
             "cas_transition_dipole",
+            "cas_energy_labels",
             "bond_order",
         ]
+
         for field in fields_to_check:
-            assert _round(results[field]) == _round(cisno_casci.correct_answer[field])
+            assert _round(results[field], 4) == _round(
+                fomo_casci.correct_answer[field], 4
+            )
+        print(results)

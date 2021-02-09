@@ -2,11 +2,11 @@ import os
 
 from tcpb import TCProtobufClient as TCPBClient
 
+from .answers import ci_overlap
 from .conftest import _round
 
 
 def test_ci_overlap(settings, ethylene):
-    from .answers import ci_overlap_example
 
     # Ethylene system
     atoms = ["C", "C", "H", "H", "H", "H"]
@@ -95,6 +95,4 @@ def test_ci_overlap(settings, ethylene):
             "bond_order",
         ]
         for field in fields_to_check:
-            assert _round(results[field]) == _round(
-                ci_overlap_example.correct_answer[field]
-            )
+            assert _round(results[field]) == _round(ci_overlap.correct_answer[field])
