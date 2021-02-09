@@ -85,5 +85,8 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
     }
     options = dict(base_options, **overlap_options)
     results = TC.compute_job_sync("ci_vec_overlap", geom, "angstrom", **options)
+    import pdb
+
+    pdb.set_trace()
 
     print("Overlap:\n{}".format(results["ci_overlap"]))
