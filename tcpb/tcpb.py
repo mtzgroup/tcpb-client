@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import socket
 import struct
+from time import sleep
 
 import numpy as np
 from qcelemental.models import AtomicInput, AtomicResult
@@ -413,10 +414,13 @@ class TCProtobufClient(object):
 
         accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
         while accepted is False:
+            sleep(0.5)
             accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
 
         completed = self.check_job_complete()
         while completed is False:
+            sleep(0.5)
+            print("Checking job completion...")
             completed = self.check_job_complete()
 
         return self.recv_job_async()

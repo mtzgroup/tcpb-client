@@ -1,16 +1,6 @@
-from typing import Collection, Union
-
 from tcpb import TCProtobufClient as TCPBClient
 
-
-def _round(value: Union[Collection[float], float], places: int = 6):
-    """Round a value or Collection of values to a set precision"""
-    if isinstance(value, float):
-        return round(value, places)
-    elif isinstance(value, Collection):
-        return [_round(v, places) for v in value]
-    else:
-        raise ValueError("Cannot round values!")
+from .conftest import _round
 
 
 def test_cisno_casci(settings, ethylene):

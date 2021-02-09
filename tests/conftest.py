@@ -1,3 +1,5 @@
+from typing import Collection, Union
+
 import pytest
 
 
@@ -31,3 +33,13 @@ def ethylene():
             0.15232587,
         ],
     }
+
+
+def _round(value: Union[Collection[float], float], places: int = 6):
+    """Round a value or Collection of values to a set precision"""
+    if isinstance(value, float):
+        return round(value, places)
+    elif isinstance(value, Collection):
+        return [_round(v, places) for v in value]
+    else:
+        raise ValueError("Cannot round values!")
