@@ -5,11 +5,14 @@ name = "pypi"
 
 [packages]
 tcpb = {editable = true, path = "."}
+qcelemental = "*"
 
 [dev-packages]
 pytest = "*"
 black = "*"
 mypy = "*"
+isort = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.8"

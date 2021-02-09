@@ -1,11 +1,7 @@
 # Test for is_available()
-
-import os
 import subprocess
 
 from tcpb import TCProtobufClient
-
-from .mock_server import MockServer
 
 # JOB OUTPUT
 expected_cycles = 6
@@ -21,11 +17,11 @@ def run_py_test(port=56789, run_real_server=False):
     Returns True if passed the tests, and False if failed the tests
     """
     # Set up MockServer for testing
-    if not run_real_server:
-        script_dir = os.path.dirname(__file__)
-        recv_file = os.path.join(script_dir, "available/client_recv.bin")
-        sent_file = os.path.join(script_dir, "available/client_sent.bin")
-        mock = MockServer(port, recv_file, sent_file)
+    # if not run_real_server:
+    #     script_dir = os.path.dirname(__file__)
+    #     recv_file = os.path.join(script_dir, "available/client_recv.bin")
+    #     sent_file = os.path.join(script_dir, "available/client_sent.bin")
+    #     mock = MockServer(port, recv_file, sent_file)
 
     with TCProtobufClient(host="localhost", port=port, trace=run_real_server) as TC:
         count = 0
@@ -54,7 +50,7 @@ def run_cpp_test(port=56789):
     Returns True if passed the tests, and False if failed the tests
     """
     # Set up MockServer for testing
-    mock = MockServer(port, "available/client_recv.bin", "available/client_sent.bin")
+    # mock = MockServer(port, "available/client_recv.bin", "available/client_sent.bin")
 
     # Subprocess out, expect a returncode of 1 for failure and 0 for success
     rc = subprocess.call(
