@@ -28,7 +28,7 @@ def test_fomo_casci(settings, ethylene):
 
         # NACME calculation
         results = TC.compute_job_sync(
-            "coupling", ethylene["geom"], "angstrom", **options
+            "coupling", ethylene["geometry"], "angstrom", **options
         )
 
         fields_to_check = [
