@@ -9,11 +9,11 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> JobInput:
     mol_msg = Mol()
     mol_msg.atoms.extend(atomic_input.molecule.symbols)
     mol_msg.xyz.extend(atomic_input.molecule.geometry.flatten())
-    # TODO: Need to specific units. Currently asking on QCArchive slack...
+    mol_msg.units = Mol.UnitType.BOHR  # Molecule always in bohr
     mol_msg.charge = int(atomic_input.molecule.molecular_charge)
     mol_msg.multiplicity = atomic_input.molecule.molecular_multiplicity
-    # TODO: Add closed
-    # TODO: Add restricted
+    mol_msg.closed = atomic_input.keywords.pop("closed_shell", True)
+    mol_msg.restricted = atomic_input.keywords.pop("restricted", True)
 
     # Create Job Inputs
     ji = JobInput(mol=mol_msg)
@@ -28,6 +28,13 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> JobInput:
         raise ValueError(f"Method '{atomic_input.model.method}' not supported by TCPB.")
 
     ji.basis = atomic_input.model.basis
+    ji.return_bond_order = atomic_input.keywords.pop("bond_order", False)
+    # Drop keyword terms already applied to Molecule
+    atomic_input.keywords.pop("charge", None)
+    atomic_input.keywords.pop("spinmult", None)
+
+    for key, value in atomic_input.keywords.items():
+        ji.user_options.extend([key, str(value)])
 
     return ji
 

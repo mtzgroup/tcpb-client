@@ -10,9 +10,10 @@ def settings():
 
 @pytest.fixture
 def ethylene():
+    # NOTE: Geometry in angstroms
     yield {
         "atoms": ["C", "C", "H", "H", "H", "H"],
-        "geom": [
+        "geometry": [
             0.35673483,
             -0.05087227,
             -0.47786734,

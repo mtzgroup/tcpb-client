@@ -1,4 +1,11 @@
 """Simple Python socket client for communicating with TeraChem Protocol Buffer servers
+
+Note that I (Stefan Seritan) have implemented a small protocol on top of the
+protobufs since we send them in binary over TCP ALL MESSAGES ARE REQUIRED TO
+HAVE AN 8 BYTE HEADER
+First 4 bytes: int32 of protocol buffer message type (check the MessageType enum
+in the protobuf file)
+Second 4 bytes: int32 of packet size (not including the header)
 """
 
 from __future__ import absolute_import, division, print_function
@@ -11,11 +18,9 @@ from time import sleep
 import numpy as np
 from qcelemental.models import AtomicInput, AtomicResult
 
+from tcpb.utils import atomic_input_to_job_input
+
 # Import the Protobuf messages generated from the .proto file
-# Note that I have implemented a small protocol on top of the protobufs since we send them in binary over TCP
-# ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
-# First 4 bytes: int32 of protocol buffer message type (check the MessageType enum in the protobuf file)
-# Second 4 bytes: int32 of packet size (not including the header)
 from . import terachem_server_pb2 as pb
 from .exceptions import ServerError
 from .molden_constructor import tcpb_imd_fields2molden_string
@@ -136,9 +141,23 @@ class TCProtobufClient(object):
 
         return not status.busy
 
-    def compute(atomic_input: AtomicInput) -> AtomicResult:
+    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
         """Top level method for performing computations with QCSchema inputs/outputs"""
-        pass
+        # Create protobuf message
+        job_input_msg = atomic_input_to_job_input(atomic_input)
+        # Send message to server; retry until accepted
+        self._send_msg(pb.JOBINPUT, job_input_msg)
+        while not self._recv_msg(pb.STATUS).accepted:
+            print("JobInput not accepted. Retrying...")
+            sleep(0.5)
+            self._send_msg(pb.JOBINPUT, job_input_msg)
+
+        while not self.check_job_complete():
+            sleep(0.5)
+
+        # job_output = self.recv_job_async()
+        job_output = self._recv_msg(pb.JOBOUTPUT)
+        return job_output
 
     def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
@@ -173,25 +192,37 @@ class TCProtobufClient(object):
             return True
 
         # Job setup
-        job_options = pb.JobInput()
-        job_options.run = pb.JobInput.RunType.Value(jobType.upper())
-        job_options.mol.xyz.extend(geom)
-        job_options.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+        job_input_msg = self._create_job_input_msg(jobType, geom, unitType, **kwargs)
 
-        self._process_kwargs(job_options, **kwargs)
+        self._send_msg(pb.JOBINPUT, job_input_msg)
 
-        self._send_msg(pb.JOBINPUT, job_options)
+        status_msg = self._recv_msg(pb.STATUS)
 
-        status = self._recv_msg(pb.STATUS)
-
-        if status.WhichOneof("job_status") == "accepted":
-            self.curr_job_dir = status.job_dir
-            self.curr_job_scr_dir = status.job_scr_dir
-            self.curr_job_id = status.server_job_id
+        if status_msg.WhichOneof("job_status") == "accepted":
+            self._set_status(status_msg)
 
             return True
         else:
             return False
+
+    def _set_status(self, status_msg: pb.Status):
+        """Sets status on self if job is accepted"""
+        self.curr_job_dir = status_msg.job_dir
+        self.curr_job_scr_dir = status_msg.job_scr_dir
+        self.curr_job_id = status_msg.server_job_id
+
+    def _create_job_input_msg(self, jobType, geom, unitType="bohr", **kwargs):
+        """Method for setting up jobs according to old mechanism
+
+        Refactored this method out to allow for better testing
+        """
+        job_input_msg = pb.JobInput()
+        job_input_msg.run = pb.JobInput.RunType.Value(jobType.upper())
+        job_input_msg.mol.xyz.extend(geom)
+        job_input_msg.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+
+        self._process_kwargs(job_input_msg, **kwargs)
+        return job_input_msg
 
     def check_job_complete(self):
         """Pack and send a Status message to the TeraChem Protobuf server asynchronously.
@@ -202,7 +233,7 @@ class TCProtobufClient(object):
         Returns:
             bool: True if job is completed, False otherwise
         """
-
+        print("Checking jobs status...")
         if self.debug:
             logging.info("in debug mode - assume check_job_complete is True")
             return True
@@ -420,7 +451,6 @@ class TCProtobufClient(object):
         completed = self.check_job_complete()
         while completed is False:
             sleep(0.5)
-            print("Checking job completion...")
             completed = self.check_job_complete()
 
         return self.recv_job_async()
@@ -684,7 +714,7 @@ class TCProtobufClient(object):
                 job_options.user_options.extend([key, str(value)])
 
     # Private send/recv functions
-    def _send_msg(self, msg_type: pb.MessageType, msg_pb=None):
+    def _send_msg(self, msg_type, msg_pb=None):
         """Sends a header + PB to the TeraChem Protobuf server (must be connected)
 
         Args:
