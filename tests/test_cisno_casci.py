@@ -1,9 +1,13 @@
+from pathlib import Path
+import pdb
+
 import numpy as np
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
+from google.protobuf.pyext._message import RepeatedScalarContainer
 
 from tcpb import TCProtobufClient as TCPBClient
-
+from tcpb import terachem_server_pb2 as pb
 from .answers import cisno_casci
 from .conftest import _round
 
@@ -84,5 +88,30 @@ def test_cisno_casci_atomic_input(settings, ethylene):
         # Add in Ethylene atoms
         results = TC.compute(atomic_input)
 
-    for field in fields_to_check:
-        assert _round(results[field]) == _round(cisno_casci.correct_answer[field])
+    job_output_correct_answer = pb.JobOutput()
+    with open(
+        Path(__file__).parent / "answers" / "cisno_casci_result.pbmsg", "rb"
+    ) as f:
+        job_output_correct_answer.ParseFromString(f.read())
+
+    # compare only relevant attributes (computed values)
+    attrs_to_compare = []
+    for attr in dir(results):
+        if (
+            not (
+                attr.startswith("__")
+                or attr.startswith("_")
+                or callable(attr)
+                or attr[0].isupper()
+            )
+            and attr in fields_to_check
+        ):
+            attrs_to_compare.append(attr)
+
+    for attr in attrs_to_compare:
+        if isinstance(getattr(results, attr), RepeatedScalarContainer):
+            assert _round([a for a in getattr(results, attr)]) == _round(
+                [a for a in getattr(job_output_correct_answer, attr)]
+            )
+        else:
+            assert getattr(results, attr) == getattr(job_output_correct_answer, attr)

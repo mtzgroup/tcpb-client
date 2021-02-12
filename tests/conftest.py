@@ -43,4 +43,4 @@ def _round(value: Union[Collection[float], float], places: int = 6):
     elif isinstance(value, Collection):
         return [_round(v, places) for v in value]
     else:
-        raise ValueError("Cannot round values!")
+        raise ValueError(f"Cannot round value of type {type(value)}")
