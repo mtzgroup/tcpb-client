@@ -1,6 +1,11 @@
 from typing import Collection, Union
+from pathlib import Path
 
 import pytest
+from qcelemental.models import Molecule, AtomicInput
+from qcelemental.models.common_models import Model
+
+from tcpb import terachem_server_pb2 as pb
 
 
 @pytest.fixture
@@ -34,6 +39,35 @@ def ethylene():
             0.15232587,
         ],
     }
+
+
+@pytest.fixture(scope="function")
+def water():
+    return Molecule.from_data(
+        """
+        -1 2
+        O 0 0 0
+        H 0 0 1
+        H 0 1 0
+        """
+    )
+
+
+@pytest.fixture(scope="function")
+def atomic_input(water):
+    model = Model(method="B3LYP", basis="6-31g")
+    return AtomicInput(molecule=water, model=model, driver="energy")
+
+
+@pytest.fixture
+def job_output():
+    """Return job_output protobuf message"""
+    job_output_correct_answer = pb.JobOutput()
+    with open(
+        Path(__file__).parent / "answers" / "cisno_casci_result.pbmsg", "rb"
+    ) as f:
+        job_output_correct_answer.ParseFromString(f.read())
+    return job_output_correct_answer
 
 
 def _round(value: Union[Collection[float], float], places: int = 6):

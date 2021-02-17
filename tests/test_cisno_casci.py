@@ -1,5 +1,4 @@
 from pathlib import Path
-import pdb
 
 import numpy as np
 import qcelemental as qcel
@@ -7,7 +6,6 @@ from qcelemental.models import AtomicInput, Molecule
 from google.protobuf.pyext._message import RepeatedScalarContainer
 
 from tcpb import TCProtobufClient as TCPBClient
-from tcpb import terachem_server_pb2 as pb
 from .answers import cisno_casci
 from .conftest import _round
 
@@ -61,7 +59,7 @@ def test_cisno_casci(settings, ethylene):
             assert _round(results[field]) == _round(cisno_casci.correct_answer[field])
 
 
-def test_cisno_casci_atomic_input(settings, ethylene):
+def test_cisno_casci_atomic_input(settings, ethylene, job_output):
     # Construct Geometry in bohr
     geom_angstrom = qcel.Datum("geometry", "angstrom", np.array(ethylene["geometry"]))
     geom_bohr = geom_angstrom.to_units("bohr")
@@ -88,12 +86,6 @@ def test_cisno_casci_atomic_input(settings, ethylene):
         # Add in Ethylene atoms
         results = TC.compute(atomic_input)
 
-    job_output_correct_answer = pb.JobOutput()
-    with open(
-        Path(__file__).parent / "answers" / "cisno_casci_result.pbmsg", "rb"
-    ) as f:
-        job_output_correct_answer.ParseFromString(f.read())
-
     # compare only relevant attributes (computed values)
     attrs_to_compare = []
     for attr in dir(results):
@@ -111,7 +103,7 @@ def test_cisno_casci_atomic_input(settings, ethylene):
     for attr in attrs_to_compare:
         if isinstance(getattr(results, attr), RepeatedScalarContainer):
             assert _round([a for a in getattr(results, attr)]) == _round(
-                [a for a in getattr(job_output_correct_answer, attr)]
+                [a for a in getattr(job_output, attr)]
             )
         else:
-            assert getattr(results, attr) == getattr(job_output_correct_answer, attr)
+            assert getattr(results, attr) == getattr(job_output, attr)
