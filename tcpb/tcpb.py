@@ -18,12 +18,15 @@ from time import sleep
 import numpy as np
 from qcelemental.models import AtomicInput, AtomicResult
 
-from tcpb.utils import atomic_input_to_job_input
+from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
 from .exceptions import ServerError
 from .molden_constructor import tcpb_imd_fields2molden_string
+
+
+logger = logging.getLogger(__name__)
 
 
 class TCProtobufClient(object):
@@ -120,7 +123,9 @@ class TCProtobufClient(object):
             self.tcsock.close()
             self.tcsock = None
         except socket.error as msg:
-            raise ServerError("Problem disconnecting from server: {}".format(msg), self)
+            logger.error(
+                f"Problem communicating with server: {self.tcaddr}. Disconnect assumed to have happened"
+            )
 
     def is_available(self):
         """Asks the TeraChem Protobuf server whether it is available or busy through the Status protobuf message.
@@ -147,17 +152,22 @@ class TCProtobufClient(object):
         job_input_msg = atomic_input_to_job_input(atomic_input)
         # Send message to server; retry until accepted
         self._send_msg(pb.JOBINPUT, job_input_msg)
-        while not self._recv_msg(pb.STATUS).accepted:
+        status = self._recv_msg(pb.STATUS)
+        while not status.accepted:
             print("JobInput not accepted. Retrying...")
             sleep(0.5)
             self._send_msg(pb.JOBINPUT, job_input_msg)
-
+            status = self._recv_msg(pb.STATUS)
+        print(status)
         while not self.check_job_complete():
             sleep(0.5)
 
         # job_output = self.recv_job_async()
         job_output = self._recv_msg(pb.JOBOUTPUT)
-        return job_output
+        # return job_output
+        return job_output_to_atomic_result(
+            atomic_input=atomic_input, job_output=job_output
+        )
 
     def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
@@ -528,7 +538,7 @@ class TCProtobufClient(object):
         orb2afile=None,
         orb2bfile=None,
         unitType="bohr",
-        **kwargs
+        **kwargs,
     ):
         """Compute wavefunction overlap given two different geometries, CI vectors, and orbitals,
         using the same atom labels/charge/spin multiplicity as the previous calculation.
@@ -586,7 +596,7 @@ class TCProtobufClient(object):
                 cvec2file=cvec2file,
                 orb1afile=orb1afile,
                 orb2afile=orb2afile,
-                **kwargs
+                **kwargs,
             )
         else:
             raise RuntimeError(

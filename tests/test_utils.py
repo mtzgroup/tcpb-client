@@ -1,9 +1,18 @@
+from os import P_PID
+from pathlib import Path
 import numpy as np
+
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
+from qcelemental.models.results import AtomicResult
 
 from tcpb.tcpb import TCProtobufClient
-from tcpb.utils import atomic_input_to_job_input
+from tcpb import terachem_server_pb2 as pb
+from tcpb.utils import (
+    atomic_input_to_job_input,
+    job_output_to_atomic_result,
+    mol_to_molecule,
+)
 
 from .conftest import _round
 
@@ -68,3 +77,37 @@ def test_atomic_input_to_job_input_cisco_casci_similarity(ethylene):
     # Create protobuf JobInput using AtomicInput object
     job_input = atomic_input_to_job_input(atomic_input)
     assert job_input == stefan_style
+
+
+def test_job_output_to_atomic_result(atomic_input, job_output):
+    atomic_result = job_output_to_atomic_result(
+        atomic_input=atomic_input, job_output=job_output
+    )
+    assert isinstance(atomic_result, AtomicResult)
+
+
+def test_mol_to_molecule_bohr():
+    with open(Path(__file__).parent / "test_data" / "water_bohr.pb", "rb") as f:
+        mol = pb.Mol()
+        mol.ParseFromString(f.read())
+    molecule = mol_to_molecule(mol)
+
+    assert [s for s in molecule.symbols] == [a for a in mol.atoms]
+    assert list(molecule.geometry.flatten()) == [coord for coord in mol.xyz]
+    assert molecule.molecular_multiplicity == mol.multiplicity
+
+
+def test_mol_to_molecule_angstrom():
+    with open(Path(__file__).parent / "test_data" / "water_angstrom.pb", "rb") as f:
+        mol = pb.Mol()
+        mol.ParseFromString(f.read())
+    molecule = mol_to_molecule(mol)
+
+    geom_angstrom = qcel.Datum("geometry", "angstrom", np.array(mol.xyz))
+    geom_bohr = geom_angstrom.to_units("bohr")
+
+    assert [s for s in molecule.symbols] == [a for a in mol.atoms]
+    assert _round(list(molecule.geometry.flatten())) == _round(
+        [coord for coord in geom_bohr]
+    )
+    assert molecule.molecular_multiplicity == mol.multiplicity
