@@ -1,3 +1,4 @@
+from typing import Any
 from numpy import array
 from qcelemental.models import AtomicInput, AtomicResult, Molecule
 from qcelemental import Datum
@@ -65,7 +66,7 @@ def job_output_to_atomic_result(
     if atomic_input.driver == "energy":
         # Select first element in list (ground state); may need to modify for excited
         # state
-        return_result = job_output.energy[0]
+        return_result: Any = job_output.energy[0]
 
     elif atomic_input.driver == "gradient":
         return_result = job_output.gradient
@@ -80,7 +81,7 @@ def job_output_to_atomic_result(
         keywords=atomic_input.keywords,
         return_result=return_result,
         provenance=Provenance(
-            creator="TeraChem Protobuf Server",
+            creator="terachem_pbs",
             version="1.9-2021.01-dev",
             routine="terachem -s",
         ),
