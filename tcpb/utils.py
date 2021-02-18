@@ -1,4 +1,6 @@
 from typing import Any
+
+from google.protobuf.json_format import MessageToDict
 from numpy import array
 from qcelemental.models import AtomicInput, AtomicResult, Molecule
 from qcelemental import Datum
@@ -49,7 +51,7 @@ def mol_to_molecule(mol: pb.Mol) -> Molecule:
         geom_angstrom = Datum("geometry", "angstrom", array(mol.xyz))
         geom_bohr = geom_angstrom.to_units("bohr")
     elif mol.units == pb.Mol.UnitType.BOHR:
-        geom_bohr = list(mol.xyz)
+        geom_bohr = array(mol.xyz)
     else:
         raise ValueError(f"Unknown Unit Type: {mol.units} for molecular geometry")
     return Molecule(
@@ -63,13 +65,17 @@ def job_output_to_atomic_result(
     *, atomic_input: AtomicInput, job_output: pb.JobOutput
 ) -> AtomicResult:
     """Convert JobOutput to AtomicResult"""
+    # Convert job_ouput to python types
+    # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
+    jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
+
     if atomic_input.driver == "energy":
         # Select first element in list (ground state); may need to modify for excited
         # state
-        return_result: Any = job_output.energy[0]
+        return_result: Any = jo_dict["energy"][0]
 
     elif atomic_input.driver == "gradient":
-        return_result = job_output.gradient
+        return_result = jo_dict["gradient"]
 
     else:
         raise ValueError(f"Unsupported driver: {atomic_input.driver}")
@@ -89,18 +95,18 @@ def job_output_to_atomic_result(
         success=True,
         extras={
             "qcvars": {
-                "charges": job_output.charges,
-                "spins": job_output.spins,
-                "job_dir": job_output.job_dir,
-                "job_scr_dir": job_output.job_scr_dir,
-                "server_job_id": job_output.server_job_id,
-                "orb1afile": job_output.orb1afile,
-                "orb1bfile": job_output.orb1bfile,
-                "bond_order": job_output.bond_order,
-                "orba_energies": job_output.orba_energies,
-                "orba_occupations": job_output.orba_occupations,
-                "orbb_energies": job_output.orbb_energies,
-                "orbb_occupations": job_output.orbb_occupations,
+                "charges": jo_dict.get("charges"),
+                "spins": jo_dict.get("spins"),
+                "job_dir": jo_dict.get("job_dir"),
+                "job_scr_dir": jo_dict.get("job_scr_dir"),
+                "server_job_id": jo_dict.get("server_job_id"),
+                "orb1afile": jo_dict.get("orb1afile"),
+                "orb1bfile": jo_dict.get("orb1bfile"),
+                "bond_order": jo_dict.get("bond_order"),
+                "orba_energies": jo_dict.get("orba_energies"),
+                "orba_occupations": jo_dict.get("orba_occupations"),
+                "orbb_energies": jo_dict.get("orbb_energies"),
+                "orbb_occupations": jo_dict.get("orbb_occupations"),
             }
         },
     )
