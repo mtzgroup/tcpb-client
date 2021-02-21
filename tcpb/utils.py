@@ -7,6 +7,7 @@ from qcelemental import Datum
 from qcelemental.models.results import AtomicResultProperties, Provenance
 
 from . import terachem_server_pb2 as pb
+from .molden_constructor import tcpb_imd_fields2molden_string
 
 
 def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
@@ -80,6 +81,12 @@ def job_output_to_atomic_result(
     else:
         raise ValueError(f"Unsupported driver: {atomic_input.driver}")
 
+    try:
+        molden_string = tcpb_imd_fields2molden_string(job_output)
+    except Exception:
+        # Don't know how this code will blow up, so except everything for now :/
+        molden_string = None
+
     atomic_result = AtomicResult(
         molecule=mol_to_molecule(job_output.mol),
         driver=atomic_input.driver,
@@ -107,7 +114,8 @@ def job_output_to_atomic_result(
                 "orba_occupations": jo_dict.get("orba_occupations"),
                 "orbb_energies": jo_dict.get("orbb_energies"),
                 "orbb_occupations": jo_dict.get("orbb_occupations"),
-            }
+            },
+            "molden": molden_string,
         },
     )
     return atomic_result
@@ -123,4 +131,5 @@ def job_output_to_atomic_result_properties(
             :-1
         ],  # Cutting out |D| value; see .proto note re: diples
         calcinfo_natom=len(job_output.mol.atoms),
+        calcinfo_nalpha=len(job_output.orba_energies),
     )
