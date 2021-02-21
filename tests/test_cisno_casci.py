@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
-from google.protobuf.pyext._message import RepeatedScalarContainer
+from google.protobuf.internal.containers import RepeatedScalarFieldContainer
 
 from tcpb import TCProtobufClient as TCPBClient
 from .answers import cisno_casci
@@ -101,7 +101,7 @@ def test_cisno_casci_atomic_input(settings, ethylene, job_output):
             attrs_to_compare.append(attr)
 
     for attr in attrs_to_compare:
-        if isinstance(getattr(results, attr), RepeatedScalarContainer):
+        if isinstance(getattr(results, attr), RepeatedScalarFieldContainer):
             assert _round([a for a in getattr(results, attr)]) == _round(
                 [a for a in getattr(job_output, attr)]
             )
