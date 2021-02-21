@@ -131,5 +131,5 @@ def job_output_to_atomic_result_properties(
             :-1
         ],  # Cutting out |D| value; see .proto note re: diples
         calcinfo_natom=len(job_output.mol.atoms),
-        calcinfo_nalpha=len(job_output.orba_energies),
+        calcinfo_nmo=len(job_output.orba_energies),
     )
