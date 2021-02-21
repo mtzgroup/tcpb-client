@@ -10,3 +10,5 @@ tests/available/available_test
 tests/energy_grad_force/energy_grad_force_test
 
 docs/_build
+
+env
