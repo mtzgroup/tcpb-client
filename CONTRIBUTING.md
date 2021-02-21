@@ -4,6 +4,8 @@
 
 If you already cloned the repository and you know that you need to deep dive in the code, here are some guidelines to set up your environment.
 
+Note that lots of apparently unused code was removed from the repo to clean it up and make clear the actual code under development. To review all old code previously in the repo checkout the `0.1.0` tag.
+
 ### Virtual environment with `venv`
 
 You can create a virtual environment in a directory using Python's `venv` module:
