@@ -16,10 +16,10 @@ pip install tcpb
 
 ## Notes
 
-The original, Python 2.7 compatible `tcpb` client built by Stefan Seritan was released as version `0.1.0`. If you depend upon this original release it can be installed by pegging to its version:
+The original, Python 2.7 compatible `tcpb` client built by Stefan Seritan was released as version `0.6.0`. If you depend upon this original release it can be installed by pegging to its version:
 
 ```sh
-pip install tcpb==0.1.0
+pip install tcpb==0.6.0
 ```
 
 All future releases will support Python 3+ and MolSSI's QCSchema for data input/output.
