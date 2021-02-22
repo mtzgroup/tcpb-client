@@ -1,28 +1,39 @@
 """Simple Python socket client for communicating with TeraChem Protocol Buffer servers
+
+Note that I (Stefan Seritan) have implemented a small protocol on top of the
+protobufs since we send them in binary over TCP ALL MESSAGES ARE REQUIRED TO
+HAVE AN 8 BYTE HEADER
+First 4 bytes: int32 of protocol buffer message type (check the MessageType enum
+in the protobuf file)
+Second 4 bytes: int32 of packet size (not including the header)
 """
 
 from __future__ import absolute_import, division, print_function
 
-import sys
-import numpy as np
+import logging
 import socket
 import struct
-import logging
+from time import sleep
 
-from .exceptions import TCPBError, ServerError
-from .molden_constructor import tcpb_imd_fields2molden_string
+import numpy as np
+from qcelemental.models import AtomicInput, AtomicResult
+
+from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
+
 # Import the Protobuf messages generated from the .proto file
-# Note that I have implemented a small protocol on top of the protobufs since we send them in binary over TCP
-# ALL MESSAGES ARE REQUIRED TO HAVE AN 8 BYTE HEADER
-# First 4 bytes: int32 of protocol buffer message type (check the MessageType enum in the protobuf file)
-# Second 4 bytes: int32 of packet size (not including the header)
 from . import terachem_server_pb2 as pb
+from .exceptions import ServerError
+from .molden_constructor import tcpb_imd_fields2molden_string
+
+
+logger = logging.getLogger(__name__)
 
 
 class TCProtobufClient(object):
     """Connect and communicate with a TeraChem instance running in Protocol Buffer server mode
     (i.e. TeraChem was started with the -s|--server flag)
     """
+
     def __init__(self, host, port, debug=False, trace=False):
         """Initialize a TCProtobufClient object.
 
@@ -35,8 +46,8 @@ class TCProtobufClient(object):
         self.debug = debug
         self.trace = trace
         if self.trace:
-            self.intracefile = open('client_recv.bin', 'wb')
-            self.outtracefile = open('client_sent.bin', 'wb')
+            self.intracefile = open("client_recv.bin", "wb")
+            self.outtracefile = open("client_sent.bin", "wb")
 
         # Socket options
         self.update_address(host, port)
@@ -64,7 +75,7 @@ class TCProtobufClient(object):
         """
         Disconnect in automatic context management.
         """
-        self.disconnect() 
+        self.disconnect()
 
     def update_address(self, host, port):
         """Update the host and port of a TCProtobufClient object.
@@ -81,16 +92,17 @@ class TCProtobufClient(object):
         if not isinstance(port, int):
             raise TypeError("Port number must be an integer")
         if port < 1023:
-            raise ValueError("Port number is not allowed to below 1023 (system reserved ports)")
+            raise ValueError(
+                "Port number is not allowed to below 1023 (system reserved ports)"
+            )
 
         # Socket options
         self.tcaddr = (host, port)
 
     def connect(self):
-        """Connect to the TeraChem Protobuf server
-        """
+        """Connect to the TeraChem Protobuf server"""
         if self.debug:
-            logging.info('in debug mode - assume connection established')
+            logging.info("in debug mode - assume connection established")
             return
 
         try:
@@ -101,10 +113,9 @@ class TCProtobufClient(object):
             raise ServerError("Problem connecting to server: {}".format(msg), self)
 
     def disconnect(self):
-        """Disconnect from the TeraChem Protobuf server
-        """
+        """Disconnect from the TeraChem Protobuf server"""
         if self.debug:
-            logging.info('in debug mode - assume disconnection worked')
+            logging.info("in debug mode - assume disconnection worked")
             return
 
         try:
@@ -112,7 +123,9 @@ class TCProtobufClient(object):
             self.tcsock.close()
             self.tcsock = None
         except socket.error as msg:
-            raise ServerError("Problem disconnecting from server: {}".format(msg), self)
+            logger.error(
+                f"Problem communicating with server: {self.tcaddr}. Disconnect assumed to have happened"
+            )
 
     def is_available(self):
         """Asks the TeraChem Protobuf server whether it is available or busy through the Status protobuf message.
@@ -122,16 +135,39 @@ class TCProtobufClient(object):
             bool: True if the TeraChem PB server is currently available (no running job)
         """
         if self.debug:
-            logging.info('in debug mode - assume terachem server is available')
+            logging.info("in debug mode - assume terachem server is available")
             return True
 
-        # Send Status message 
+        # Send Status message
         self._send_msg(pb.STATUS, None)
 
         # Receive Status header
         status = self._recv_msg(pb.STATUS)
 
         return not status.busy
+
+    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
+        """Top level method for performing computations with QCSchema inputs/outputs"""
+        # Create protobuf message
+        job_input_msg = atomic_input_to_job_input(atomic_input)
+        # Send message to server; retry until accepted
+        self._send_msg(pb.JOBINPUT, job_input_msg)
+        status = self._recv_msg(pb.STATUS)
+        while not status.accepted:
+            print("JobInput not accepted. Retrying...")
+            sleep(0.5)
+            self._send_msg(pb.JOBINPUT, job_input_msg)
+            status = self._recv_msg(pb.STATUS)
+        print(status)
+        while not self.check_job_complete():
+            sleep(0.5)
+
+        # job_output = self.recv_job_async()
+        job_output = self._recv_msg(pb.JOBOUTPUT)
+        # return job_output
+        return job_output_to_atomic_result(
+            atomic_input=atomic_input, job_output=job_output
+        )
 
     def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
@@ -147,40 +183,56 @@ class TCProtobufClient(object):
             bool: True on job acceptance, False on server busy, and errors out if communication fails
         """
         if jobType.upper() not in list(pb.JobInput.RunType.keys()):
-            raise ValueError("Job type specified is not available in this version of the TCPB client\n" \
-                             "Allowed run types: {}".format(list(pb.JobInput.RunType.keys())))
+            raise ValueError(
+                "Job type specified is not available in this version of the TCPB client\n"
+                "Allowed run types: {}".format(list(pb.JobInput.RunType.keys()))
+            )
         if geom is None:
             raise SyntaxError("Did not provide geometry to send_job_async()")
         if isinstance(geom, np.ndarray):
             geom = geom.flatten()
         if unitType.upper() not in list(pb.Mol.UnitType.keys()):
-            raise ValueError("Unit type specified is not available in this version of the TCPB client\n" \
-                             "Allowed unit types: {}".format(list(pb.Mol.UnitType.keys())))
+            raise ValueError(
+                "Unit type specified is not available in this version of the TCPB client\n"
+                "Allowed unit types: {}".format(list(pb.Mol.UnitType.keys()))
+            )
 
         if self.debug:
             logging.info("in debug mode - assume job completed")
             return True
 
         # Job setup
-        job_options = pb.JobInput()
-        job_options.run = pb.JobInput.RunType.Value(jobType.upper())
-        job_options.mol.xyz.extend(geom)
-        job_options.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+        job_input_msg = self._create_job_input_msg(jobType, geom, unitType, **kwargs)
 
-        self._process_kwargs(job_options, **kwargs)
+        self._send_msg(pb.JOBINPUT, job_input_msg)
 
-        self._send_msg(pb.JOBINPUT, job_options)
+        status_msg = self._recv_msg(pb.STATUS)
 
-        status = self._recv_msg(pb.STATUS)
-
-        if status.WhichOneof("job_status") == "accepted":
-            self.curr_job_dir = status.job_dir
-            self.curr_job_scr_dir = status.job_scr_dir
-            self.curr_job_id = status.server_job_id
+        if status_msg.WhichOneof("job_status") == "accepted":
+            self._set_status(status_msg)
 
             return True
         else:
             return False
+
+    def _set_status(self, status_msg: pb.Status):
+        """Sets status on self if job is accepted"""
+        self.curr_job_dir = status_msg.job_dir
+        self.curr_job_scr_dir = status_msg.job_scr_dir
+        self.curr_job_id = status_msg.server_job_id
+
+    def _create_job_input_msg(self, jobType, geom, unitType="bohr", **kwargs):
+        """Method for setting up jobs according to old mechanism
+
+        Refactored this method out to allow for better testing
+        """
+        job_input_msg = pb.JobInput()
+        job_input_msg.run = pb.JobInput.RunType.Value(jobType.upper())
+        job_input_msg.mol.xyz.extend(geom)
+        job_input_msg.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+
+        self._process_kwargs(job_input_msg, **kwargs)
+        return job_input_msg
 
     def check_job_complete(self):
         """Pack and send a Status message to the TeraChem Protobuf server asynchronously.
@@ -191,7 +243,7 @@ class TCProtobufClient(object):
         Returns:
             bool: True if job is completed, False otherwise
         """
-
+        print("Checking jobs status...")
         if self.debug:
             logging.info("in debug mode - assume check_job_complete is True")
             return True
@@ -207,7 +259,10 @@ class TCProtobufClient(object):
         elif status.WhichOneof("job_status") == "working":
             return False
         else:
-            raise ServerError("Invalid or no job status received, either no job submitted before check_job_complete() or major server issue", self)
+            raise ServerError(
+                "Invalid or no job status received, either no job submitted before check_job_complete() or major server issue",
+                self,
+            )
 
     def recv_job_async(self):
         """Recv and unpack a JobOutput message from the TeraChem Protobuf server asynchronously.
@@ -254,7 +309,7 @@ class TCProtobufClient(object):
         * cas_transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
 
         Available for CIS jobs:
-        
+
         * cis_states:         Number of excited states for reported properties
         * cis_unrelaxed_dipoles:    # of excited states list of flat 3-element NumPy arrays (default included with 'cis yes', or explicitly with 'cisunrelaxdipole yes', units a.u.)
         * cis_relaxed_dipoles:      # of excited states list of flat 3-element NumPy arrays (included with 'cisrelaxdipole yes', units a.u.)
@@ -262,84 +317,113 @@ class TCProtobufClient(object):
                                     Order given lexically (e.g. 0->1, 0->2, 1->2 for 2 states)
 
         Returns:
-            dict: Results as described above 
+            dict: Results as described above
         """
         output = self._recv_msg(pb.JOBOUTPUT)
 
         # Parse output into normal python dictionary
         results = {
-            'atoms'           : np.array(output.mol.atoms, dtype='S2'),
-            'geom'            : np.array(output.mol.xyz, dtype=np.float64).reshape(-1, 3),
-            'charges'         : np.array(output.charges, dtype=np.float64),
-            'spins'           : np.array(output.spins, dtype=np.float64),
-            'dipole_moment'   : output.dipoles[3],
-            'dipole_vector'   : np.array(output.dipoles[:3], dtype=np.float64),
-            'job_dir'         : output.job_dir,
-            'job_scr_dir'     : output.job_scr_dir,
-            'server_job_id'   : output.server_job_id,
+            "atoms": np.array(output.mol.atoms, dtype="S2"),
+            "geom": np.array(output.mol.xyz, dtype=np.float64).reshape(-1, 3),
+            "charges": np.array(output.charges, dtype=np.float64),
+            "spins": np.array(output.spins, dtype=np.float64),
+            "dipole_moment": output.dipoles[3],
+            "dipole_vector": np.array(output.dipoles[:3], dtype=np.float64),
+            "job_dir": output.job_dir,
+            "job_scr_dir": output.job_scr_dir,
+            "server_job_id": output.server_job_id,
         }
 
         if len(output.energy):
-            results['energy'] = output.energy[0]
+            results["energy"] = output.energy[0]
 
         if output.mol.closed is True:
-            results['orbfile'] = output.orb1afile
+            results["orbfile"] = output.orb1afile
 
-            results['orb_energies'] = np.array(output.orba_energies)
-            results['orb_occupations'] = np.array(output.orba_occupations)
+            results["orb_energies"] = np.array(output.orba_energies)
+            results["orb_occupations"] = np.array(output.orba_occupations)
         else:
-            results['orbfile_a'] = output.orb1afile
-            results['orbfile_b'] = output.orb1bfile
+            results["orbfile_a"] = output.orb1afile
+            results["orbfile_b"] = output.orb1bfile
 
-            results['orb_energies_a'] = np.array(output.orba_energies)
-            results['orb_occupations_a'] = np.array(output.orba_occupations)
-            results['orb_energies_b'] = np.array(output.orbb_energies)
-            results['orb_occupations_b'] = np.array(output.orbb_occupations)
+            results["orb_energies_a"] = np.array(output.orba_energies)
+            results["orb_occupations_a"] = np.array(output.orba_occupations)
+            results["orb_energies_b"] = np.array(output.orbb_energies)
+            results["orb_occupations_b"] = np.array(output.orbb_occupations)
 
         if len(output.gradient):
-            results['gradient'] = np.array(output.gradient, dtype=np.float64).reshape(-1, 3)
+            results["gradient"] = np.array(output.gradient, dtype=np.float64).reshape(
+                -1, 3
+            )
 
         if len(output.nacme):
-            results['nacme'] = np.array(output.nacme, dtype=np.float64).reshape(-1, 3)
+            results["nacme"] = np.array(output.nacme, dtype=np.float64).reshape(-1, 3)
 
         if len(output.cas_transition_dipole):
-            results['cas_transition_dipole'] = np.array(output.cas_transition_dipole, dtype=np.float64)
+            results["cas_transition_dipole"] = np.array(
+                output.cas_transition_dipole, dtype=np.float64
+            )
 
         if len(output.cas_energy_states):
-            results['energy'] = np.array(output.energy[:len(output.cas_energy_states)], dtype=np.float64)
-            results['cas_energy_labels'] = list(zip(output.cas_energy_states, output.cas_energy_mults))
+            results["energy"] = np.array(
+                output.energy[: len(output.cas_energy_states)], dtype=np.float64
+            )
+            results["cas_energy_labels"] = list(
+                zip(output.cas_energy_states, output.cas_energy_mults)
+            )
 
         if len(output.bond_order):
             nAtoms = len(output.mol.atoms)
-            results['bond_order'] = np.array(output.bond_order, dtype=np.float64).reshape(nAtoms, nAtoms)
+            results["bond_order"] = np.array(
+                output.bond_order, dtype=np.float64
+            ).reshape(nAtoms, nAtoms)
 
         if len(output.ci_overlaps):
-            results['ci_overlap'] = np.array(output.ci_overlaps, dtype=np.float64).reshape(output.ci_overlap_size, output.ci_overlap_size)
+            results["ci_overlap"] = np.array(
+                output.ci_overlaps, dtype=np.float64
+            ).reshape(output.ci_overlap_size, output.ci_overlap_size)
 
         if output.cis_states > 0:
-            results['energy'] = np.array(output.energy[:output.cis_states+1], dtype=np.float64)
-            results['cis_states'] = output.cis_states
+            results["energy"] = np.array(
+                output.energy[: output.cis_states + 1], dtype=np.float64
+            )
+            results["cis_states"] = output.cis_states
 
             if len(output.cis_unrelaxed_dipoles):
                 uDips = []
                 for i in range(output.cis_states):
-                    uDips.append(np.array(output.cis_unrelaxed_dipoles[4*i:4*i+3], dtype=np.float64))
-                results['cis_unrelaxed_dipoles'] = uDips
+                    uDips.append(
+                        np.array(
+                            output.cis_unrelaxed_dipoles[4 * i : 4 * i + 3],
+                            dtype=np.float64,
+                        )
+                    )
+                results["cis_unrelaxed_dipoles"] = uDips
 
             if len(output.cis_relaxed_dipoles):
                 rDips = []
                 for i in range(output.cis_states):
-                    rDips.append(np.array(output.cis_relaxed_dipoles[4*i:4*i+3], dtype=np.float64))
-                results['cis_relaxed_dipoles'] = rDips
+                    rDips.append(
+                        np.array(
+                            output.cis_relaxed_dipoles[4 * i : 4 * i + 3],
+                            dtype=np.float64,
+                        )
+                    )
+                results["cis_relaxed_dipoles"] = rDips
 
             if len(output.cis_transition_dipoles):
                 tDips = []
-                for i in range((output.cis_states+1)*output.cis_states/2):
-                    tDips.append(np.array(output.cis_transition_dipoles[4*i:4*i+3], dtype=np.float64))
-                results['cis_transition_dipoles'] = tDips
+                for i in range((output.cis_states + 1) * output.cis_states / 2):
+                    tDips.append(
+                        np.array(
+                            output.cis_transition_dipoles[4 * i : 4 * i + 3],
+                            dtype=np.float64,
+                        )
+                    )
+                results["cis_transition_dipoles"] = tDips
 
         if len(output.compressed_mo_vector):
-            results['molden'] = tcpb_imd_fields2molden_string(output);
+            results["molden"] = tcpb_imd_fields2molden_string(output)
 
         # Save results for user access later
         self.prev_results = results
@@ -364,15 +448,19 @@ class TCProtobufClient(object):
             dict: Results mirroring recv_job_async
         """
         if self.debug:
-            logging.info("in debug mode - assume compute_job_sync completed successfully")
+            logging.info(
+                "in debug mode - assume compute_job_sync completed successfully"
+            )
             return True
 
         accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
         while accepted is False:
+            sleep(0.5)
             accepted = self.send_job_async(jobType, geom, unitType, **kwargs)
 
         completed = self.check_job_complete()
         while completed is False:
+            sleep(0.5)
             completed = self.check_job_complete()
 
         return self.recv_job_async()
@@ -391,7 +479,7 @@ class TCProtobufClient(object):
             float: Energy
         """
         results = self.compute_job_sync("energy", geom, unitType, **kwargs)
-        return results['energy']
+        return results["energy"]
 
     def compute_gradient(self, geom=None, unitType="bohr", **kwargs):
         """Compute gradient of a new geometry, but with the same atom labels/charge/spin
@@ -406,7 +494,7 @@ class TCProtobufClient(object):
             tuple: Tuple of (energy, gradient)
         """
         results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
-        return results['energy'], results['gradient']
+        return results["energy"], results["gradient"]
 
     # Convenience to maintain compatibility with NanoReactor2
     def compute_forces(self, geom=None, unitType="bohr", **kwargs):
@@ -422,7 +510,7 @@ class TCProtobufClient(object):
             tuple: Tuple of (energy, forces), which is really (energy, -gradient)
         """
         results = self.compute_job_sync("gradient", geom, unitType, **kwargs)
-        return results['energy'], -1.0*results['gradient']
+        return results["energy"], -1.0 * results["gradient"]
 
     def compute_coupling(self, geom=None, unitType="bohr", **kwargs):
         """Compute nonadiabatic coupling of a new geometry, but with the same atoms labels/charge/spin
@@ -437,14 +525,24 @@ class TCProtobufClient(object):
             (num_atoms, 3) ndarray: Nonadiabatic coupling vector
         """
         results = self.compute_job_sync("coupling", geom, unitType, **kwargs)
-        return results['nacme']
+        return results["nacme"]
 
-
-    def compute_ci_overlap(self, geom=None, geom2=None, cvec1file=None, cvec2file=None,
-        orb1afile=None, orb1bfile=None, orb2afile=None, orb2bfile=None, unitType="bohr", **kwargs):
+    def compute_ci_overlap(
+        self,
+        geom=None,
+        geom2=None,
+        cvec1file=None,
+        cvec2file=None,
+        orb1afile=None,
+        orb1bfile=None,
+        orb2afile=None,
+        orb2bfile=None,
+        unitType="bohr",
+        **kwargs,
+    ):
         """Compute wavefunction overlap given two different geometries, CI vectors, and orbitals,
         using the same atom labels/charge/spin multiplicity as the previous calculation.
-        
+
         To run a closed shell calculation, only populate orb1afile/orb2afile, leaving orb1bfile/orb2bfile blank.
         Currently, open-shell overlap calculations are not supported by TeraChem.
 
@@ -468,29 +566,53 @@ class TCProtobufClient(object):
         if cvec1file is None or cvec2file is None:
             raise SyntaxError("Did not provide two CI vectors to compute_ci_overlap()")
         if orb1afile is None or orb1bfile is None:
-            raise SyntaxError("Did not provide two sets of orbitals to compute_ci_overlap()")
-        if (orb1bfile is not None and orb2bfile is None) or (orb1bfile is None and orb2bfile is not None) and kwargs['closed_shell'] is False:
-            raise SyntaxError("Did not provide two sets of open-shell orbitals to compute_ci_overlap()")
-        elif orb1bfile is not None and orb2bfile is not None and kwargs['closed_shell'] is True:
-            print("WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals.")
+            raise SyntaxError(
+                "Did not provide two sets of orbitals to compute_ci_overlap()"
+            )
+        if (
+            (orb1bfile is not None and orb2bfile is None)
+            or (orb1bfile is None and orb2bfile is not None)
+            and kwargs["closed_shell"] is False
+        ):
+            raise SyntaxError(
+                "Did not provide two sets of open-shell orbitals to compute_ci_overlap()"
+            )
+        elif (
+            orb1bfile is not None
+            and orb2bfile is not None
+            and kwargs["closed_shell"] is True
+        ):
+            print(
+                "WARNING: System specified as closed, but open-shell orbitals were passed to compute_ci_overlap(). Ignoring beta orbitals."
+            )
 
-        if kwargs['closed_shell']:
-            results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
-                cvec1file=cvec1file, cvec2file=cvec2file,
-                orb1afile=orb1afile, orb2afile=orb2afile, **kwargs)
+        if kwargs["closed_shell"]:
+            results = self.compute_job_sync(
+                "ci_vec_overlap",
+                geom,
+                unitType,
+                geom2=geom2,
+                cvec1file=cvec1file,
+                cvec2file=cvec2file,
+                orb1afile=orb1afile,
+                orb2afile=orb2afile,
+                **kwargs,
+            )
         else:
-            raise RuntimeError("WARNING: Open-shell systems are currently not supported for overlaps")
-            #results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
+            raise RuntimeError(
+                "WARNING: Open-shell systems are currently not supported for overlaps"
+            )
+            # results = self.compute_job_sync("ci_vec_overlap", geom, unitType, geom2=geom2,
             #    cvec1file=cvec1file, cvec2file=cvec2file,
             #    orb1afile=orb1afile, orb1bfile=orb1bfile,
             #    orb2afile=orb1bfile, orb2bfile=orb2bfile, **kwargs)
-            
-        return results['ci_overlap']
+
+        return results["ci_overlap"]
 
     # Private kwarg helper function
-    def _process_kwargs(self, job_options, **kwargs):
+    def _process_kwargs(self, job_options, **kwargs):  # noqa NOTE: C901 too complex!
         """Process user-provided keyword arguments into a JobInput object
-        
+
         Several keywords are processed by the client to set more complex fields
         in the Protobuf messages. These are:
 
@@ -508,81 +630,101 @@ class TCProtobufClient(object):
         """
         # Validate all options are here
         # TODO: Replace with mtzutils.Options
-        required = ['atoms', 'charge', 'spinmult', 'closed_shell', 'restricted', 'method', 'basis']
+        required = [
+            "atoms",
+            "charge",
+            "spinmult",
+            "closed_shell",
+            "restricted",
+            "method",
+            "basis",
+        ]
         types = [str, int, int, bool, bool, str, str]
 
         for r, t in zip(required, types):
             if kwargs.get(r, None) is None:
                 raise SyntaxError("Keyword %s must be specified in options" % r)
-            elif r == 'atoms':
-                for a in kwargs['atoms']:
+            elif r == "atoms":
+                for a in kwargs["atoms"]:
                     if not isinstance(a, t):
                         raise TypeError("Each atom must have type: basestring")
-            elif r == 'method':
-                if not isinstance(kwargs['method'], t):
+            elif r == "method":
+                if not isinstance(kwargs["method"], t):
                     raise TypeError("%s must have type: %s" % (r, t))
-                elif kwargs['method'].upper() not in list(pb.JobInput.MethodType.keys()):
-                    raise ValueError("Method specified is not available in this version of the TCPB client\n" \
-                                     "Allowed methods: {}".format(list(pb.JobInput.MethodType.keys())))
+                elif kwargs["method"].upper() not in list(
+                    pb.JobInput.MethodType.keys()
+                ):
+                    raise ValueError(
+                        "Method specified is not available in this version of the TCPB client\n"
+                        "Allowed methods: {}".format(
+                            list(pb.JobInput.MethodType.keys())
+                        )
+                    )
             elif not isinstance(kwargs[r], t):
                 raise TypeError("%s must have type: %s" % (r, t))
 
         for key, value in kwargs.items():
-            if key == 'atoms':
+            if key == "atoms":
                 job_options.mol.atoms.extend(value)
-            elif key == 'charge':
+            elif key == "charge":
                 job_options.mol.charge = value
-            elif key == 'spinmult':
+            elif key == "spinmult":
                 job_options.mol.multiplicity = value
-            elif key == 'closed_shell':
+            elif key == "closed_shell":
                 job_options.mol.closed = value
-            elif key == 'restricted':
+            elif key == "restricted":
                 job_options.mol.restricted = value
-            elif key == 'method':
+            elif key == "method":
                 job_options.method = pb.JobInput.MethodType.Value(value.upper())
-            elif key == 'basis':
+            elif key == "basis":
                 job_options.basis = value
-            elif key == 'geom':
+            elif key == "geom":
                 # Standard geometry, usually handled in other calling functions but here just in case
                 if isinstance(value, np.ndarray):
                     value = value.flatten()
-                if len(kwargs['atoms']) != len(value)/3.0:
-                    raise ValueError("Geometry provided to geom does not match atom list")
+                if len(kwargs["atoms"]) != len(value) / 3.0:
+                    raise ValueError(
+                        "Geometry provided to geom does not match atom list"
+                    )
 
                 del job_options.mol.xyz[:]
                 job_options.mol.xyz.extend(value)
-            elif key == 'geom2':
+            elif key == "geom2":
                 # Second geometry for ci_vec_overlap job
                 if isinstance(value, np.ndarray):
                     value = value.flatten()
-                if len(kwargs['atoms']) != len(value)/3.0:
-                    raise ValueError("Geometry provided to geom2 does not match atom list")
+                if len(kwargs["atoms"]) != len(value) / 3.0:
+                    raise ValueError(
+                        "Geometry provided to geom2 does not match atom list"
+                    )
 
                 del job_options.xyz2[:]
                 job_options.xyz2.extend(value)
-            elif key == 'bond_order':
+            elif key == "bond_order":
                 # Request Meyer bond order matrix
                 if value is not True and value is not False:
                     raise ValueError("Bond order request must be True or False")
 
                 job_options.return_bond_order = value
-            elif key == 'mo_output':
+            elif key == "mo_output":
                 # Request AO and MO information
                 if value is True:
-                    job_options.imd_orbital_type = pb.JobInput.ImdOrbitalType.Value("WHOLE_C")
+                    job_options.imd_orbital_type = pb.JobInput.ImdOrbitalType.Value(
+                        "WHOLE_C"
+                    )
             elif key in job_options.user_options:
                 # Overwrite currently defined custom user option
                 index = job_options.user_options.index(key)
                 if value is None:
-                    del job_options.user_options[index:(index+1)]
+                    del job_options.user_options[index : (index + 1)]
                 else:
-                    job_options.user_options[index+1] = str(value)
+                    job_options.user_options[index + 1] = str(value)
             elif key not in job_options.user_options and value is not None:
                 # New custom user option
                 job_options.user_options.extend([key, str(value)])
 
     # Private send/recv functions
-    def _send_msg(self, msg_type, msg_pb):
+    def _send_msg(self, msg_type, msg_pb=None):
         """Sends a header + PB to the TeraChem Protobuf server (must be connected)
 
         Args:
@@ -596,13 +738,13 @@ class TCProtobufClient(object):
         else:
             msg_size = msg_pb.ByteSize()
 
-        header = struct.pack('>II', msg_type, msg_size)
+        header = struct.pack(">II", msg_type, msg_size)
         try:
             self.tcsock.sendall(header)
         except socket.error as msg:
             raise ServerError("Could not send header: {}".format(msg), self)
 
-        msg_str = b''
+        msg_str = b""
         if msg_pb is not None:
             try:
                 msg_str = msg_pb.SerializeToString()
@@ -614,7 +756,7 @@ class TCProtobufClient(object):
             packet = header + msg_str
             self.outtracefile.write(packet)
 
-    def _recv_msg(self, msg_type):
+    def _recv_msg(self, msg_type):  # noqa NOTE: C901 too complex!
         """Receives a header + PB from the TeraChem Protobuf server (must be connected)
 
         Args:
@@ -625,45 +767,65 @@ class TCProtobufClient(object):
         """
         # Receive header
         try:
-            header = b''
+            header = b""
             nleft = self.header_size
             while nleft:
                 data = self.tcsock.recv(nleft)
-                if data == b'':
+                if data == b"":
                     break
                 header += data
                 nleft -= len(data)
 
             # Check we got full message
-            if nleft == self.header_size and data == b'':
-                raise ServerError("Could not recv header because socket was closed from server", self)
+            if nleft == self.header_size and data == b"":
+                raise ServerError(
+                    "Could not recv header because socket was closed from server", self
+                )
             elif nleft:
-                raise ServerError("Recv'd {} of {} expected bytes for header".format(nleft, self.header_size), self)
+                raise ServerError(
+                    "Recv'd {} of {} expected bytes for header".format(
+                        nleft, self.header_size
+                    ),
+                    self,
+                )
         except socket.error as msg:
             raise ServerError("Could not recv header: {}".format(msg), self)
 
         msg_info = struct.unpack_from(">II", header)
 
         if msg_info[0] != msg_type:
-            raise ServerError("Received header for incorrect packet type (expecting {} and got {})".format(msg_type, msg_info[0]), self)
+            raise ServerError(
+                "Received header for incorrect packet type (expecting {} and got {})".format(
+                    msg_type, msg_info[0]
+                ),
+                self,
+            )
 
         # Receive Protocol Buffer (if one was sent)
         if msg_info[1] >= 0:
             try:
-                msg_str = b''
-                nleft = msg_info[1] 
+                msg_str = b""
+                nleft = msg_info[1]
                 while nleft:
                     data = self.tcsock.recv(nleft)
-                    if data == b'':
+                    if data == b"":
                         break
                     msg_str += data
                     nleft -= len(data)
 
                 # Check we got full message
-                if nleft == self.header_size and data == b'':
-                    raise ServerError("Could not recv message because socket was closed from server", self)
+                if nleft == self.header_size and data == b"":
+                    raise ServerError(
+                        "Could not recv message because socket was closed from server",
+                        self,
+                    )
                 elif nleft:
-                    raise ServerError("Recv'd {} of {} expected bytes for protobuf".format(nleft, msg_info[1]), self)
+                    raise ServerError(
+                        "Recv'd {} of {} expected bytes for protobuf".format(
+                            nleft, msg_info[1]
+                        ),
+                        self,
+                    )
             except socket.error as msg:
                 raise ServerError("Could not recv protobuf: {}".format(msg), self)
 
@@ -676,7 +838,9 @@ class TCProtobufClient(object):
         elif msg_type == pb.JOBOUTPUT:
             recv_pb = pb.JobOutput()
         else:
-            raise ServerError("Unknown message type {} for received message.".format(msg_type), self)
+            raise ServerError(
+                "Unknown message type {} for received message.".format(msg_type), self
+            )
 
         recv_pb.ParseFromString(msg_str)
 
@@ -685,4 +849,3 @@ class TCProtobufClient(object):
             self.intracefile.write(packet)
 
         return recv_pb
-

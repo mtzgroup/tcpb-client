@@ -1,17 +1,25 @@
 # Python TeraChem Protocol Buffer (TCPB) Client
 
-This repository is designed to facilitate the development a Python client for communicating with TeraChem running in Protocol Buffer server mode.
+Python client to communicate with TeraChem running in server mode.
 
-This client uses C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output.
+Client uses C-style sockets for communication and Protocol Buffers for data serialization.
 
-For more documentation, check out https://mtzgrouptcpb.readthedocs.io/en/latest/.
+## Requirements
 
-For distribution, check out https://anaconda.org/mtzgroup/tcpb.
+- Python 3.6+
 
-## How do I use this?
+## Installation
 
-TODO: More details
+```sh
+pip install tcpb
+```
 
-## Contact
+## Notes
 
-* Stefan Seritan <sseritan@stanford.edu>
+The original, Python 2.7 compatible `tcpb` client built by Stefan Seritan was released as version `0.6.0`. If you depend upon this original release it can be installed by pegging to its version:
+
+```sh
+pip install tcpb==0.6.0
+```
+
+All future releases will support Python 3+ and MolSSI's QCSchema for data input/output.
