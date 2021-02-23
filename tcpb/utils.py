@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Union, List
 
 from google.protobuf.json_format import MessageToDict
 from numpy import array
@@ -66,14 +66,14 @@ def job_output_to_atomic_result(
     *, atomic_input: AtomicInput, job_output: pb.JobOutput
 ) -> AtomicResult:
     """Convert JobOutput to AtomicResult"""
-    # Convert job_ouput to python types
+    # Convert job_output to python types
     # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
     jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
 
     if atomic_input.driver == "energy":
         # Select first element in list (ground state); may need to modify for excited
         # state
-        return_result: Any = jo_dict["energy"][0]
+        return_result: Union[float, List[float]] = jo_dict["energy"][0]
 
     elif atomic_input.driver == "gradient":
         return_result = jo_dict["gradient"]
@@ -81,10 +81,14 @@ def job_output_to_atomic_result(
     else:
         raise ValueError(f"Unsupported driver: {atomic_input.driver}")
 
-    try:
-        molden_string = tcpb_imd_fields2molden_string(job_output)
-    except Exception:
-        # Don't know how this code will blow up, so except everything for now :/
+    if atomic_input.keywords.get("molden"):
+        # If molden file was request
+        try:
+            molden_string = tcpb_imd_fields2molden_string(job_output)
+        except Exception:
+            # Don't know how this code will blow up, so except everything for now :/
+            molden_string = "Unable to create molden output"
+    else:
         molden_string = None
 
     atomic_result = AtomicResult(
@@ -114,6 +118,8 @@ def job_output_to_atomic_result(
                 "orba_occupations": jo_dict.get("orba_occupations"),
                 "orbb_energies": jo_dict.get("orbb_energies"),
                 "orbb_occupations": jo_dict.get("orbb_occupations"),
+                "excited_state_energies": jo_dict.get("energy"),
+                "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
             },
             "molden": molden_string,
         },
