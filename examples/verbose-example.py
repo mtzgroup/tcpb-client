@@ -50,7 +50,7 @@ print("TCPB Server available: {}".format(avail))
 # energy, gradient = TC.compute_gradient(geom, "angstrom", **tc_opts)
 result = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
 print(result)
-print("H2O Gradient:\n{}".format(result['gradient']))
+print("H2O Gradient:\n{}".format(result["gradient"]))
 
 # # Forces calculation (just like gradient call with -1*gradient)
 # energy, forces = TC.compute_forces(geom, "angstrom", **tc_opts)
