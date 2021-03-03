@@ -20,25 +20,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Using `flit` instead of `setuptools` for packaging.
+- Compatible with only python 3.6+ (adding type annotations)
 
 ### Removed
 
 - `setup.py`
 - Unused and broken test files including non functional mock server.
 
-## [0.6.0] - 2021-02-25
+## [r0.6.0] - 2021-02-25
 
 ### Changed
 
 - Added Henry's molden file constructor function.
 
-## [0.5.x] - Long long ago
+## 0.5.x - Long long ago
 
 ### Added
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.0...HEAD
 [0.7.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0
 [r0.6.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.6.0
 [r0.5.3]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.5.3
