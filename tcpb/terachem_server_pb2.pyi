@@ -13,14 +13,20 @@ import typing_extensions
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
 
 global___MessageType = MessageType
-class _MessageType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[MessageType.V], builtins.type):
+
+class _MessageType(
+    google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[MessageType.V],
+    builtins.type,
+):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
     STATUS = MessageType.V(0)
     MOL = MessageType.V(1)
     JOBINPUT = MessageType.V(2)
     JOBOUTPUT = MessageType.V(3)
+
 class MessageType(metaclass=_MessageType):
-    V = typing.NewType('V', builtins.int)
+    V = typing.NewType("V", builtins.int)
+
 STATUS = MessageType.V(0)
 MOL = MessageType.V(1)
 JOBINPUT = MessageType.V(2)
@@ -42,30 +48,68 @@ class Status(google.protobuf.message.Message):
     job_dir: typing.Text = ...
     job_scr_dir: typing.Text = ...
     server_job_id: builtins.int = ...
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        busy : builtins.bool = ...,
-        accepted : builtins.bool = ...,
-        working : builtins.bool = ...,
-        completed : builtins.bool = ...,
-        job_dir : typing.Text = ...,
-        job_scr_dir : typing.Text = ...,
-        server_job_id : builtins.int = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"accepted",b"accepted",u"completed",b"completed",u"job_status",b"job_status",u"working",b"working"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"accepted",b"accepted",u"busy",b"busy",u"completed",b"completed",u"job_dir",b"job_dir",u"job_scr_dir",b"job_scr_dir",u"job_status",b"job_status",u"server_job_id",b"server_job_id",u"working",b"working"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"job_status",b"job_status"]) -> typing_extensions.Literal["accepted","working","completed"]: ...
+        busy: builtins.bool = ...,
+        accepted: builtins.bool = ...,
+        working: builtins.bool = ...,
+        completed: builtins.bool = ...,
+        job_dir: typing.Text = ...,
+        job_scr_dir: typing.Text = ...,
+        server_job_id: builtins.int = ...,
+    ) -> None: ...
+    def HasField(
+        self,
+        field_name: typing_extensions.Literal[
+            "accepted",
+            b"accepted",
+            "completed",
+            b"completed",
+            "job_status",
+            b"job_status",
+            "working",
+            b"working",
+        ],
+    ) -> builtins.bool: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions.Literal[
+            "accepted",
+            b"accepted",
+            "busy",
+            b"busy",
+            "completed",
+            b"completed",
+            "job_dir",
+            b"job_dir",
+            "job_scr_dir",
+            b"job_scr_dir",
+            "job_status",
+            b"job_status",
+            "server_job_id",
+            b"server_job_id",
+            "working",
+            b"working",
+        ],
+    ) -> None: ...
+    def WhichOneof(
+        self, oneof_group: typing_extensions.Literal["job_status", b"job_status"]
+    ) -> typing_extensions.Literal["accepted", "working", "completed"]: ...
+
 global___Status = Status
 
 class Mol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    class _UnitType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[UnitType.V], builtins.type):
+    class _UnitType(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[UnitType.V],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         ANGSTROM = Mol.UnitType.V(0)
         BOHR = Mol.UnitType.V(1)
     class UnitType(metaclass=_UnitType):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     ANGSTROM = Mol.UnitType.V(0)
     BOHR = Mol.UnitType.V(1)
 
@@ -76,30 +120,56 @@ class Mol(google.protobuf.message.Message):
     MULTIPLICITY_FIELD_NUMBER: builtins.int
     CLOSED_FIELD_NUMBER: builtins.int
     RESTRICTED_FIELD_NUMBER: builtins.int
-    atoms: google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text] = ...
-    xyz: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    atoms: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        typing.Text
+    ] = ...
+    xyz: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     units: global___Mol.UnitType.V = ...
     charge: builtins.int = ...
     multiplicity: builtins.int = ...
     closed: builtins.bool = ...
     restricted: builtins.bool = ...
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        atoms : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        xyz : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        units : global___Mol.UnitType.V = ...,
-        charge : builtins.int = ...,
-        multiplicity : builtins.int = ...,
-        closed : builtins.bool = ...,
-        restricted : builtins.bool = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"atoms",b"atoms",u"charge",b"charge",u"closed",b"closed",u"multiplicity",b"multiplicity",u"restricted",b"restricted",u"units",b"units",u"xyz",b"xyz"]) -> None: ...
+        atoms: typing.Optional[typing.Iterable[typing.Text]] = ...,
+        xyz: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        units: global___Mol.UnitType.V = ...,
+        charge: builtins.int = ...,
+        multiplicity: builtins.int = ...,
+        closed: builtins.bool = ...,
+        restricted: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions.Literal[
+            "atoms",
+            b"atoms",
+            "charge",
+            b"charge",
+            "closed",
+            b"closed",
+            "multiplicity",
+            b"multiplicity",
+            "restricted",
+            b"restricted",
+            "units",
+            b"units",
+            "xyz",
+            b"xyz",
+        ],
+    ) -> None: ...
+
 global___Mol = Mol
 
 class JobInput(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    class _RunType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[RunType.V], builtins.type):
+    class _RunType(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[RunType.V],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         ENERGY = JobInput.RunType.V(0)
         GRADIENT = JobInput.RunType.V(1)
@@ -107,14 +177,16 @@ class JobInput(google.protobuf.message.Message):
         TDCI = JobInput.RunType.V(16)
         CI_VEC_OVERLAP = JobInput.RunType.V(19)
     class RunType(metaclass=_RunType):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     ENERGY = JobInput.RunType.V(0)
     GRADIENT = JobInput.RunType.V(1)
     COUPLING = JobInput.RunType.V(14)
     TDCI = JobInput.RunType.V(16)
     CI_VEC_OVERLAP = JobInput.RunType.V(19)
-
-    class _MethodType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[MethodType.V], builtins.type):
+    class _MethodType(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[MethodType.V],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         HF = JobInput.MethodType.V(0)
         CASE = JobInput.MethodType.V(2)
@@ -144,7 +216,7 @@ class JobInput(google.protobuf.message.Message):
         GFNXTB = JobInput.MethodType.V(24)
         GFN2XTB = JobInput.MethodType.V(25)
     class MethodType(metaclass=_MethodType):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     HF = JobInput.MethodType.V(0)
     CASE = JobInput.MethodType.V(2)
     SVWN1 = JobInput.MethodType.V(3)
@@ -172,21 +244,25 @@ class JobInput(google.protobuf.message.Message):
     WB97XD3 = JobInput.MethodType.V(23)
     GFNXTB = JobInput.MethodType.V(24)
     GFN2XTB = JobInput.MethodType.V(25)
-
-    class _ImdType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdType.V], builtins.type):
+    class _ImdType(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdType.V],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         NOT_IMD = JobInput.ImdType.V(0)
         IMD_NEW_CONDITION = JobInput.ImdType.V(1)
         IMD_CONTINUE = JobInput.ImdType.V(2)
         IMD_HESSIAN = JobInput.ImdType.V(3)
     class ImdType(metaclass=_ImdType):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     NOT_IMD = JobInput.ImdType.V(0)
     IMD_NEW_CONDITION = JobInput.ImdType.V(1)
     IMD_CONTINUE = JobInput.ImdType.V(2)
     IMD_HESSIAN = JobInput.ImdType.V(3)
-
-    class _ImdOrbitalType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdOrbitalType.V], builtins.type):
+    class _ImdOrbitalType(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdOrbitalType.V],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         NO_ORBITAL = JobInput.ImdOrbitalType.V(0)
         ALPHA_ORBITAL = JobInput.ImdOrbitalType.V(1)
@@ -195,20 +271,24 @@ class JobInput(google.protobuf.message.Message):
         BETA_DENSITY = JobInput.ImdOrbitalType.V(4)
         WHOLE_C = JobInput.ImdOrbitalType.V(5)
     class ImdOrbitalType(metaclass=_ImdOrbitalType):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     NO_ORBITAL = JobInput.ImdOrbitalType.V(0)
     ALPHA_ORBITAL = JobInput.ImdOrbitalType.V(1)
     BETA_ORBITAL = JobInput.ImdOrbitalType.V(2)
     ALPHA_DENSITY = JobInput.ImdOrbitalType.V(3)
     BETA_DENSITY = JobInput.ImdOrbitalType.V(4)
     WHOLE_C = JobInput.ImdOrbitalType.V(5)
-
-    class _ImdAdditionalOption(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdAdditionalOption.V], builtins.type):
+    class _ImdAdditionalOption(
+        google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[
+            ImdAdditionalOption.V
+        ],
+        builtins.type,
+    ):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         IMD_NORMAL_MD = JobInput.ImdAdditionalOption.V(0)
         IMD_MECI_OPT_GRADIENT = JobInput.ImdAdditionalOption.V(1)
     class ImdAdditionalOption(metaclass=_ImdAdditionalOption):
-        V = typing.NewType('V', builtins.int)
+        V = typing.NewType("V", builtins.int)
     IMD_NORMAL_MD = JobInput.ImdAdditionalOption.V(0)
     IMD_MECI_OPT_GRADIENT = JobInput.ImdAdditionalOption.V(1)
 
@@ -232,45 +312,97 @@ class JobInput(google.protobuf.message.Message):
     run: global___JobInput.RunType.V = ...
     method: global___JobInput.MethodType.V = ...
     basis: typing.Text = ...
-    user_options: google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text] = ...
+    user_options: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        typing.Text
+    ] = ...
     orb1afile: typing.Text = ...
     orb1bfile: typing.Text = ...
     return_bond_order: builtins.bool = ...
-    xyz2: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    xyz2: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     imd_type: global___JobInput.ImdType.V = ...
     imd_initial_orbital: builtins.int = ...
     imd_orbital_type: global___JobInput.ImdOrbitalType.V = ...
-    imd_xyz_previous: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    imd_mo_previous: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    imd_mmatom_position: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    imd_mmatom_info: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    imd_xyz_previous: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    imd_mo_previous: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    imd_mmatom_position: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    imd_mmatom_info: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     imd_additional_option: global___JobInput.ImdAdditionalOption.V = ...
-
     @property
     def mol(self) -> global___Mol: ...
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        mol : typing.Optional[global___Mol] = ...,
-        run : global___JobInput.RunType.V = ...,
-        method : global___JobInput.MethodType.V = ...,
-        basis : typing.Text = ...,
-        user_options : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        orb1afile : typing.Text = ...,
-        orb1bfile : typing.Text = ...,
-        return_bond_order : builtins.bool = ...,
-        xyz2 : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_type : global___JobInput.ImdType.V = ...,
-        imd_initial_orbital : builtins.int = ...,
-        imd_orbital_type : global___JobInput.ImdOrbitalType.V = ...,
-        imd_xyz_previous : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_mo_previous : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_mmatom_position : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_mmatom_info : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_additional_option : global___JobInput.ImdAdditionalOption.V = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"mol",b"mol"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"basis",b"basis",u"imd_additional_option",b"imd_additional_option",u"imd_initial_orbital",b"imd_initial_orbital",u"imd_mmatom_info",b"imd_mmatom_info",u"imd_mmatom_position",b"imd_mmatom_position",u"imd_mo_previous",b"imd_mo_previous",u"imd_orbital_type",b"imd_orbital_type",u"imd_type",b"imd_type",u"imd_xyz_previous",b"imd_xyz_previous",u"method",b"method",u"mol",b"mol",u"orb1afile",b"orb1afile",u"orb1bfile",b"orb1bfile",u"return_bond_order",b"return_bond_order",u"run",b"run",u"user_options",b"user_options",u"xyz2",b"xyz2"]) -> None: ...
+        mol: typing.Optional[global___Mol] = ...,
+        run: global___JobInput.RunType.V = ...,
+        method: global___JobInput.MethodType.V = ...,
+        basis: typing.Text = ...,
+        user_options: typing.Optional[typing.Iterable[typing.Text]] = ...,
+        orb1afile: typing.Text = ...,
+        orb1bfile: typing.Text = ...,
+        return_bond_order: builtins.bool = ...,
+        xyz2: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_type: global___JobInput.ImdType.V = ...,
+        imd_initial_orbital: builtins.int = ...,
+        imd_orbital_type: global___JobInput.ImdOrbitalType.V = ...,
+        imd_xyz_previous: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_mo_previous: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_mmatom_position: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_mmatom_info: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_additional_option: global___JobInput.ImdAdditionalOption.V = ...,
+    ) -> None: ...
+    def HasField(
+        self, field_name: typing_extensions.Literal["mol", b"mol"]
+    ) -> builtins.bool: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions.Literal[
+            "basis",
+            b"basis",
+            "imd_additional_option",
+            b"imd_additional_option",
+            "imd_initial_orbital",
+            b"imd_initial_orbital",
+            "imd_mmatom_info",
+            b"imd_mmatom_info",
+            "imd_mmatom_position",
+            b"imd_mmatom_position",
+            "imd_mo_previous",
+            b"imd_mo_previous",
+            "imd_orbital_type",
+            b"imd_orbital_type",
+            "imd_type",
+            b"imd_type",
+            "imd_xyz_previous",
+            b"imd_xyz_previous",
+            "method",
+            b"method",
+            "mol",
+            b"mol",
+            "orb1afile",
+            b"orb1afile",
+            "orb1bfile",
+            b"orb1bfile",
+            "return_bond_order",
+            b"return_bond_order",
+            "run",
+            b"run",
+            "user_options",
+            b"user_options",
+            "xyz2",
+            b"xyz2",
+        ],
+    ) -> None: ...
+
 global___JobInput = JobInput
 
 class JobOutput(google.protobuf.message.Message):
@@ -310,82 +442,212 @@ class JobOutput(google.protobuf.message.Message):
     COMPRESSED_PRIMITIVE_DATA_FIELD_NUMBER: builtins.int
     COMPRESSED_MO_VECTOR_FIELD_NUMBER: builtins.int
     IMD_MMATOM_GRADIENT_FIELD_NUMBER: builtins.int
-    energy: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    gradient: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    charges: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    spins: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    energy: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    gradient: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    charges: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    spins: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     job_dir: typing.Text = ...
     job_scr_dir: typing.Text = ...
     server_job_id: builtins.int = ...
     orb1afile: typing.Text = ...
     orb1bfile: typing.Text = ...
     orb_size: builtins.int = ...
-    bond_order: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    ci_overlaps: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    bond_order: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    ci_overlaps: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     ci_overlap_size: builtins.int = ...
-    cas_energy_states: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int] = ...
-    cas_energy_mults: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int] = ...
-    cas_transition_dipole: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    nacme: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    orba_energies: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    orbb_energies: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    orba_occupations: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    orbb_occupations: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
+    cas_energy_states: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.int
+    ] = ...
+    cas_energy_mults: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.int
+    ] = ...
+    cas_transition_dipole: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    nacme: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    orba_energies: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    orbb_energies: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    orba_occupations: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    orbb_occupations: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     cis_states: builtins.int = ...
-    cis_unrelaxed_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    cis_relaxed_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    cis_transition_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    ci_vec_re: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    ci_vec_im: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    compressed_bond_order: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int] = ...
-    compressed_hessian: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    compressed_ao_data: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    compressed_primitive_data: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    compressed_mo_vector: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-    imd_mmatom_gradient: google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.float] = ...
-
+    cis_unrelaxed_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    cis_relaxed_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    cis_transition_dipoles: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    ci_vec_re: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    ci_vec_im: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    compressed_bond_order: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.int
+    ] = ...
+    compressed_hessian: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    compressed_ao_data: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    compressed_primitive_data: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    compressed_mo_vector: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
+    imd_mmatom_gradient: google.protobuf.internal.containers.RepeatedScalarFieldContainer[
+        builtins.float
+    ] = ...
     @property
     def mol(self) -> global___Mol: ...
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        mol : typing.Optional[global___Mol] = ...,
-        energy : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        gradient : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        charges : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        spins : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        dipoles : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        job_dir : typing.Text = ...,
-        job_scr_dir : typing.Text = ...,
-        server_job_id : builtins.int = ...,
-        orb1afile : typing.Text = ...,
-        orb1bfile : typing.Text = ...,
-        orb_size : builtins.int = ...,
-        bond_order : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        ci_overlaps : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        ci_overlap_size : builtins.int = ...,
-        cas_energy_states : typing.Optional[typing.Iterable[builtins.int]] = ...,
-        cas_energy_mults : typing.Optional[typing.Iterable[builtins.int]] = ...,
-        cas_transition_dipole : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        nacme : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        orba_energies : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        orbb_energies : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        orba_occupations : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        orbb_occupations : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        cis_states : builtins.int = ...,
-        cis_unrelaxed_dipoles : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        cis_relaxed_dipoles : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        cis_transition_dipoles : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        ci_vec_re : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        ci_vec_im : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        compressed_bond_order : typing.Optional[typing.Iterable[builtins.int]] = ...,
-        compressed_hessian : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        compressed_ao_data : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        compressed_primitive_data : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        compressed_mo_vector : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        imd_mmatom_gradient : typing.Optional[typing.Iterable[builtins.float]] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"mol",b"mol"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"bond_order",b"bond_order",u"cas_energy_mults",b"cas_energy_mults",u"cas_energy_states",b"cas_energy_states",u"cas_transition_dipole",b"cas_transition_dipole",u"charges",b"charges",u"ci_overlap_size",b"ci_overlap_size",u"ci_overlaps",b"ci_overlaps",u"ci_vec_im",b"ci_vec_im",u"ci_vec_re",b"ci_vec_re",u"cis_relaxed_dipoles",b"cis_relaxed_dipoles",u"cis_states",b"cis_states",u"cis_transition_dipoles",b"cis_transition_dipoles",u"cis_unrelaxed_dipoles",b"cis_unrelaxed_dipoles",u"compressed_ao_data",b"compressed_ao_data",u"compressed_bond_order",b"compressed_bond_order",u"compressed_hessian",b"compressed_hessian",u"compressed_mo_vector",b"compressed_mo_vector",u"compressed_primitive_data",b"compressed_primitive_data",u"dipoles",b"dipoles",u"energy",b"energy",u"gradient",b"gradient",u"imd_mmatom_gradient",b"imd_mmatom_gradient",u"job_dir",b"job_dir",u"job_scr_dir",b"job_scr_dir",u"mol",b"mol",u"nacme",b"nacme",u"orb1afile",b"orb1afile",u"orb1bfile",b"orb1bfile",u"orb_size",b"orb_size",u"orba_energies",b"orba_energies",u"orba_occupations",b"orba_occupations",u"orbb_energies",b"orbb_energies",u"orbb_occupations",b"orbb_occupations",u"server_job_id",b"server_job_id",u"spins",b"spins"]) -> None: ...
+        mol: typing.Optional[global___Mol] = ...,
+        energy: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        gradient: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        charges: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        spins: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        dipoles: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        job_dir: typing.Text = ...,
+        job_scr_dir: typing.Text = ...,
+        server_job_id: builtins.int = ...,
+        orb1afile: typing.Text = ...,
+        orb1bfile: typing.Text = ...,
+        orb_size: builtins.int = ...,
+        bond_order: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        ci_overlaps: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        ci_overlap_size: builtins.int = ...,
+        cas_energy_states: typing.Optional[typing.Iterable[builtins.int]] = ...,
+        cas_energy_mults: typing.Optional[typing.Iterable[builtins.int]] = ...,
+        cas_transition_dipole: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        nacme: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        orba_energies: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        orbb_energies: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        orba_occupations: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        orbb_occupations: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        cis_states: builtins.int = ...,
+        cis_unrelaxed_dipoles: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        cis_relaxed_dipoles: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        cis_transition_dipoles: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        ci_vec_re: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        ci_vec_im: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        compressed_bond_order: typing.Optional[typing.Iterable[builtins.int]] = ...,
+        compressed_hessian: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        compressed_ao_data: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        compressed_primitive_data: typing.Optional[
+            typing.Iterable[builtins.float]
+        ] = ...,
+        compressed_mo_vector: typing.Optional[typing.Iterable[builtins.float]] = ...,
+        imd_mmatom_gradient: typing.Optional[typing.Iterable[builtins.float]] = ...,
+    ) -> None: ...
+    def HasField(
+        self, field_name: typing_extensions.Literal["mol", b"mol"]
+    ) -> builtins.bool: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions.Literal[
+            "bond_order",
+            b"bond_order",
+            "cas_energy_mults",
+            b"cas_energy_mults",
+            "cas_energy_states",
+            b"cas_energy_states",
+            "cas_transition_dipole",
+            b"cas_transition_dipole",
+            "charges",
+            b"charges",
+            "ci_overlap_size",
+            b"ci_overlap_size",
+            "ci_overlaps",
+            b"ci_overlaps",
+            "ci_vec_im",
+            b"ci_vec_im",
+            "ci_vec_re",
+            b"ci_vec_re",
+            "cis_relaxed_dipoles",
+            b"cis_relaxed_dipoles",
+            "cis_states",
+            b"cis_states",
+            "cis_transition_dipoles",
+            b"cis_transition_dipoles",
+            "cis_unrelaxed_dipoles",
+            b"cis_unrelaxed_dipoles",
+            "compressed_ao_data",
+            b"compressed_ao_data",
+            "compressed_bond_order",
+            b"compressed_bond_order",
+            "compressed_hessian",
+            b"compressed_hessian",
+            "compressed_mo_vector",
+            b"compressed_mo_vector",
+            "compressed_primitive_data",
+            b"compressed_primitive_data",
+            "dipoles",
+            b"dipoles",
+            "energy",
+            b"energy",
+            "gradient",
+            b"gradient",
+            "imd_mmatom_gradient",
+            b"imd_mmatom_gradient",
+            "job_dir",
+            b"job_dir",
+            "job_scr_dir",
+            b"job_scr_dir",
+            "mol",
+            b"mol",
+            "nacme",
+            b"nacme",
+            "orb1afile",
+            b"orb1afile",
+            "orb1bfile",
+            b"orb1bfile",
+            "orb_size",
+            b"orb_size",
+            "orba_energies",
+            b"orba_energies",
+            "orba_occupations",
+            b"orba_occupations",
+            "orbb_energies",
+            b"orbb_energies",
+            "orbb_occupations",
+            b"orbb_occupations",
+            "server_job_id",
+            b"server_job_id",
+            "spins",
+            b"spins",
+        ],
+    ) -> None: ...
+
 global___JobOutput = JobOutput

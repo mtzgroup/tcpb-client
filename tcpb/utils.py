@@ -24,18 +24,27 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
 
     # Create Job Inputs
     ji = pb.JobInput(mol=mol_msg)
+
+    # Set driver
     try:
         ji.run = getattr(pb.JobInput.RunType, atomic_input.driver.upper())
     except AttributeError:
         raise ValueError(f"Driver '{atomic_input.driver}' not supported by TCPB.")
 
+    # Set Method
     try:
         ji.method = getattr(pb.JobInput.MethodType, atomic_input.model.method.upper())
     except AttributeError:
         raise ValueError(f"Method '{atomic_input.model.method}' not supported by TCPB.")
 
+    # Set protobuf specific keywords that should fall under the "user_options" catch all
     ji.basis = atomic_input.model.basis
     ji.return_bond_order = atomic_input.keywords.pop("bond_order", False)
+    ji.imd_orbital_type = getattr(
+        pb.JobInput.ImdOrbitalType,
+        atomic_input.keywords.pop("imd_orbital_type", "NO_ORBITAL").upper(),
+    )
+
     # Drop keyword terms already applied to Molecule
     atomic_input.keywords.pop("charge", None)
     atomic_input.keywords.pop("spinmult", None)
