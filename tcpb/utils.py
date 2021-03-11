@@ -100,20 +100,26 @@ def job_output_to_atomic_result(
     else:
         molden_string = None
 
+    # Prepare AtomicInput to be base input for AtomicResult
+    atomic_input_dict = atomic_input.dict()
+    atomic_input_dict.pop("provenance", None)
+
+    # Create AtomicResult as superset of AtomicInput values
     atomic_result = AtomicResult(
-        molecule=mol_to_molecule(job_output.mol),
-        driver=atomic_input.driver,
-        model=atomic_input.model,
-        keywords=atomic_input.keywords,
-        return_result=return_result,
+        **atomic_input_dict,
+        # Create new provenance object
         provenance=Provenance(
             creator="terachem_pbs",
             version="1.9-2021.01-dev",
             routine="terachem -s",
         ),
+        return_result=return_result,
         properties=job_output_to_atomic_result_properties(job_output),
         success=True,
-        extras={
+    )
+    # And extend extras to include values additional to input extras
+    atomic_result.extras.update(
+        {
             "qcvars": {
                 "charges": jo_dict.get("charges"),
                 "spins": jo_dict.get("spins"),
@@ -131,7 +137,7 @@ def job_output_to_atomic_result(
                 "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
             },
             "molden": molden_string,
-        },
+        }
     )
     return atomic_result
 
