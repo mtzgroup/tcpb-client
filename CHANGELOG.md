@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.7.2] - 2021-03-10
+
+### Changed
+
+- Learned that AtomicResult is supposed to be a full superset of AtomicInput used to generate the result. Changed `utils.job_output_to_atomic_result()` to reflect this reality.
+
 ## [0.7.1] - 2021-03-10
 
 ### Added
@@ -43,7 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.2...HEAD
+[0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
 [0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
 [0.7.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0
 [r0.6.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.6.0
