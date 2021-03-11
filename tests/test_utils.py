@@ -103,6 +103,14 @@ def test_job_output_to_atomic_result(atomic_input, job_output):
         )
 
 
+def test_job_output_to_atomic_result_maintains_extras(atomic_input, job_output):
+    atomic_input.extras["mytag"] = "fake_value"
+    atomic_result = job_output_to_atomic_result(
+        atomic_input=atomic_input, job_output=job_output
+    )
+    assert "mytag" in atomic_result.extras
+
+
 def test_mol_to_molecule_bohr():
     with open(Path(__file__).parent / "test_data" / "water_bohr.pb", "rb") as f:
         mol = pb.Mol()
