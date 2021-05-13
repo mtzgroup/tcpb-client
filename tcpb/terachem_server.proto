@@ -127,6 +127,7 @@ message JobInput {
 
   // OUTPUT REQUESTS
   bool return_bond_order = 16; // Want Meyer bond order matrix in output
+  bool return_gradients = 29; // Want derivative quantities written to output
 
   // Job specific inputs
   // CI_VEC_OVERLAP
@@ -159,12 +160,17 @@ message JobInput {
   repeated double imd_xyz_previous = 22;
   repeated float imd_mo_previous = 23;
   repeated float imd_mmatom_position = 24;
-  repeated float imd_mmatom_info = 25;
+  repeated float imd_mmatom_info = 25; // Array of { atomic number, charge, mass }
   enum ImdAdditionalOption {
     IMD_NORMAL_MD = 0;
     IMD_MECI_OPT_GRADIENT = 1;
   }
   ImdAdditionalOption imd_additional_option = 26;
+
+  string prmtop_path = 30;
+  string prmtop_content = 31;
+  repeated int32 qm_indices = 32;
+  repeated double mmatom_position = 33;
 }
 
 message JobOutput {
@@ -226,16 +232,20 @@ message JobOutput {
   repeated double cis_unrelaxed_dipoles = 30;
   repeated double cis_relaxed_dipoles = 31;
   repeated double cis_transition_dipoles = 32;
+  repeated double cis_dipole_deriv = 41;
+  repeated double cis_trans_dipole_deriv = 42;
 
   // TDCI specific output
   repeated double ci_vec_re = 33;
   repeated double ci_vec_im = 34;
 
   // IMD specific
-  repeated uint32 compressed_bond_order = 35;
+  repeated uint32 compressed_bond_order = 35; // lower triangular, multiplied by 50
   repeated float compressed_hessian = 36;
-  repeated float compressed_ao_data = 37;
-  repeated float compressed_primitive_data = 38;
+  repeated float compressed_ao_data = 37; // Array of { angular component indicator, number of primitives, atom index }
+  repeated float compressed_primitive_data = 38; // Array of { exponent, contraction coefficient }
   repeated float compressed_mo_vector = 39;
   repeated float imd_mmatom_gradient = 40;
+
+  repeated double mmatom_gradient = 43;
 }
