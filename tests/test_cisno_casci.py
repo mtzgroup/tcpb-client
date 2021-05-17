@@ -100,6 +100,7 @@ def test_cisno_casci_atomic_input(settings, ethylene, job_output):
         ):
             attrs_to_compare.append(attr)
 
+    # TODO: attrs_to_compare is empty! No test is actually performed
     for attr in attrs_to_compare:
         if isinstance(getattr(results, attr), RepeatedScalarFieldContainer):
             assert _round([a for a in getattr(results, attr)]) == _round(

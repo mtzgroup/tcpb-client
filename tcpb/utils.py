@@ -1,7 +1,7 @@
 from typing import Union, List
 
 from google.protobuf.json_format import MessageToDict
-from numpy import array
+from numpy import array, ndarray
 from qcelemental.models import AtomicInput, AtomicResult, Molecule
 from qcelemental import Datum
 from qcelemental.models.results import AtomicResultProperties, Provenance
@@ -21,6 +21,10 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
     mol_msg.multiplicity = atomic_input.molecule.molecular_multiplicity
     mol_msg.closed = atomic_input.keywords.pop("closed_shell", True)
     mol_msg.restricted = atomic_input.keywords.pop("restricted", True)
+
+    # Drop keyword terms already applied to Molecule
+    atomic_input.keywords.pop("charge", None)
+    atomic_input.keywords.pop("spinmult", None)
 
     # Create Job Inputs
     ji = pb.JobInput(mol=mol_msg)
@@ -44,10 +48,52 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
         pb.JobInput.ImdOrbitalType,
         atomic_input.keywords.pop("imd_orbital_type", "NO_ORBITAL").upper(),
     )
+    
+    # Second geometry for ci_vec_overlap job
+    # TODO: Not tested yet!
+    try:
+        geom2 = atomic_input.keywords.pop("geom2")
+        if isinstance(geom2, ndarray):
+            geom2 = geom2.flatten()
+        if len(atomic_input.molecule.symbols) != len(geom2) / 3.0:
+            raise ValueError(
+                "Geometry provided to geom2 does not match atom list"
+            )
+        del ji.xyz2[:]
+        ji.xyz2.extend(geom2)
+    except KeyError:
+        pass
 
-    # Drop keyword terms already applied to Molecule
-    atomic_input.keywords.pop("charge", None)
-    atomic_input.keywords.pop("spinmult", None)
+    # MM atom geometries
+    try:
+        mm_geom = atomic_input.keywords.pop("mm_geometry")
+    except KeyError:
+        mm_geom = None
+    try:
+        qm_indices = atomic_input.keywords.pop("qm_indices")
+    except KeyError:
+        qm_indices = None
+    try:
+        prmtop = atomic_input.keywords.pop("prmtop")
+    except KeyError:
+        prmtop = None
+    
+    if (mm_geom is None) and (qm_indices is None) and (prmtop is None):
+        # No QMMM
+        pass
+    elif (mm_geom is not None) and (qm_indices is not None) and (prmtop is not None):
+        if isinstance(mm_geom, ndarray):
+            mm_geom = mm_geom.flatten()
+        
+        del ji.mmatom_position[:]
+        del ji.qm_indices[:]
+        ji.mmatom_position.extend(mm_geom)
+        ji.qm_indices.extend(qm_indices)
+        ji.prmtop_path = str(prmtop)
+    else:
+        raise Exception("QM/MM parameters are not set correctly, "
+        "either one of \"mm_geometry\", \"qm_indices\" or \"prmtop\""
+        "was not set!")
 
     for key, value in atomic_input.keywords.items():
         ji.user_options.extend([key, str(value)])
@@ -85,6 +131,8 @@ def job_output_to_atomic_result(
         return_result: Union[float, List[float]] = jo_dict["energy"][0]
 
     elif atomic_input.driver == "gradient":
+        # TODO: Gradient calculation should also return energy. Henry throw energy and gradient
+        # outputs to extras["qcvars"]. There should be a cleaner way.
         return_result = jo_dict["gradient"]
 
     else:
@@ -121,6 +169,8 @@ def job_output_to_atomic_result(
     atomic_result.extras.update(
         {
             "qcvars": {
+                "energy": jo_dict.get("energy"),
+                "gradient": jo_dict.get("gradient"),
                 "charges": jo_dict.get("charges"),
                 "spins": jo_dict.get("spins"),
                 "job_dir": jo_dict.get("job_dir"),
@@ -135,6 +185,9 @@ def job_output_to_atomic_result(
                 "orbb_occupations": jo_dict.get("orbb_occupations"),
                 "excited_state_energies": jo_dict.get("energy"),
                 "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
+                "mm_gradient": jo_dict.get("mmatom_gradient"),
+                "dipole_moment": jo_dict.get("dipoles")[3],
+                "dipole_vector": jo_dict.get("dipoles")[:3],
             },
             "molden": molden_string,
         }
