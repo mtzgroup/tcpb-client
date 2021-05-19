@@ -30,6 +30,7 @@ requires = [
   "protobuf>=3.2.0",
   "numpy>=1.13",
   "qcelemental>=0.17.0",
+  "pydantic>=1.7.3",
 ]
 requires-python = ">=3.6"
 

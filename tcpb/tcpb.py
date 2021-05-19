@@ -22,6 +22,7 @@ from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
+from . import models
 from .exceptions import ServerError
 from .molden_constructor import tcpb_imd_fields2molden_string
 
@@ -146,28 +147,37 @@ class TCProtobufClient(object):
 
         return not status.busy
 
-    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
+    def compute(self, atomic_input: AtomicInput, interval: float = 0.5) -> AtomicResult:
         """Top level method for performing computations with QCSchema inputs/outputs"""
         # Create protobuf message
         job_input_msg = atomic_input_to_job_input(atomic_input)
-        # Send message to server; retry until accepted
-        self._send_msg(pb.JOBINPUT, job_input_msg)
-        status = self._recv_msg(pb.STATUS)
-        while not status.accepted:
-            print("JobInput not accepted. Retrying...")
-            sleep(0.5)
-            self._send_msg(pb.JOBINPUT, job_input_msg)
-            status = self._recv_msg(pb.STATUS)
-        print(status)
-        while not self.check_job_complete():
-            sleep(0.5)
-
-        # job_output = self.recv_job_async()
-        job_output = self._recv_msg(pb.JOBOUTPUT)
-        # return job_output
+        job_output = self.compute_pb(job_input_msg, interval)
         return job_output_to_atomic_result(
             atomic_input=atomic_input, job_output=job_output
         )
+
+    def compute_py(
+        self, job_input: models.JobInput, interval: float = 0.5
+    ) -> models.JobOutput:
+        job_input_msg = job_input.to_pb()
+        job_output_msg = self.compute_pb(job_input_msg, interval)
+        return models.JobOutput.from_pb(job_output_msg)
+
+    def compute_pb(self, job_input: pb.JobInput, interval: float = 0.5) -> pb.JobOutput:
+        """Perform a computation using protocol buffer messages"""
+        # Send message to server; retry until accepted
+        self._send_msg(pb.JOBINPUT, job_input)
+        status = self._recv_msg(pb.STATUS)
+        while not status.accepted:
+            print("JobInput not accepted. Retrying...")
+            sleep(interval)
+            self._send_msg(pb.JOBINPUT, job_input)
+            status = self._recv_msg(pb.STATUS)
+        print(status)
+        while not self.check_job_complete():
+            sleep(interval)
+
+        return self._recv_msg(pb.JOBOUTPUT)
 
     def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
