@@ -2,61 +2,74 @@ from typing import Union, List
 
 from google.protobuf.json_format import MessageToDict
 from numpy import array
-from qcelemental.models import AtomicInput, AtomicResult, Molecule
+from qcelemental.models import AtomicInput, AtomicResult, Molecule, BasisSet
 from qcelemental import Datum
-from qcelemental.models.results import AtomicResultProperties, Provenance
+from qcelemental.models.results import (
+    AtomicResultProperties,
+    Provenance,
+    WavefunctionProperties,
+)
 
 from . import terachem_server_pb2 as pb
 from .molden_constructor import tcpb_imd_fields2molden_string
 
+SUPPORTED_DRIVERS = {"ENERGY", "GRADIENT"}
+
 
 def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
     """Convert AtomicInput to JobInput"""
+    # Don't mutate original atomic_input object
+    ai_copy = atomic_input.copy(deep=True)
+
     # Create Mol instance
     mol_msg = pb.Mol()
-    mol_msg.atoms.extend(atomic_input.molecule.symbols)
-    mol_msg.xyz.extend(atomic_input.molecule.geometry.flatten())
+    mol_msg.atoms.extend(ai_copy.molecule.symbols)
+    mol_msg.xyz.extend(ai_copy.molecule.geometry.flatten())
     mol_msg.units = pb.Mol.UnitType.BOHR  # Molecule always in bohr
-    mol_msg.charge = int(atomic_input.molecule.molecular_charge)
-    mol_msg.multiplicity = atomic_input.molecule.molecular_multiplicity
-    mol_msg.closed = atomic_input.keywords.pop("closed_shell", True)
-    mol_msg.restricted = atomic_input.keywords.pop("restricted", True)
+    mol_msg.charge = int(ai_copy.molecule.molecular_charge)
+    mol_msg.multiplicity = ai_copy.molecule.molecular_multiplicity
+    mol_msg.closed = ai_copy.keywords.pop("closed_shell", True)
+    mol_msg.restricted = ai_copy.keywords.pop("restricted", True)
+    # Drop keyword terms already applied from Molecule object
+    ai_copy.keywords.pop("charge", None)  # mol_msg.charge
+    ai_copy.keywords.pop("spinmult", None)  # mol_msg.multiplicity
 
-    # Create Job Inputs
+    # Create JobInput message
     ji = pb.JobInput(mol=mol_msg)
-
     # Set driver
-    try:
-        ji.run = getattr(pb.JobInput.RunType, atomic_input.driver.upper())
-    except AttributeError:
-        raise ValueError(f"Driver '{atomic_input.driver}' not supported by TCPB.")
-
+    driver = ai_copy.driver.upper()
+    if driver not in SUPPORTED_DRIVERS:
+        # Only support QCEngine supported drivers; energy, gradient, hessian, properties
+        raise ValueError(
+            f"Driver '{driver}' not supported, please select from {SUPPORTED_DRIVERS}"
+        )
+    ji.run = pb.JobInput.RunType.Value(driver)
     # Set Method
-    try:
-        ji.method = getattr(pb.JobInput.MethodType, atomic_input.model.method.upper())
-    except AttributeError:
-        raise ValueError(f"Method '{atomic_input.model.method}' not supported by TCPB.")
+    ji.method = pb.JobInput.MethodType.Value(ai_copy.model.method.upper())
+    # Set Basis
+    ji.basis = ai_copy.model.basis
 
-    # Set protobuf specific keywords that should fall under the "user_options" catch all
-    ji.basis = atomic_input.model.basis
-    ji.return_bond_order = atomic_input.keywords.pop("bond_order", False)
-    ji.imd_orbital_type = getattr(
-        pb.JobInput.ImdOrbitalType,
-        atomic_input.keywords.pop("imd_orbital_type", "NO_ORBITAL").upper(),
-    )
+    # Get keywords that have specific protobuf fields
+    ji.return_bond_order = ai_copy.keywords.pop("bond_order", False)
+    # Request AO and MO information
+    if ai_copy.keywords.pop("mo_output", False):
+        ji.imd_orbital_type = pb.JobInput.ImdOrbitalType.WHOLE_C
 
-    # Drop keyword terms already applied to Molecule
-    atomic_input.keywords.pop("charge", None)
-    atomic_input.keywords.pop("spinmult", None)
-
-    for key, value in atomic_input.keywords.items():
+    # Set all other keywords under the "user_options" catch all
+    for key, value in ai_copy.keywords.items():
         ji.user_options.extend([key, str(value)])
 
     return ji
 
 
 def mol_to_molecule(mol: pb.Mol) -> Molecule:
-    """Convert mol protobuf message to Molecule"""
+    """Convert mol protobuf message to Molecule
+
+    Note:
+        Should not use for returning AtomicResults objects because the AtomicResult
+        object should be a direct superset of the AtomicInput that created it (and
+        already contains the Molecule submitted by the user)
+    """
     if mol.units == pb.Mol.UnitType.ANGSTROM:
         geom_angstrom = Datum("geometry", "angstrom", array(mol.xyz))
         geom_bohr = geom_angstrom.to_units("bohr")
@@ -79,24 +92,28 @@ def job_output_to_atomic_result(
     # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
     jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
 
-    if atomic_input.driver == "energy":
+    if atomic_input.driver.upper() == "ENERGY":
         # Select first element in list (ground state); may need to modify for excited
-        # state
+        # states
         return_result: Union[float, List[float]] = jo_dict["energy"][0]
 
-    elif atomic_input.driver == "gradient":
+    elif atomic_input.driver.upper() == "GRADIENT":
         return_result = jo_dict["gradient"]
 
     else:
-        raise ValueError(f"Unsupported driver: {atomic_input.driver}")
+        raise ValueError(
+            f"Unsupported driver: {atomic_input.driver.upper()}, supported drivers "
+            f"include: {SUPPORTED_DRIVERS}"
+        )
 
     if atomic_input.keywords.get("molden"):
-        # If molden file was request
+        # Molden file was request
         try:
             molden_string = tcpb_imd_fields2molden_string(job_output)
         except Exception:
             # Don't know how this code will blow up, so except everything for now :/
-            molden_string = "Unable to create molden output"
+            # NOTE: mo_output will set imd_orbital_type to "WHOLE_C"
+            molden_string = "Unable to create molden output. Did you include the 'mo_output' keyword??"
     else:
         molden_string = None
 
@@ -111,10 +128,12 @@ def job_output_to_atomic_result(
         provenance=Provenance(
             creator="terachem_pbs",
             version="1.9-2021.01-dev",
-            routine="terachem -s",
+            routine="tcpb.TCProtobufClient.compute",
         ),
         return_result=return_result,
-        properties=job_output_to_atomic_result_properties(job_output),
+        properties=to_atomic_result_properties(job_output),
+        # NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != 'none'
+        wavefunction=to_wavefunction_properties(job_output, atomic_input),
         success=True,
     )
     # And extend extras to include values additional to input extras
@@ -123,18 +142,23 @@ def job_output_to_atomic_result(
             "qcvars": {
                 "charges": jo_dict.get("charges"),
                 "spins": jo_dict.get("spins"),
+                "meyer_bond_order": jo_dict.get("bond_order"),
+                "orb_size": jo_dict.get("orb_size"),
+                "excited_state_energies": jo_dict.get("energy"),
+                "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
+                "compressed_bond_order": jo_dict.get("compressed_bond_order"),
+                "compressed_hessian": jo_dict.get("compressed_hessian"),
+                "compressed_ao_data": jo_dict.get("compressed_ao_data"),
+                "compressed_primitive_data": jo_dict.get("compressed_primitive_data"),
+                "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
+                "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
+            },
+            "job_extras": {
                 "job_dir": jo_dict.get("job_dir"),
                 "job_scr_dir": jo_dict.get("job_scr_dir"),
                 "server_job_id": jo_dict.get("server_job_id"),
                 "orb1afile": jo_dict.get("orb1afile"),
                 "orb1bfile": jo_dict.get("orb1bfile"),
-                "bond_order": jo_dict.get("bond_order"),
-                "orba_energies": jo_dict.get("orba_energies"),
-                "orba_occupations": jo_dict.get("orba_occupations"),
-                "orbb_energies": jo_dict.get("orbb_energies"),
-                "orbb_occupations": jo_dict.get("orbb_occupations"),
-                "excited_state_energies": jo_dict.get("energy"),
-                "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
             },
             "molden": molden_string,
         }
@@ -142,10 +166,8 @@ def job_output_to_atomic_result(
     return atomic_result
 
 
-def job_output_to_atomic_result_properties(
-    job_output: pb.JobOutput,
-) -> AtomicResultProperties:
-    """Convert a JobOutput protobuf message to MolSSI QCSchema AtomicResultProperties"""
+def to_atomic_result_properties(job_output: pb.JobOutput) -> AtomicResultProperties:
+    """Extract AtomicResultProperties from JobOutput protobuf message"""
     return AtomicResultProperties(
         return_energy=job_output.energy[0],
         scf_dipole_moment=job_output.dipoles[
@@ -153,4 +175,25 @@ def job_output_to_atomic_result_properties(
         ],  # Cutting out |D| value; see .proto note re: diples
         calcinfo_natom=len(job_output.mol.atoms),
         calcinfo_nmo=len(job_output.orba_energies),
+        calcinfo_nalpha=sum(job_output.orba_occupations),
+        calcinfo_nbeta=sum(job_output.orbb_occupations),
+    )
+
+
+def to_wavefunction_properties(
+    job_output: pb.JobOutput, atomic_input: AtomicInput
+) -> WavefunctionProperties:
+    """Extract WavefunctionProperties from JobOutput protobuf message"""
+    jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
+    return WavefunctionProperties(
+        basis=BasisSet(
+            name=atomic_input.model.basis,
+            center_data={},  # TODO: need to fill out
+            atom_map=[],  # TODO: need to fill out
+        ),
+        restricted=atomic_input.keywords.get("restricted", True),
+        scf_eigenvalues_a=jo_dict.get("orba_energies"),
+        scf_occupations_a=jo_dict.get("orba_occupations"),
+        scf_eigenvalues_b=jo_dict.get("orbb_energies", []),
+        scf_occupations_b=jo_dict.get("orbb_occupations", []),
     )

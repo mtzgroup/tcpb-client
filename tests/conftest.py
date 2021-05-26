@@ -14,6 +14,12 @@ def settings():
 
 
 @pytest.fixture
+def test_data_dir():
+    """Test data directory Path"""
+    return Path(__file__).parent / "test_data"
+
+
+@pytest.fixture
 def ethylene():
     # NOTE: Geometry in angstroms
     yield {
@@ -43,13 +49,9 @@ def ethylene():
 
 @pytest.fixture(scope="function")
 def water():
-    return Molecule.from_data(
-        """
-        -1 2
-        O 0 0 0
-        H 0 0 1
-        H 0 1 0
-        """
+    return Molecule(
+        symbols=["O", "H", "H"],
+        geometry=[0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 1.5],  # in bohr
     )
 
 
