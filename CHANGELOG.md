@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Removed
+
+## [0.8.0] - 2021-05-26
+
+### Added
+
+- Many IMD values to the `result.extra['qcvars']` dict
+- `result.wavefunction` now contains `WavefunctionProperties`
+
+### Changed
+
+- `result.extras['qcvars']['bond_order']` -> `result.extras['qcvars']['meyer_bond_order']`
+- Many values in `result.extras['qcvars']` moved to `result.extras['job_extras']` if they didn't pertain to quantum chemistry values.
+- `result.extras['qcvars']['orb{a,b}_{energies,occupations}']` moved to `result.wavefunction`. Note these will only be returned if `AtomicInput.protocols.wavefunction = "all"`.
+
+### Removed
+
+- Removed unused documentation setup. Can add documentation with `mkdocs` later if needed.
+
 ## [0.7.2] - 2021-03-10
 
 ### Changed
@@ -49,7 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.2...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0
 [0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
 [0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
 [0.7.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0

@@ -18,11 +18,11 @@ molecule = Molecule(symbols=atoms, geometry=geom)
 atomic_input = AtomicInput(
     molecule=molecule,
     model={
-        "method": "pbe0",
+        "method": "b3lyp",
         "basis": "6-31g",
     },
     driver="energy",
-    keywords={"closed_shell": True, "restricted": True},
+    protocols={"wavefunction": "all"},
 )
 
 with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:

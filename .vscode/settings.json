@@ -4,6 +4,9 @@
         "Protobuf",
         "TCPB",
         "casci",
-        "qcel"
+        "orba",
+        "orbb",
+        "qcel",
+        "wavefunction"
     ]
 }
