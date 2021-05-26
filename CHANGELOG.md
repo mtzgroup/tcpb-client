@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.8.0] - 2021-05-26
+
+### Added
+
 - Many IMD values to the `result.extra['qcvars']` dict
 - `result.wavefunction` now contains `WavefunctionProperties`
 
@@ -64,7 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.7.2...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0
 [0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
 [0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
 [0.7.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0
