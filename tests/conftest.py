@@ -64,6 +64,7 @@ def job_output():
     """Return job_output protobuf message"""
     job_output_correct_answer = pb.JobOutput()
     with open(
+        # TODO: This specific file doesn't fit well with the function signiture
         Path(__file__).parent / "answers" / "cisno_casci_result.pbmsg", "rb"
     ) as f:
         job_output_correct_answer.ParseFromString(f.read())
