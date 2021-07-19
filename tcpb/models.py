@@ -1,14 +1,17 @@
 import os
+import inspect
 
-from typing import Sequence, List, Dict, Optional
+from typing import List, Dict, Tuple, Union, Optional
 
 from pydantic import BaseModel, validator, root_validator
 from . import terachem_server_pb2 as pb
 
+from .molden_constructor import tcpb_imd_fields2molden_string
+
 
 class Mol(BaseModel):
     atoms: List[str]
-    xyz: List[float] # in the order of x1,y1,z1,x2,y2,z2,..., unit must match "units field"
+    xyz: List[float] # Length 3 * n_qm of order [i_xyz + 3 * i_qm], unit must match "units field"
     units: str = "BOHR"
     charge: int = 0
     multiplicity: int = 1
@@ -62,10 +65,10 @@ class JobInput(BaseModel):
     basis: str
     return_bond_order: bool = False
     imd_orbital_type: str = "NO_ORBITAL"
-    xyz2: List[float] = None
-    mm_xyz: List[float] = None # in the order of x1,y1,z1,x2,y2,z2,..., unit must match "units" in "mol" field
-    qm_indices: List[int] = None
-    prmtop_path: str = None
+    xyz2: Optional[List[float]] = None
+    mm_xyz: Optional[List[float]] = None # Length 3 * n_mm of order [i_xyz + 3 * i_mm], unit must match "units" in "mol" field
+    qm_indices: Optional[List[int]] = None
+    prmtop_path: Optional[str] = None
     user_options: Dict[str, str] = {}
 
     class Config:
@@ -105,12 +108,18 @@ class JobInput(BaseModel):
         return v
 
     @root_validator
-    def xyz2_xyz_length_correct(cls, values):
+    def xyz2_xyz_length_correct_and_exist_in_ci_vec_overlap(cls, values):
         """Ensure xyz length is 3x the number of atoms"""
-        mol, xyz2 = values.get("mol"), values.get("xyz2")
+        mol = values.get("mol")
+        xyz2 = values.get("xyz2")
+        run = values.get("run")
         if mol is not None and xyz2 is not None and len(xyz2) != len(mol.xyz):
             raise ValueError(
                 f"xyz2 of length {len(xyz2)} is not the same as xyz length of {len(mol.xyz)} in mol"
+            )
+        if run == "CI_VEC_OVERLAP" and xyz2 is None:
+            raise ValueError(
+                f"xyz2 is not provided with run = {run}"
             )
         return values
 
@@ -161,13 +170,97 @@ class JobInput(BaseModel):
 
 
 class JobOutput(BaseModel):
-    # TODO: Fill out the rest of this data model and each field's associated validator (if required)
-    mol: Mol
-    # NOTE: This is how you define optional fields
-    imd_mmatom_gradient: Optional[List[float]] = None
+    charges: List[float] # Length n_qm
+    spins: List[float] # Length n_qm
+    dipole_moment: float
+    dipole_vector: List[float] # Length 3
+    job_dir: str
+    job_scr_dir: str
+    server_job_id: int
+    orbfile: Union[str, Tuple[str, str]]
+    orb_energies: Union[List[float], Tuple[List[float], List[float]]] # Length n_mo
+    orb_occupations: Union[List[float], Tuple[List[float], List[float]]] # Length n_mo
 
+    energy: Optional[Union[float, List[float]]]
+    gradient: Optional[List[float]] # Length 3 * n_qm of order [i_xyz + 3 * i_qm]
+    nacme: Optional[List[float]] # Length 3 * n_qm of order [i_xyz + 3 * i_qm]
+    cas_transition_dipole: Optional[List[float]] # Length 3 * n_transition of order [i_xyz + 3 * i_transition]
+    cas_energy_labels: Optional[List[Tuple[int, int]]] # (state, multiplicity), length n_state
+    bond_order: Optional[List[float]] # Length n_qm * n_qm
+    ci_overlaps: Optional[List[float]] # Length n_state * n_state
+    cis_states: Optional[int]
+    cis_unrelaxed_dipoles: Optional[List[float]] # Length 4 * n_state of order [i_xyzd + 4 * i_state]
+    cis_relaxed_dipoles: Optional[List[float]] # Length 4 * n_state of order [i_xyzd + 4 * i_state]
+    cis_transition_dipoles: Optional[List[float]] # Length 4 * (n_state * (n_state + 1) / 2) of order [i_xyzd + 4 * i_state_2]
+    molden: Optional[str]
+
+    class Config:
+        allow_mutation = False
+
+    # def from_pb(cls, job_output_msg: pb.JobOutput) -> "JobOutput":
     @classmethod
-    def from_pb(cls, job_output_msg: pb.JobOutput) -> "JobOutput":
+    def __init__(self, job_output_msg: pb.JobOutput):
         """Create JobOutput object from protocol buffer JobOutput message"""
-        # TODO: Fill out method
-        return cls(...)
+        
+        self.charges = job_output_msg.charges
+        self.spins = job_output_msg.spins
+        self.dipole_moment = job_output_msg.dipoles[3]
+        self.dipole_vector = job_output_msg.dipoles[:3]
+        self.job_dir = job_output_msg.job_dir
+        self.job_scr_dir = job_output_msg.job_scr_dir
+        self.server_job_id = job_output_msg.server_job_id
+
+        self.energy = job_output_msg.energy[0] # The energies for multiple states are set later
+
+        if job_output_msg.mol.closed is True:
+            self.orbfile = job_output_msg.orb1afile
+            self.orb_energies = job_output_msg.orba_energies
+            self.orb_occupations = job_output_msg.orba_occupations
+        else:
+            self.orbfile = (job_output_msg.orb1afile, job_output_msg.orb1bfile)
+            self.orb_energies = (job_output_msg.orba_energies, job_output_msg.orbb_energies)
+            self.orb_occupations = (job_output_msg.orba_occupations, job_output_msg.orbb_occupations)
+
+        if len(job_output_msg.gradient):
+            self.gradient = job_output_msg.gradient
+
+        if len(job_output_msg.nacme):
+            self.nacme = job_output_msg.nacme
+
+        if len(job_output_msg.cas_transition_dipole):
+            self.cas_transition_dipole = job_output_msg.cas_transition_dipole
+
+        cas_state_number = len(job_output_msg.cas_energy_states) # == 0 if not a cas run
+        if cas_state_number:
+            self.energy = job_output_msg.energy[: cas_state_number]
+            self.cas_energy_labels = list(zip(
+                job_output_msg.cas_energy_states,
+                job_output_msg.cas_energy_mults,
+            ))
+
+        if len(job_output_msg.bond_order):
+            self.bond_order = job_output_msg.bond_order
+
+        if len(job_output_msg.ci_overlaps):
+            self.ci_overlap = job_output_msg.ci_overlaps
+
+        if job_output_msg.cis_states > 0:
+            self.energy = job_output_msg.energy[: job_output_msg.cis_states + 1]
+            self.cis_states = job_output_msg.cis_states
+
+            if len(job_output_msg.cis_unrelaxed_dipoles):
+                self.cis_unrelaxed_dipoles = job_output_msg.cis_unrelaxed_dipoles
+            if len(job_output_msg.cis_relaxed_dipoles):
+                self.cis_relaxed_dipoles = job_output_msg.cis_relaxed_dipoles
+            if len(job_output_msg.cis_transition_dipoles):
+                self.cis_transition_dipoles = job_output_msg.cis_transition_dipoles
+
+        if len(job_output_msg.compressed_mo_vector):
+            self.molden = tcpb_imd_fields2molden_string(job_output_msg)
+
+    def __str__(self):
+        attributes = inspect.getmembers(type(self), lambda a : not(inspect.isroutine(a)))
+        attributes = [a for a in attributes if not(a[0].startswith('_'))]
+        attributes = dict(attributes)
+
+        return str(attributes)

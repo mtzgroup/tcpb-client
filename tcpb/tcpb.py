@@ -162,7 +162,7 @@ class TCProtobufClient(object):
         """Top level method for performing computations using python objects"""
         job_input_msg = job_input.to_pb()
         job_output_msg = self.compute_pb(job_input_msg, interval)
-        return models.JobOutput.from_pb(job_output_msg)
+        return models.JobOutput(job_output_msg)
 
     def compute_pb(self, job_input: pb.JobInput, interval: float = 0.5) -> pb.JobOutput:
         """Top level method for performing computations using protocol buffer messages"""

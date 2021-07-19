@@ -64,37 +64,6 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
     except KeyError:
         pass
 
-    # MM atom geometries
-    try:
-        mm_geom = atomic_input.keywords.pop("mm_geometry")
-    except KeyError:
-        mm_geom = None
-    try:
-        qm_indices = atomic_input.keywords.pop("qm_indices")
-    except KeyError:
-        qm_indices = None
-    try:
-        prmtop = atomic_input.keywords.pop("prmtop")
-    except KeyError:
-        prmtop = None
-    
-    if (mm_geom is None) and (qm_indices is None) and (prmtop is None):
-        # No QMMM
-        pass
-    elif (mm_geom is not None) and (qm_indices is not None) and (prmtop is not None):
-        if isinstance(mm_geom, ndarray):
-            mm_geom = mm_geom.flatten()
-        
-        del ji.mmatom_position[:]
-        del ji.qm_indices[:]
-        ji.mmatom_position.extend(mm_geom)
-        ji.qm_indices.extend(qm_indices)
-        ji.prmtop_path = str(prmtop)
-    else:
-        raise Exception("QM/MM parameters are not set correctly, "
-        "either one of \"mm_geometry\", \"qm_indices\" or \"prmtop\""
-        "was not set!")
-
     for key, value in atomic_input.keywords.items():
         ji.user_options.extend([key, str(value)])
 
