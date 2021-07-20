@@ -61,8 +61,6 @@ def test_qmmm_basic(settings):
         # "bond_order",
     ]
     print(results)
-    print(vars(results))
-    print(results.__dict__)
 
     for field in fields_to_check:
         assert _round(getattr(results, field), 5) == _round(

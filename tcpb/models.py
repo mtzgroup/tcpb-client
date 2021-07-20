@@ -1,9 +1,10 @@
 import os
 import inspect
+import numpy as np
 
 from typing import List, Dict, Tuple, Union, Optional
-
 from pydantic import BaseModel, validator, root_validator
+
 from . import terachem_server_pb2 as pb
 
 from .molden_constructor import tcpb_imd_fields2molden_string
@@ -170,6 +171,9 @@ class JobInput(BaseModel):
 
 
 class JobOutput(BaseModel):
+    atoms_copy: List[str]
+    xyz_copy: List[float] # Length 3 * n_qm of order [i_xyz + 3 * i_qm]
+
     charges: List[float] # Length n_qm
     spins: List[float] # Length n_qm
     dipole_moment: float
@@ -187,6 +191,7 @@ class JobOutput(BaseModel):
     cas_transition_dipole: Optional[List[float]] # Length 3 * n_transition of order [i_xyz + 3 * i_transition]
     cas_energy_labels: Optional[List[Tuple[int, int]]] # (state, multiplicity), length n_state
     bond_order: Optional[List[float]] # Length n_qm * n_qm
+    ci_overlap_size: Optional[int]
     ci_overlaps: Optional[List[float]] # Length n_state * n_state
     cis_states: Optional[int]
     cis_unrelaxed_dipoles: Optional[List[float]] # Length 4 * n_state of order [i_xyzd + 4 * i_state]
@@ -198,11 +203,14 @@ class JobOutput(BaseModel):
     class Config:
         allow_mutation = False
 
+    # Henry 20210720: The reason we have to use this constructor instead of __init__()
+    # is that, __init__ is incompatible with BaseModel, and by overwriting __init__()
+    # provided by BaseModel, the default __str__() and __dict__ all fails to work.
     @classmethod
     def from_pb(cls, job_output_msg: pb.JobOutput) -> "JobOutput":
         """Create JobOutput object from protocol buffer JobOutput message"""
 
-        energy = job_output_msg.energy[0]
+        energy = job_output_msg.energy[0] if len(job_output_msg.energy) > 0 else None
         cas_state_number = len(job_output_msg.cas_energy_states) # == 0 if not a cas run
         if cas_state_number > 0:
             energy = job_output_msg.energy[: cas_state_number]
@@ -210,6 +218,9 @@ class JobOutput(BaseModel):
             energy = job_output_msg.energy[: job_output_msg.cis_states + 1]
 
         output = cls(
+            atoms_copy = list(job_output_msg.mol.atoms),
+            xyz_copy = list(job_output_msg.mol.xyz),
+
             charges = list(job_output_msg.charges),
             spins = list(job_output_msg.spins),
             dipole_moment = job_output_msg.dipoles[3],
@@ -235,7 +246,9 @@ class JobOutput(BaseModel):
                 )) if cas_state_number > 0 else None,
 
             bond_order = list(job_output_msg.bond_order) if len(job_output_msg.bond_order) > 0 else None,
-            ci_overlap = list(job_output_msg.ci_overlaps) if len(job_output_msg.ci_overlaps) > 0 else None,
+            
+            ci_overlap_size = job_output_msg.ci_overlap_size if job_output_msg.ci_overlap_size > 0 else None,
+            ci_overlaps = list(job_output_msg.ci_overlaps) if len(job_output_msg.ci_overlaps) > 0 else None,
 
             cis_states = job_output_msg.cis_states if job_output_msg.cis_states > 0 else None,
             cis_unrelaxed_dipoles = list(job_output_msg.cis_unrelaxed_dipoles)
@@ -311,9 +324,161 @@ class JobOutput(BaseModel):
     #     if len(job_output_msg.compressed_mo_vector):
     #         self.molden = tcpb_imd_fields2molden_string(job_output_msg)
 
-    # def __str__(self):
-    #     attributes = inspect.getmembers(type(self), lambda a : not(inspect.isroutine(a)))
-    #     attributes = [a for a in attributes if not(a[0].startswith('_'))]
-    #     attributes = dict(attributes)
+    # Helper function for all other packages depends on tcpb-client before the
+    # existence of models.py
+    def to_stefan_style_dict(self):
+        """
+        Creates a results dictionary that mirrors the JobOutput message, using NumPy arrays when appropriate.
+        Results are also saved in the prev_results class member.
+        An inclusive list of the results members (with types):
 
-    #     return str(attributes)
+        * atoms:              Flat # of atoms NumPy array of 2-character strings
+        * geom:               # of atoms by 3 NumPy array of doubles
+        * energy:             Either empty, single energy, or flat # of cas_energy_labels of NumPy array of doubles
+        * charges:            Flat # of atoms NumPy array of doubles
+        * spins:              Flat # of atoms NumPy array of doubles
+        * dipole_moment:      Single element (units Debye)
+        * dipole_vector:      Flat 3-element NumPy array of doubles (units Debye)
+        * job_dir:            String
+        * job_scr_dir:        String
+        * server_job_id:      Int
+        * orbfile:            String (if restricted is True, otherwise not included)
+        * orbfile_a:          String (if restricted is False, otherwise not included)
+        * orbfile_b:          String (if restricted is False, otherwise not included)
+        * orb_energies:       Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+        * orb_occupations:    Flat # of orbitals NumPy array of doubles (if restricted is True, otherwise not included)
+        * orb_energies_a:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_occupations_a:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_energies_b:     Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+        * orb_occupations_b:  Flat # of orbitals NumPy array of doubles (if restricted is False, otherwise not included)
+
+        Additional (optional) members of results:
+
+        * bond_order:         # of atoms by # of atoms NumPy array of doubles
+
+        Available per job type:
+
+        * gradient:           # of atoms by 3 NumPy array of doubles (available for 'gradient' job)
+        * nacme:              # of atoms by 3 NumPy array of doubles (available for 'coupling' job)
+        * ci_overlap:         ci_overlap_size by ci_overlap_size NumPy array of doubles (available for 'ci_vec_overlap' job)
+
+        Available for CAS jobs:
+
+        * cas_energy_labels:  List of tuples of (state, multiplicity) corresponding to the energy list
+        * cas_transition_dipole:  Flat 3-element NumPy array of doubles (available for 'coupling' job)
+
+        Available for CIS jobs:
+
+        * cis_states:         Number of excited states for reported properties
+        * cis_unrelaxed_dipoles:    # of excited states list of flat 3-element NumPy arrays (default included with 'cis yes', or explicitly with 'cisunrelaxdipole yes', units a.u.)
+        * cis_relaxed_dipoles:      # of excited states list of flat 3-element NumPy arrays (included with 'cisrelaxdipole yes', units a.u.)
+        * cis_transition_dipoles:   # of excited state combinations (N(N-1)/2) list of flat 3-element NumPy arrays (default includeded with 'cis yes', or explicitly with 'cistransdipole yes', units a.u.)
+                                    Order given lexically (e.g. 0->1, 0->2, 1->2 for 2 states)
+        """
+
+        result_dict = {
+            "atoms": np.array(self.atoms_copy, dtype="S2"),
+            "geom": np.array(self.xyz_copy, dtype=np.float64).reshape(-1, 3),
+            "charges": np.array(self.charges, dtype=np.float64),
+            "spins": np.array(self.spins, dtype=np.float64),
+            "dipole_moment": self.dipole_moment,
+            "dipole_vector": np.array(self.dipole_vector, dtype=np.float64),
+            "job_dir": self.job_dir,
+            "job_scr_dir": self.job_scr_dir,
+            "server_job_id": self.server_job_id,
+        }
+
+        if isinstance(self.orbfile, Tuple):
+            result_dict["orbfile_a"] = self.orbfile[0]
+            result_dict["orbfile_b"] = self.orbfile[1]
+        else:
+            result_dict["orbfile"] = self.orbfile
+            
+        if isinstance(self.orb_energies, Tuple):
+            result_dict["orb_energies_a"] = np.array(self.orb_energies[0])
+            result_dict["orb_energies_b"] = np.array(self.orb_energies[1])
+        else:
+            result_dict["orb_energies"] = np.array(self.orb_energies)
+
+        if isinstance(self.orb_occupations, Tuple):
+            result_dict["orb_occupations_a"] = np.array(self.orb_occupations[0])
+            result_dict["orb_occupations_b"] = np.array(self.orb_occupations[1])
+        else:
+            result_dict["orb_occupations"] = np.array(self.orb_occupations)
+
+        if self.energy is not None:
+            if isinstance(self.energy, List):
+                result_dict["energy"] = np.array(self.energy, dtype=np.float64)
+            else:
+                result_dict["energy"] = self.energy
+
+        if self.gradient is not None:
+            result_dict["gradient"] = \
+                np.array(self.gradient, dtype=np.float64).reshape(-1, 3)
+
+        if self.nacme is not None:
+            result_dict["nacme"] = \
+                np.array(self.nacme, dtype=np.float64).reshape(-1, 3)
+
+        if self.cas_transition_dipole is not None:
+            result_dict["cas_transition_dipole"] = \
+                np.array(self.cas_transition_dipole, dtype=np.float64)
+
+        if self.cas_energy_labels is not None:
+            result_dict["cas_energy_labels"] = self.cas_energy_labels
+
+        if self.bond_order is not None:
+            nAtoms = len(self.atoms_copy)
+            result_dict["bond_order"] = \
+                np.array(self.bond_order, dtype=np.float64).reshape(nAtoms, nAtoms)
+
+        if (self.ci_overlap_size is not None) and (self.ci_overlaps is not None):
+            print("Henry: in")
+            result_dict["ci_overlap"] = \
+                np.array(self.ci_overlaps, dtype=np.float64).\
+                    reshape(self.ci_overlap_size, self.ci_overlap_size)
+
+        if self.cis_states is not None:
+            result_dict["cis_states"] = self.cis_states
+
+        if (self.cis_states is not None) and (self.cis_unrelaxed_dipoles is not None):
+            uDips = []
+            for i in range(self.cis_states):
+                uDips.append(
+                    np.array(
+                        self.cis_unrelaxed_dipoles[4 * i : 4 * i + 3],
+                        dtype=np.float64,
+                    )
+                )
+            result_dict["cis_unrelaxed_dipoles"] = uDips
+
+        if (self.cis_states is not None) and (self.cis_relaxed_dipoles is not None):
+            rDips = []
+            for i in range(self.cis_states):
+                rDips.append(
+                    np.array(
+                        self.cis_relaxed_dipoles[4 * i : 4 * i + 3],
+                        dtype=np.float64,
+                    )
+                )
+            result_dict["cis_relaxed_dipoles"] = rDips
+
+        if (self.cis_states is not None) and (self.cis_transition_dipoles is not None):
+            tDips = []
+            for i in range((self.cis_states + 1) * self.cis_states / 2):
+                tDips.append(
+                    np.array(
+                        self.cis_transition_dipoles[4 * i : 4 * i + 3],
+                        dtype=np.float64,
+                    )
+                )
+            result_dict["cis_transition_dipoles"] = tDips
+
+        if self.molden is not None:
+            result_dict["molden"] = self.molden
+        
+        if self.mm_gradient is not None:
+            result_dict["mm_gradient"] = \
+                np.array(self.mm_gradient, dtype=np.float64).reshape(-1, 3)
+
+        return result_dict
