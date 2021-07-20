@@ -188,7 +188,7 @@ class TCProtobufClient(object):
             jobType:    Job type key, as defined in the pb.JobInput.RunType enum (defaults to "energy")
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to "bohr")
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             bool: True on job acceptance, False on server busy, and errors out if communication fails
@@ -237,12 +237,10 @@ class TCProtobufClient(object):
 
         Refactored this method out to allow for better testing
         """
-        job_input_msg = pb.JobInput()
-        job_input_msg.run = pb.JobInput.RunType.Value(jobType.upper())
-        job_input_msg.mol.xyz.extend(geom)
-        job_input_msg.mol.units = pb.Mol.UnitType.Value(unitType.upper())
+        job_input_msg = \
+            models.JobInput.from_stefan_style_dict(jobType, geom, unitType, **kwargs)\
+                .to_pb()
 
-        self._process_kwargs(job_input_msg, **kwargs)
         return job_input_msg
 
     def check_job_complete(self):
@@ -303,7 +301,7 @@ class TCProtobufClient(object):
             jobType:    Job type key, as defined in the pb.JobInput.RunType enum (defaults to 'energy')
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             dict: Results mirroring recv_job_async
@@ -334,7 +332,7 @@ class TCProtobufClient(object):
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             float: Energy
@@ -349,7 +347,7 @@ class TCProtobufClient(object):
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             tuple: Tuple of (energy, gradient)
@@ -365,7 +363,7 @@ class TCProtobufClient(object):
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             tuple: Tuple of (energy, forces), which is really (energy, -gradient)
@@ -380,7 +378,7 @@ class TCProtobufClient(object):
         Args:
             geom:       Cartesian geometry of the new point
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             (num_atoms, 3) ndarray: Nonadiabatic coupling vector
@@ -417,7 +415,7 @@ class TCProtobufClient(object):
             orb2afile:  Binary file of alpha MO coefficients for second geometry (row-major, double64)
             orb2bfile:  Binary file of beta MO coefficients for second geometry (row-major, double64)
             unitType:   Unit type key, as defined in the pb.Mol.UnitType enum (defaults to 'bohr')
-            **kwargs:   Additional TeraChem keywords, check _process_kwargs for behaviour
+            **kwargs:   Additional TeraChem keywords, check models.JobInput.from_stefan_style_dict() for behaviour
 
         Returns:
             (num_states, num_states) ndarray: CI vector overlaps
@@ -469,120 +467,6 @@ class TCProtobufClient(object):
             #    orb2afile=orb1bfile, orb2bfile=orb2bfile, **kwargs)
 
         return results["ci_overlap"]
-
-    # Private kwarg helper function
-    def _process_kwargs(self, job_options, **kwargs):  # noqa NOTE: C901 too complex!
-        """Process user-provided keyword arguments into a JobInput object
-
-        Several keywords are processed by the client to set more complex fields
-        in the Protobuf messages. These are:
-
-        * geom:               Sets job_options.mol.xyz from a list or NumPy array
-        * geom2:              Sets job_options.xyz2 from a list or NumPy array
-        * bond_order:         Sets job_options.return_bond_order to True or False
-
-        All others are passed through as key-value pairs to the server, which will
-        place them in the start file.
-        Passing None to a previously set option will remove it from job_options
-
-        Args:
-            job_options: Target JobInput object
-            **kwargs: Keyword arguments passed by user
-        """
-        # Validate all options are here
-        # TODO: Replace with mtzutils.Options
-        required = [
-            "atoms",
-            "charge",
-            "spinmult",
-            "closed_shell",
-            "restricted",
-            "method",
-            "basis",
-        ]
-        types = [str, int, int, bool, bool, str, str]
-
-        for r, t in zip(required, types):
-            if kwargs.get(r, None) is None:
-                raise SyntaxError("Keyword %s must be specified in options" % r)
-            elif r == "atoms":
-                for a in kwargs["atoms"]:
-                    if not isinstance(a, t):
-                        raise TypeError("Each atom must have type: basestring")
-            elif r == "method":
-                if not isinstance(kwargs["method"], t):
-                    raise TypeError("%s must have type: %s" % (r, t))
-                elif kwargs["method"].upper() not in list(
-                    pb.JobInput.MethodType.keys()
-                ):
-                    raise ValueError(
-                        "Method specified is not available in this version of the TCPB client\n"
-                        "Allowed methods: {}".format(
-                            list(pb.JobInput.MethodType.keys())
-                        )
-                    )
-            elif not isinstance(kwargs[r], t):
-                raise TypeError("%s must have type: %s" % (r, t))
-
-        for key, value in kwargs.items():
-            if key == "atoms":
-                job_options.mol.atoms.extend(value)
-            elif key == "charge":
-                job_options.mol.charge = value
-            elif key == "spinmult":
-                job_options.mol.multiplicity = value
-            elif key == "closed_shell":
-                job_options.mol.closed = value
-            elif key == "restricted":
-                job_options.mol.restricted = value
-            elif key == "method":
-                job_options.method = pb.JobInput.MethodType.Value(value.upper())
-            elif key == "basis":
-                job_options.basis = value
-            elif key == "geom":
-                # Standard geometry, usually handled in other calling functions but here just in case
-                if isinstance(value, np.ndarray):
-                    value = value.flatten()
-                if len(kwargs["atoms"]) != len(value) / 3.0:
-                    raise ValueError(
-                        "Geometry provided to geom does not match atom list"
-                    )
-
-                del job_options.mol.xyz[:]
-                job_options.mol.xyz.extend(value)
-            elif key == "geom2":
-                # Second geometry for ci_vec_overlap job
-                if isinstance(value, np.ndarray):
-                    value = value.flatten()
-                if len(kwargs["atoms"]) != len(value) / 3.0:
-                    raise ValueError(
-                        "Geometry provided to geom2 does not match atom list"
-                    )
-
-                del job_options.xyz2[:]
-                job_options.xyz2.extend(value)
-            elif key == "bond_order":
-                # Request Meyer bond order matrix
-                if value is not True and value is not False:
-                    raise ValueError("Bond order request must be True or False")
-
-                job_options.return_bond_order = value
-            elif key == "mo_output":
-                # Request AO and MO information
-                if value is True:
-                    job_options.imd_orbital_type = pb.JobInput.ImdOrbitalType.Value(
-                        "WHOLE_C"
-                    )
-            elif key in job_options.user_options:
-                # Overwrite currently defined custom user option
-                index = job_options.user_options.index(key)
-                if value is None:
-                    del job_options.user_options[index : (index + 1)]
-                else:
-                    job_options.user_options[index + 1] = str(value)
-            elif key not in job_options.user_options and value is not None:
-                # New custom user option
-                job_options.user_options.extend([key, str(value)])
 
     # Private send/recv functions
     def _send_msg(self, msg_type, msg_pb=None):

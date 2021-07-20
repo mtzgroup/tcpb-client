@@ -169,6 +169,84 @@ class JobInput(BaseModel):
         
         return job_input_msg
 
+    # Helper function for all other packages depends on tcpb-client before the
+    # existence of models.py
+    @classmethod
+    def from_stefan_style_dict(cls, jobType: str, geom: np.ndarray, unitType: str, **kwargs) -> "JobInput":
+        """Process user-provided keyword arguments into a JobInput object
+
+        Several keywords are processed by the client to set more complex fields
+        in the Protobuf messages. These are:
+
+        * geom:               Sets job_options.mol.xyz from a list or NumPy array
+        * geom2:              Sets job_options.xyz2 from a list or NumPy array
+        * bond_order:         Sets job_options.return_bond_order to True or False
+
+        All others are passed through as key-value pairs to the server, which will
+        place them in the start file.
+        Passing None to a previously set option will remove it from job_options
+
+        Args:
+            job_options: Target JobInput object
+            **kwargs: Keyword arguments passed by user
+        """
+
+        handled_keywords = \
+            [ "atoms", "geom", "charge", "spinmult", "closed_shell", "restricted", "method",
+              "basis", "geom2", "bond_order", "mm_geom", "qm_indices", "prmtop_path", "mo_output"]
+
+        mol_geom = geom if "geom" not in kwargs else kwargs["geom"]
+        if isinstance(mol_geom, np.ndarray):
+            mol_geom = list(mol_geom.flatten())
+        mm_geom = kwargs["mm_geom"] if "mm_geom" in kwargs else None
+        if mm_geom is not None and isinstance(mm_geom, np.ndarray):
+            mm_geom = list(mm_geom.flatten())
+        geom2 = kwargs["geom2"] if "geom2" in kwargs else None
+        if geom2 is not None and isinstance(geom2, np.ndarray):
+            geom2 = list(geom2.flatten())
+
+        mol = Mol(
+            atoms = kwargs["atoms"],
+            xyz = mol_geom,
+            units = unitType,
+        )
+
+        if "charge" in kwargs:
+            mol.charge = kwargs["charge"]
+        if "spinmult" in kwargs:
+            mol.multiplicity = kwargs["spinmult"]
+        if "closed_shell" in kwargs:
+            mol.closed = kwargs["closed_shell"]
+        if "restricted" in kwargs:
+            mol.restricted = kwargs["restricted"]
+
+        input = cls(
+            mol = mol,
+            run = jobType,
+            method_type = kwargs["method"],
+            basis = kwargs["basis"],
+
+            xyz2 = geom2,
+            mm_xyz = mm_geom,
+            qm_indices = kwargs["qm_indices"] if "qm_indices" in kwargs else None,
+            prmtop_path = kwargs["prmtop_path"] if "prmtop_path" in kwargs else None,
+        )
+
+        if "bond_order" in kwargs:
+            input.return_bond_order = kwargs["bond_order"]
+        if "mo_output" in kwargs:
+            if kwargs["mo_output"] is True:
+                input.imd_orbital_type = "WHOLE_C"
+        
+        user_options = {}
+        for key, value in kwargs.items():
+            if key not in handled_keywords:
+                user_options[key] = value
+        
+        input.user_options = user_options
+        
+        return input
+
 
 class JobOutput(BaseModel):
     atoms_copy: List[str]
