@@ -1,15 +1,12 @@
 from pathlib import Path
 
 import numpy as np
-import qcelemental as qcel
-from qcelemental.models import AtomicInput, Molecule
-from google.protobuf.internal.containers import RepeatedScalarFieldContainer
+from tcpb.models import Mol, JobInput, JobOutput
 
 from tcpb import TCProtobufClient as TCPBClient
 
 from .answers import qmmm_basic
 from .conftest import _round
-
 
 def test_qmmm_basic(settings):
 
@@ -29,42 +26,28 @@ def test_qmmm_basic(settings):
     ]
     prmtop_file = Path(__file__).parent / "test_data" / "2water.prmtop"
 
-    qm_geom_angstrom = qcel.Datum("geometry", "angstrom", np.array(qm_geom))
-    qm_geom_bohr = qm_geom_angstrom.to_units("bohr")
-    mm_geom_angstrom = qcel.Datum("geometry", "angstrom", np.array(mm_geom))
-    mm_geom_bohr = mm_geom_angstrom.to_units("bohr")
-
-    # Construct Molecule object
-    m_qm_water = Molecule.from_data(
-        {
-            "symbols": qm_atoms,
-            "geometry": qm_geom_bohr,
-            "molecular_multiplicity": 1,
-            "molecular_charge": 0,
-        }
+    mol_qm_water = Mol(
+        atoms = qm_atoms,
+        xyz = qm_geom,
+        units = "Angstrom",
+        charge = 0,
+        multiplicity = 1,
+        closed = True,
+        restricted = True,
     )
 
-    # Construct AtomicInput
-    atomic_input = AtomicInput(
-        molecule = m_qm_water,
-        driver = "gradient",
-        model = {
-            "method": "hf",
-            "basis": "3-21g",
-        },
-        keywords = {
-            "closed_shell": True,
-            "restricted": True,
-            "prmtop": prmtop_file,
-            "mm_geometry": mm_geom_bohr,
-            "qm_indices": qm_indices,
-        }
+    jobinput = JobInput(
+        mol = mol_qm_water,
+        method_type = "HF",
+        run = "gradient",
+        basis = "3-21g",
+        prmtop_path = str(prmtop_file),
+        mm_xyz = mm_geom,
+        qm_indices = qm_indices,
     )
 
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
-        # Add in Ethylene atoms
-        results = TC.compute(atomic_input)
-        results = results.extras["qcvars"]
+        results = TC.compute_py(jobinput)
 
     fields_to_check = [
         "charges",
@@ -77,10 +60,11 @@ def test_qmmm_basic(settings):
         # "orb_occupations",
         # "bond_order",
     ]
-
     print(results)
+    print(vars(results))
+    print(results.__dict__)
 
     for field in fields_to_check:
-        assert _round(results[field], 5) == _round(
+        assert _round(getattr(results, field), 5) == _round(
             qmmm_basic.correct_answer[field], 5
         )

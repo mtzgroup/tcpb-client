@@ -22,7 +22,7 @@ correct_answer = {
     "spins": array([10.0, 10.0, 10.0]), # not validated
     "dipole_moment": 2.436694,
     "dipole_vector": array([1.544914, 1.884333, -0.002387]),
-    "energy": [-75.5924554235],
+    "energy": -75.5924554235,
     "gradient": array(
         [
             0.0105322205, 0.0078665231, -0.0009857979,

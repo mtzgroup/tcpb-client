@@ -6,8 +6,8 @@ from tcpb.models import Mol, JobInput
 from tcpb.tcpb import TCProtobufClient
 
 
-# pytest -k test_model_object_to_job_input_similarity -r P
-def test_model_object_to_job_input_similarity(settings, ethylene):
+# pytest -k test_model_object_similarity -r P
+def test_model_object_similarity(settings, ethylene):
     """
     Test that the new model object function produces the same protobuf
     messages that Stefan's old method created
@@ -55,9 +55,6 @@ def test_model_object_to_job_input_similarity(settings, ethylene):
         run = "energy",
         basis = "6-31g**",
         user_options = keywords,
-        # mm_xyz = [],
-        # qm_indices = [],
-        # prmtop_path = str(Path(__file__).parent / "test_data" / "2water.prmtop"),
     )
     print(ethylene_jobinput.to_pb())
     print()

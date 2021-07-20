@@ -192,75 +192,128 @@ class JobOutput(BaseModel):
     cis_unrelaxed_dipoles: Optional[List[float]] # Length 4 * n_state of order [i_xyzd + 4 * i_state]
     cis_relaxed_dipoles: Optional[List[float]] # Length 4 * n_state of order [i_xyzd + 4 * i_state]
     cis_transition_dipoles: Optional[List[float]] # Length 4 * (n_state * (n_state + 1) / 2) of order [i_xyzd + 4 * i_state_2]
+    mm_gradient: Optional[List[float]] # Length 3 * n_mm of order [i_xyz + 3 * i_mm]
     molden: Optional[str]
 
     class Config:
         allow_mutation = False
 
-    # def from_pb(cls, job_output_msg: pb.JobOutput) -> "JobOutput":
     @classmethod
-    def __init__(self, job_output_msg: pb.JobOutput):
+    def from_pb(cls, job_output_msg: pb.JobOutput) -> "JobOutput":
         """Create JobOutput object from protocol buffer JobOutput message"""
-        
-        self.charges = job_output_msg.charges
-        self.spins = job_output_msg.spins
-        self.dipole_moment = job_output_msg.dipoles[3]
-        self.dipole_vector = job_output_msg.dipoles[:3]
-        self.job_dir = job_output_msg.job_dir
-        self.job_scr_dir = job_output_msg.job_scr_dir
-        self.server_job_id = job_output_msg.server_job_id
 
-        self.energy = job_output_msg.energy[0] # The energies for multiple states are set later
-
-        if job_output_msg.mol.closed is True:
-            self.orbfile = job_output_msg.orb1afile
-            self.orb_energies = job_output_msg.orba_energies
-            self.orb_occupations = job_output_msg.orba_occupations
-        else:
-            self.orbfile = (job_output_msg.orb1afile, job_output_msg.orb1bfile)
-            self.orb_energies = (job_output_msg.orba_energies, job_output_msg.orbb_energies)
-            self.orb_occupations = (job_output_msg.orba_occupations, job_output_msg.orbb_occupations)
-
-        if len(job_output_msg.gradient):
-            self.gradient = job_output_msg.gradient
-
-        if len(job_output_msg.nacme):
-            self.nacme = job_output_msg.nacme
-
-        if len(job_output_msg.cas_transition_dipole):
-            self.cas_transition_dipole = job_output_msg.cas_transition_dipole
-
+        energy = job_output_msg.energy[0]
         cas_state_number = len(job_output_msg.cas_energy_states) # == 0 if not a cas run
-        if cas_state_number:
-            self.energy = job_output_msg.energy[: cas_state_number]
-            self.cas_energy_labels = list(zip(
-                job_output_msg.cas_energy_states,
-                job_output_msg.cas_energy_mults,
-            ))
-
-        if len(job_output_msg.bond_order):
-            self.bond_order = job_output_msg.bond_order
-
-        if len(job_output_msg.ci_overlaps):
-            self.ci_overlap = job_output_msg.ci_overlaps
-
+        if cas_state_number > 0:
+            energy = job_output_msg.energy[: cas_state_number]
         if job_output_msg.cis_states > 0:
-            self.energy = job_output_msg.energy[: job_output_msg.cis_states + 1]
-            self.cis_states = job_output_msg.cis_states
+            energy = job_output_msg.energy[: job_output_msg.cis_states + 1]
 
-            if len(job_output_msg.cis_unrelaxed_dipoles):
-                self.cis_unrelaxed_dipoles = job_output_msg.cis_unrelaxed_dipoles
-            if len(job_output_msg.cis_relaxed_dipoles):
-                self.cis_relaxed_dipoles = job_output_msg.cis_relaxed_dipoles
-            if len(job_output_msg.cis_transition_dipoles):
-                self.cis_transition_dipoles = job_output_msg.cis_transition_dipoles
+        output = cls(
+            charges = list(job_output_msg.charges),
+            spins = list(job_output_msg.spins),
+            dipole_moment = job_output_msg.dipoles[3],
+            dipole_vector = list(job_output_msg.dipoles[:3]),
+            job_dir = job_output_msg.job_dir,
+            job_scr_dir = job_output_msg.job_scr_dir,
+            server_job_id = job_output_msg.server_job_id,
 
-        if len(job_output_msg.compressed_mo_vector):
-            self.molden = tcpb_imd_fields2molden_string(job_output_msg)
+            orbfile = job_output_msg.orb1afile
+                if job_output_msg.mol.closed else (job_output_msg.orb1afile, job_output_msg.orb1bfile),
+            orb_energies = list(job_output_msg.orba_energies)
+                if job_output_msg.mol.closed else (list(job_output_msg.orba_energies), list(job_output_msg.orbb_energies)),
+            orb_occupations = list(job_output_msg.orba_occupations)
+                if job_output_msg.mol.closed else (list(job_output_msg.orba_occupations), list(job_output_msg.orbb_occupations)),
 
-    def __str__(self):
-        attributes = inspect.getmembers(type(self), lambda a : not(inspect.isroutine(a)))
-        attributes = [a for a in attributes if not(a[0].startswith('_'))]
-        attributes = dict(attributes)
+            energy = energy,
+            gradient = list(job_output_msg.gradient) if len(job_output_msg.gradient) > 0 else None,
+            nacme = list(job_output_msg.nacme) if len(job_output_msg.nacme) > 0 else None,
+            cas_transition_dipole = list(job_output_msg.cas_transition_dipole) if len(job_output_msg.cas_transition_dipole) > 0 else None,
+            cas_energy_labels = list(zip(
+                    job_output_msg.cas_energy_states,
+                    job_output_msg.cas_energy_mults,
+                )) if cas_state_number > 0 else None,
 
-        return str(attributes)
+            bond_order = list(job_output_msg.bond_order) if len(job_output_msg.bond_order) > 0 else None,
+            ci_overlap = list(job_output_msg.ci_overlaps) if len(job_output_msg.ci_overlaps) > 0 else None,
+
+            cis_states = job_output_msg.cis_states if job_output_msg.cis_states > 0 else None,
+            cis_unrelaxed_dipoles = list(job_output_msg.cis_unrelaxed_dipoles)
+                if job_output_msg.cis_states > 0 and len(job_output_msg.cis_unrelaxed_dipoles) > 0 else None,
+            cis_relaxed_dipoles = list(job_output_msg.cis_relaxed_dipoles)
+                if job_output_msg.cis_states > 0 and len(job_output_msg.cis_relaxed_dipoles) > 0 else None,
+            cis_transition_dipoles = list(job_output_msg.cis_transition_dipoles)
+                if job_output_msg.cis_states > 0 and len(job_output_msg.cis_transition_dipoles) > 0 else None,
+
+            mm_gradient = list(job_output_msg.mmatom_gradient) if len(job_output_msg.mmatom_gradient) > 0 else None,
+            molden = tcpb_imd_fields2molden_string(job_output_msg) if len(job_output_msg.compressed_mo_vector) > 0 else None,
+        )
+        return output
+
+    # def __init__(self, job_output_msg: pb.JobOutput):
+    #     """Create JobOutput object from protocol buffer JobOutput message"""
+    #     self.charges = job_output_msg.charges
+    #     self.spins = job_output_msg.spins
+    #     self.dipole_moment = job_output_msg.dipoles[3]
+    #     self.dipole_vector = job_output_msg.dipoles[:3]
+    #     self.job_dir = job_output_msg.job_dir
+    #     self.job_scr_dir = job_output_msg.job_scr_dir
+    #     self.server_job_id = job_output_msg.server_job_id
+
+    #     self.energy = job_output_msg.energy[0] # The energies for multiple states are set later
+
+    #     if job_output_msg.mol.closed is True:
+    #         self.orbfile = job_output_msg.orb1afile
+    #         self.orb_energies = job_output_msg.orba_energies
+    #         self.orb_occupations = job_output_msg.orba_occupations
+    #     else:
+    #         self.orbfile = (job_output_msg.orb1afile, job_output_msg.orb1bfile)
+    #         self.orb_energies = (job_output_msg.orba_energies, job_output_msg.orbb_energies)
+    #         self.orb_occupations = (job_output_msg.orba_occupations, job_output_msg.orbb_occupations)
+
+    #     if len(job_output_msg.gradient):
+    #         self.gradient = job_output_msg.gradient
+
+    #     if len(job_output_msg.nacme):
+    #         self.nacme = job_output_msg.nacme
+
+    #     if len(job_output_msg.cas_transition_dipole):
+    #         self.cas_transition_dipole = job_output_msg.cas_transition_dipole
+
+    #     cas_state_number = len(job_output_msg.cas_energy_states) # == 0 if not a cas run
+    #     if cas_state_number:
+    #         self.energy = job_output_msg.energy[: cas_state_number]
+    #         self.cas_energy_labels = list(zip(
+    #             job_output_msg.cas_energy_states,
+    #             job_output_msg.cas_energy_mults,
+    #         ))
+
+    #     if len(job_output_msg.bond_order):
+    #         self.bond_order = job_output_msg.bond_order
+
+    #     if len(job_output_msg.ci_overlaps):
+    #         self.ci_overlap = job_output_msg.ci_overlaps
+
+    #     if job_output_msg.cis_states > 0:
+    #         self.energy = job_output_msg.energy[: job_output_msg.cis_states + 1]
+    #         self.cis_states = job_output_msg.cis_states
+
+    #         if len(job_output_msg.cis_unrelaxed_dipoles):
+    #             self.cis_unrelaxed_dipoles = job_output_msg.cis_unrelaxed_dipoles
+    #         if len(job_output_msg.cis_relaxed_dipoles):
+    #             self.cis_relaxed_dipoles = job_output_msg.cis_relaxed_dipoles
+    #         if len(job_output_msg.cis_transition_dipoles):
+    #             self.cis_transition_dipoles = job_output_msg.cis_transition_dipoles
+
+    #     if len(job_output_msg.mmatom_gradient):
+    #         self.mm_gradient = job_output_msg.mmatom_gradient
+    
+    #     if len(job_output_msg.compressed_mo_vector):
+    #         self.molden = tcpb_imd_fields2molden_string(job_output_msg)
+
+    # def __str__(self):
+    #     attributes = inspect.getmembers(type(self), lambda a : not(inspect.isroutine(a)))
+    #     attributes = [a for a in attributes if not(a[0].startswith('_'))]
+    #     attributes = dict(attributes)
+
+    #     return str(attributes)
