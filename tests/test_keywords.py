@@ -1,5 +1,6 @@
 import time
 
+import pytest
 from numpy import ndarray
 from qcelemental.models import AtomicInput
 
@@ -15,20 +16,26 @@ def test_molden_file_creation(settings, atomic_input, test_data_dir):
     with open(test_data_dir / "water.molden") as f:
         correct_molden = f.read()
 
+    with open("output.molden", "w") as f:
+        f.write(result.extras["molden"])
     assert result.extras["molden"] == correct_molden
 
 
+@pytest.mark.skip(
+    reason="You can see in the tc.in/out files the convergence is set correctly. Yes a"
+    "looser convergence doesn't always produce a shorter computation time."
+)
 def test_convthre(settings, atomic_input):
     atomic_input.keywords["convthre"] = 3.0e-5
-    with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as TC:
+    with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as client:
         start = time.time()
-        TC.compute(atomic_input)
+        client.compute(atomic_input)
         tight_thresh = time.time() - start
 
-    atomic_input.keywords["convthre"] = 3.0e-2
-    with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as TC:
+    atomic_input.keywords["convthre"] = 3.0e-1
+    with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as client:
         start = time.time()
-        TC.compute(atomic_input)
+        client.compute(atomic_input)
         looser_thresh = time.time() - start
 
     assert tight_thresh > looser_thresh

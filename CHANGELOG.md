@@ -8,7 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particulat `c0` files as initial wavefunction guesses.
+  - Configuration parameters for controlling TCFrontEndClient behavior are
+    found in AtomicInput.extras['tcfe:config'] and include:
+    1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess
+       wavefunction
+    2. `scratch_messy`: `bool` - If `True` client will not delete files on server
+       after a computation
+    3. `uploads_messy`: `bool` - If `True` client will not delete uploaded c0
+       file(s) after a computation
+  - Client also supports [AtomicResultProtocols](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/qcelemental/models/results.py#L538) `stdout` and `native_files`.
+
 ### Changed
+
+- `qcelemental` required version bumped from `>=0.17.0` to `>=0.24.0` to support `native_files` field for returning files. See [qcelemental note](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/docs/source/changelog.rst#0240--2021-11-18). Note I am breaking the convention and returning binary data as well since I have more control over file access via the `TCFrontEndClient` than anticipated in the `qcelemental`/`qcengine` specification. Additionally I need the binary `c0` file to use as initial guesses for TeraChem computations.
 
 ### Removed
 

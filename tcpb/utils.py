@@ -1,9 +1,9 @@
-from typing import Union, List
+from typing import List, Union
 
 from google.protobuf.json_format import MessageToDict
 from numpy import array
-from qcelemental.models import AtomicInput, AtomicResult, Molecule, BasisSet
 from qcelemental import Datum
+from qcelemental.models import AtomicInput, AtomicResult, BasisSet, Molecule
 from qcelemental.models.results import (
     AtomicResultProperties,
     Provenance,
@@ -11,6 +11,7 @@ from qcelemental.models.results import (
 )
 
 from . import terachem_server_pb2 as pb
+from .config import settings
 from .molden_constructor import tcpb_imd_fields2molden_string
 
 SUPPORTED_DRIVERS = {"ENERGY", "GRADIENT"}
@@ -51,6 +52,9 @@ def atomic_input_to_job_input(atomic_input: AtomicInput) -> pb.JobInput:
 
     # Get keywords that have specific protobuf fields
     ji.return_bond_order = ai_copy.keywords.pop("bond_order", False)
+    ji.orb1afile = ai_copy.keywords.pop("orb1afile", "")
+    ji.orb1bfile = ai_copy.keywords.pop("orb1bfile", "")
+
     # Request AO and MO information
     if ai_copy.keywords.pop("mo_output", False):
         ji.imd_orbital_type = pb.JobInput.ImdOrbitalType.WHOLE_C
@@ -139,7 +143,7 @@ def job_output_to_atomic_result(
     # And extend extras to include values additional to input extras
     atomic_result.extras.update(
         {
-            "qcvars": {
+            settings.extras_qcvars_kwarg: {
                 "charges": jo_dict.get("charges"),
                 "spins": jo_dict.get("spins"),
                 "meyer_bond_order": jo_dict.get("bond_order"),
@@ -153,7 +157,7 @@ def job_output_to_atomic_result(
                 "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
                 "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
             },
-            "job_extras": {
+            settings.extras_job_kwarg: {
                 "job_dir": jo_dict.get("job_dir"),
                 "job_scr_dir": jo_dict.get("job_scr_dir"),
                 "server_job_id": jo_dict.get("server_job_id"),

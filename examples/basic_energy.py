@@ -2,8 +2,9 @@
 # Basic energy calculation
 import sys
 
+from qcelemental.models import AtomicInput, Molecule
+
 from tcpb import TCProtobufClient as TCPBClient
-from qcelemental.models import Molecule, AtomicInput
 
 if len(sys.argv) != 3:
     print("Usage: {} host port".format(sys.argv[0]))
@@ -25,8 +26,8 @@ atomic_input = AtomicInput(
     protocols={"wavefunction": "all"},
 )
 
-with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
-    result = TC.compute(atomic_input)
+with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
+    result = client.compute(atomic_input)
 
 print(result)
 print(result.return_result)
