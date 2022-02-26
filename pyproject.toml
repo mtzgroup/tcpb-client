@@ -29,7 +29,8 @@ requires = [
   "google==1.9.3",
   "protobuf>=3.2.0",
   "numpy>=1.13",
-  "qcelemental>=0.17.0",
+  "qcelemental>=0.24.0",
+  "httpx>=0.22.0",
 ]
 requires-python = ">=3.6"
 
@@ -37,6 +38,7 @@ requires-python = ">=3.6"
 dev = [
   "flake8 >=3.8.4",
   "pre-commit >= 2.9.3",
+  "autoflake >= 1.4",
 ]
 test = [
   "pytest >=6.2.1",

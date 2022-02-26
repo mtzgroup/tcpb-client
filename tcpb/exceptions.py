@@ -9,8 +9,6 @@ See https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
 class TCPBError(Exception):
     """Base error for package"""
 
-    pass
-
 
 class ServerError(TCPBError):
     """Raised when socket connection to server dies
@@ -19,7 +17,7 @@ class ServerError(TCPBError):
     """
 
     def __init__(self, msg, client):
-        msg += "\n\nServer Address: {}\n".format(client.tcaddr)
+        msg += "\n\nServer Address: {}\n".format((client.host, client.port))
 
         job_dir = client.curr_job_dir
         job_id = client.curr_job_id

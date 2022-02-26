@@ -1,5 +1,5 @@
 """Protobuf client for TeraChem server mode"""
 
-from .tcpb import TCProtobufClient  # noqa
+from .clients import TCFrontEndClient, TCProtobufClient  # noqa
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"

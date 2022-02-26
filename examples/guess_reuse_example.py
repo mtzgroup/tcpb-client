@@ -34,15 +34,17 @@ with TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
         "restricted": True,
         "method": "pbe0",
         "basis": "6-31g",
+        # necessary to avoid density matrix purification on second calc which will
+        # cause second calc to begin at different starting point than where first cals
+        # ended
+        "purify": "no",
     }
 
-    results = TC.compute_job_sync("gradient", geom, "angstrom", **tc_opts)
+    results = TC.compute_job_sync("gradient", geom, "bohr", **tc_opts)
 
     # We can pull the orbital path from the previous job to feed in as a guess
     orb_path = os.path.join(results["job_scr_dir"], "c0")
-    results = TC.compute_job_sync(
-        "gradient", geom, "angstrom", guess=orb_path, **tc_opts
-    )
+    results = TC.compute_job_sync("gradient", geom, "bohr", guess=orb_path, **tc_opts)
 
     # Things look slightly different for unrestricted guesses
     tc_opts["closed_shell"] = False
@@ -51,6 +53,7 @@ with TCProtobufClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
 
     # TeraChem expects "guess <ca0 file> <cb0 file>"
     orb_paths = "{0}/ca0 {0}/cb0".format(results["job_scr_dir"])
+    print(orb_paths)
     results = TC.compute_job_sync(
         "gradient", geom, "angstrom", guess=orb_paths, **tc_opts
     )

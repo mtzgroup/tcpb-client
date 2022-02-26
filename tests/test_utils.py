@@ -1,13 +1,13 @@
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
 from qcelemental.models.results import AtomicResult
 
-from tcpb.tcpb import TCProtobufClient
 from tcpb import terachem_server_pb2 as pb
+from tcpb.clients import TCProtobufClient
+from tcpb.config import settings
 from tcpb.utils import (
     atomic_input_to_job_input,
     job_output_to_atomic_result,
@@ -86,7 +86,7 @@ def test_job_output_to_atomic_result(atomic_input, job_output):
     assert isinstance(atomic_result, AtomicResult)
 
     # Check that all types in extras are regular python types (no longer protobuf types)
-    for key, value in atomic_result.extras["qcvars"].items():
+    for key, value in atomic_result.extras[settings.extras_qcvars_kwarg].items():
         assert isinstance(key, str)
         assert (
             isinstance(
@@ -102,13 +102,13 @@ def test_job_output_to_atomic_result(atomic_input, job_output):
             or value is None
         )
 
+
 def test_job_output_to_atomic_result_maintains_extras(atomic_input, job_output):
     atomic_input.extras["mytag"] = "fake_value"
     atomic_result = job_output_to_atomic_result(
         atomic_input=atomic_input, job_output=job_output
     )
     assert "mytag" in atomic_result.extras
-
 
 
 def test_mol_to_molecule_bohr():

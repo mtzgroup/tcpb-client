@@ -1,11 +1,10 @@
-from pathlib import Path
-
 import numpy as np
 import qcelemental as qcel
-from qcelemental.models import AtomicInput, Molecule
 from google.protobuf.internal.containers import RepeatedScalarFieldContainer
+from qcelemental.models import AtomicInput, Molecule
 
 from tcpb import TCProtobufClient as TCPBClient
+
 from .answers import cisno_casci
 from .conftest import _round
 
