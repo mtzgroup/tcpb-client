@@ -1,6 +1,10 @@
-"""Simple Python socket client for communicating with TeraChem Protocol Buffer servers
+"""Python clients for communicating with TeraChem in Server Mode.
 
-Note that I (Stefan Seritan) have implemented a small protocol on top of the
+Two clients exist, one for communicating direclty with the protocol buffer server run
+by TeraChem. One for communicating with the TeraChem Frontend server which provides
+increased functionality.
+
+Note that Stefan Seritan has implemented a small protocol on top of the
 protobufs since we send them in binary over TCP ALL MESSAGES ARE REQUIRED TO
 HAVE AN 8 BYTE HEADER
 First 4 bytes: int32 of protocol buffer message type (check the MessageType enum
@@ -8,58 +12,70 @@ in the protobuf file)
 Second 4 bytes: int32 of packet size (not including the header)
 """
 
-from __future__ import absolute_import, division, print_function
-
 import logging
 import socket
 import struct
+import warnings
 from time import sleep
+from typing import Dict, List, Optional
+from uuid import uuid4
 
+import httpx
 import numpy as np
-from qcelemental.models import AtomicInput, AtomicResult
+from qcelemental.models.results import (
+    AtomicInput,
+    AtomicResult,
+    NativeFilesProtocolEnum,
+)
 
 from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
+from .config import settings
 from .exceptions import ServerError
 from .molden_constructor import tcpb_imd_fields2molden_string
-
 
 logger = logging.getLogger(__name__)
 
 
-class TCProtobufClient(object):
+class TCProtobufClient:
     """Connect and communicate with a TeraChem instance running in Protocol Buffer server mode
     (i.e. TeraChem was started with the -s|--server flag)
     """
 
-    def __init__(self, host, port, debug=False, trace=False):
+    def __init__(
+        self, host: str = "127.0.0.1", port: int = 11111, debug=False, trace=False
+    ):
         """Initialize a TCProtobufClient object.
 
-        Args:
-            host (str): Hostname
-            port (int): Port number (must be above 1023)
-            debug (bool): If True, assumes connections work (used for testing with no server)
-            trace (bool): If True, packets are saved to .bin files (which can then be used for testing)
+        Parameters:
+            host: Hostname
+            port: Port number (must be above 1023)
+            debug: If True, assumes connections work (used for testing with no server)
+            trace: If True, packets are saved to .bin files (which can then be used for testing)
         """
+        if port < 1023:
+            raise ValueError(
+                "Port number is not allowed to below 1023 (system reserved ports)"
+            )
+        self.host = host
+        self.port = port
         self.debug = debug
         self.trace = trace
         if self.trace:
             self.intracefile = open("client_recv.bin", "wb")
             self.outtracefile = open("client_sent.bin", "wb")
 
-        # Socket options
-        self.update_address(host, port)
         self.tcsock = None
         # Would like to not hard code this, but the truth is I am expecting exactly 8 bytes, not whatever Python thinks 2 ints is
         self.header_size = 8
 
         self.prev_results = None
 
-        self.curr_job_dir = None
-        self.curr_job_scr_dir = None
-        self.curr_job_id = None
+        self.curr_job_dir: Optional[str] = None
+        self.curr_job_scr_dir: Optional[str] = None
+        self.curr_job_id: Optional[int] = None
 
     def __enter__(self):
         """
@@ -77,28 +93,6 @@ class TCProtobufClient(object):
         """
         self.disconnect()
 
-    def update_address(self, host, port):
-        """Update the host and port of a TCProtobufClient object.
-        Note that you will have to call disconnect() and connect() before and after this
-        yourself to actually connect to the new server.
-
-        Args:
-            host (str): Hostname
-            port (int): Port number (must be above 1023)
-        """
-        # Sanity checks
-        if not isinstance(host, str):
-            raise TypeError("Hostname must be a string")
-        if not isinstance(port, int):
-            raise TypeError("Port number must be an integer")
-        if port < 1023:
-            raise ValueError(
-                "Port number is not allowed to below 1023 (system reserved ports)"
-            )
-
-        # Socket options
-        self.tcaddr = (host, port)
-
     def connect(self):
         """Connect to the TeraChem Protobuf server"""
         if self.debug:
@@ -108,9 +102,9 @@ class TCProtobufClient(object):
         try:
             self.tcsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.tcsock.settimeout(60.0)  # Timeout of 1 minute
-            self.tcsock.connect(self.tcaddr)
+            self.tcsock.connect((self.host, self.port))
         except socket.error as msg:
-            raise ServerError("Problem connecting to server: {}".format(msg), self)
+            raise ServerError(f"Problem connecting to server: {msg}", self)
 
     def disconnect(self):
         """Disconnect from the TeraChem Protobuf server"""
@@ -124,7 +118,7 @@ class TCProtobufClient(object):
             self.tcsock = None
         except socket.error as msg:
             logger.error(
-                f"Problem communicating with server: {self.tcaddr}. Disconnect assumed to have happened"
+                f"Problem communicating with server: {msg}. Disconnect assumed to have happened"
             )
 
     def is_available(self):
@@ -158,13 +152,10 @@ class TCProtobufClient(object):
             sleep(0.5)
             self._send_msg(pb.JOBINPUT, job_input_msg)
             status = self._recv_msg(pb.STATUS)
-        print(status)
         while not self.check_job_complete():
             sleep(0.5)
 
-        # job_output = self.recv_job_async()
         job_output = self._recv_msg(pb.JOBOUTPUT)
-        # return job_output
         return job_output_to_atomic_result(
             atomic_input=atomic_input, job_output=job_output
         )
@@ -217,6 +208,10 @@ class TCProtobufClient(object):
 
     def _set_status(self, status_msg: pb.Status):
         """Sets status on self if job is accepted"""
+        warnings.warn(
+            "The status returned from the TCPB Server is off by one. The status "
+            "returned contains actually contains values for the previous job."
+        )
         self.curr_job_dir = status_msg.job_dir
         self.curr_job_scr_dir = status_msg.job_scr_dir
         self.curr_job_id = status_msg.server_job_id
@@ -849,3 +844,196 @@ class TCProtobufClient(object):
             self.intracefile.write(packet)
 
         return recv_pb
+
+
+class TCFrontEndClient(TCProtobufClient):
+    """Client for interating with TeraChem FrontEnd.
+
+    TeraChem FrontEnd proxies calls to a TeraChem Protocol Buffer Server and provides
+    access to the underlying files created by TeraChem from a compute job.
+    """
+
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 11111,
+        frontend_port: int = 80,
+        uploads_prefix: str = "uploads",
+        debug=False,
+        trace=False,
+    ):
+        self.frontend_port = frontend_port
+        self.uploads_prefix = uploads_prefix
+
+        super().__init__(host, port, debug, trace)
+
+    def _request(self, method: str, path: str, **kwargs) -> httpx.Response:
+        """Main method for sending requests to the TCFrontEnd file server"""
+
+        if path.startswith("/"):
+            raise ValueError("Path cannot start with '/'")
+
+        with httpx.Client() as client:
+            res = client.request(
+                method.upper(),
+                f"http://{self.host}:{self.frontend_port}/{path}",
+                **kwargs,
+            )
+        res.raise_for_status()
+        return res
+
+    def ls(self, path: str = "/") -> List[Dict[str, str]]:
+        """List directories on TeraChem Server
+
+        Parmeters:
+            path: Optional filepath.
+        """
+        if not path.endswith("/"):
+            path += "/"
+
+        req = self._request("GET", path)
+        return req.json()
+
+    def get(self, path: str) -> bytes:
+        """Retreive file from TeraChem Server
+
+        Parmameters:
+            path: Full filepath to the file to download. Does not begin with '/'.
+
+        Returns:
+            Bytes of the file. All files (text or binary) returned as bytes. So to
+            write to disk open file in binary mode. e.g.,:
+                with open('my_output.txt', 'wb') as f:
+                    f.write(client.get('path_to_file'))
+        """
+        req = self._request("GET", path)
+        return req.content
+
+    def put(self, filename: str, content: bytes) -> str:
+        """Upload a file to the TeraChem Server
+
+        Returns:
+            Path to the uploaded file.
+            NOTE: Full path will vary from filename passed as server will place file
+                into designated uploads directory with uuid in path.
+        """
+        uuid = uuid4()
+        req = self._request(
+            "PUT", f"{self.uploads_prefix}/{uuid}-{filename}", content=content
+        )
+        return str(req.url.path)[1:]  # remove intial '/'
+
+    def delete(self, path_or_filename: str) -> None:
+        """Delete a directory or file from the TeraChem Server"""
+        with httpx.Client() as client:
+            req = client.delete(
+                f"http://{self.host}:{self.frontend_port}/{path_or_filename}"
+            )
+        req.raise_for_status()
+
+    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
+        """Top level method for performing computations with QCSchema inputs/outputs
+
+        This method should be seen as an implementation of the QCEngine
+        ProgramHarness.compute() method.
+
+        NOTE: Configuration parameters for controlling TCFrontEndClient behavior are
+            found in AtomicInput.extras['tcfe:config'] and include:
+                1. 'c0' | 'ca0 and cb0': Binary files to use as an initial guess
+                    wavefunction
+                2. 'scratch_messy': bool If True client will not delete files on server
+                    after a computation
+                3. 'uploads_messy': bool If True client will not delete uploaded c0
+                    file(s) after a computation
+
+        Parameters:
+            atomic_input: AtomicInput object specifying the computation
+        """
+        # Do pre-compute work
+        atomic_input = self._pre_compute_tasks(atomic_input)
+        # Send calculation to TCPBS
+        result = super().compute(atomic_input)
+
+        # Do post-compute work
+        result = self._post_compute_tasks(result)
+        return result
+
+    def _pre_compute_tasks(self, atomic_input: AtomicInput) -> AtomicInput:
+        """Tasks to be performed prior to submitting computation to TeraChem PBS
+
+        Currently this involves:
+            1. If binary data found in AtomicInput.extras['tcfe:config']['c0|ca0/cb0']
+                it is uploaded to the server and the path is set as the `guess` value
+                in AtomicInput.keywords
+        """
+        tcfe_config = atomic_input.extras.get(settings.tcfe_config_kwarg, {})
+        ai_dict = atomic_input.dict()
+
+        # Upload c0|ca0/cb0 (wavefunction) data if provided
+        if any(key in {"c0", "ca0", "cb0"} for key in tcfe_config.keys()):
+
+            if "c0" in tcfe_config:
+                path = self.put("c0", tcfe_config["c0"])
+
+            else:
+                # ca0 and cb0 both exist
+                ca0_path = self.put("ca0", tcfe_config["ca0"])
+                cb0_path = self.put("cb0", tcfe_config["cb0"])
+                path = f"{ca0_path} {cb0_path}"
+
+            # 'keywords' will exist because AtomicInput defaults it to {} if empty
+            ai_dict["keywords"]["guess"] = path
+
+        return AtomicInput(**ai_dict)
+
+    def _post_compute_tasks(self, result: AtomicResult) -> AtomicResult:
+        """Tasks to be performed after receiving a result from Terachem PBS
+
+        Currently this involves:
+            1. Getting tc.out if stdout was requested via stdout = True
+            2. Returning c0/ca0/cb0 files if requested via native_files = 'all'
+            3. Deleting the files on the server unless scratch_messy = True
+            4. Deleting uploaded files on the server unless uploads_messy = True
+        """
+        tcfe_config = result.extras.get(settings.tcfe_config_kwarg, {})
+        job_dir = result.extras[settings.extras_job_kwarg]["job_dir"]
+
+        # dict for modifying attributes
+        result_dict = result.dict()
+
+        # Retreive tc.out if requested
+        if result.protocols.stdout:
+            req = self._request("GET", f"{job_dir}/tc.out")
+            result_dict["stdout"] = req.text
+
+        # Retrieve native_files if requested (files produced by TeraChem that don't fit
+        # cleanly into the QCSchema json)
+        if result.protocols.native_files in {NativeFilesProtocolEnum.all}:
+            # Assume no native_files added previously
+            result_dict["native_files"] = {}
+
+            # Collect Files; "all" is shorthand for the files collected below
+            orb1a_path = result.extras[settings.extras_job_kwarg]["orb1afile"]
+            orb1a_name = orb1a_path.split("/")[-1]
+            req = self._request("GET", orb1a_path)
+            result_dict["native_files"][orb1a_name] = req.content
+
+            orb1b_path = result.extras[settings.extras_job_kwarg]["orb1bfile"]
+            if orb1b_path:
+                orb1b_name = orb1b_path.split("/")[-1]
+                req = self._request("GET", orb1b_path)
+                result_dict["native_files"][orb1b_name] = req.content
+
+        # Cleanup uploads
+        if self.uploads_prefix in result.keywords.get(
+            "guess", ""
+        ) and not tcfe_config.get("uploads_messy"):
+            # Files were uploaded and put in "guess" keyword; also no request to maintain files
+            for path in result.keywords["guess"].split():
+                req = self._request("DELETE", f"{path}")
+
+        # Cleanup Scratch Directory
+        if not tcfe_config.get("scratch_messy"):
+            self._request("DELETE", f"{job_dir}/")
+
+        return AtomicResult(**result_dict)

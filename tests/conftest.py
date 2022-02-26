@@ -1,8 +1,8 @@
-from typing import Collection, Union
 from pathlib import Path
+from typing import Collection, Union
 
 import pytest
-from qcelemental.models import Molecule, AtomicInput
+from qcelemental.models import AtomicInput, Molecule
 from qcelemental.models.common_models import Model
 
 from tcpb import terachem_server_pb2 as pb
