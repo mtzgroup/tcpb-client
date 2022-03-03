@@ -12,7 +12,6 @@ from qcelemental.models.results import (
 
 from . import terachem_server_pb2 as pb
 from .config import settings
-from .molden_constructor import tcpb_imd_fields2molden_string
 
 SUPPORTED_DRIVERS = {"ENERGY", "GRADIENT"}
 
@@ -110,17 +109,6 @@ def job_output_to_atomic_result(
             f"include: {SUPPORTED_DRIVERS}"
         )
 
-    if atomic_input.keywords.get("molden"):
-        # Molden file was request
-        try:
-            molden_string = tcpb_imd_fields2molden_string(job_output)
-        except Exception:
-            # Don't know how this code will blow up, so except everything for now :/
-            # NOTE: mo_output will set imd_orbital_type to "WHOLE_C"
-            molden_string = "Unable to create molden output. Did you include the 'mo_output' keyword??"
-    else:
-        molden_string = None
-
     # Prepare AtomicInput to be base input for AtomicResult
     atomic_input_dict = atomic_input.dict()
     atomic_input_dict.pop("provenance", None)
@@ -164,7 +152,6 @@ def job_output_to_atomic_result(
                 "orb1afile": jo_dict.get("orb1afile"),
                 "orb1bfile": jo_dict.get("orb1bfile"),
             },
-            "molden": molden_string,
         }
     )
     return atomic_result
