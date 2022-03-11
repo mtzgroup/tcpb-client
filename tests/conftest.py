@@ -2,10 +2,16 @@ from pathlib import Path
 from typing import Collection, Union
 
 import pytest
-from qcelemental.models import AtomicInput, Molecule
+from qcelemental.models import (
+    AtomicInput,
+    AtomicResult,
+    AtomicResultProperties,
+    Molecule,
+)
 from qcelemental.models.common_models import Model
 
 from tcpb import terachem_server_pb2 as pb
+from tcpb.config import settings as tcpb_settings
 
 
 @pytest.fixture
@@ -59,6 +65,18 @@ def water():
 def atomic_input(water):
     model = Model(method="B3LYP", basis="6-31g")
     return AtomicInput(molecule=water, model=model, driver="energy")
+
+
+@pytest.fixture(scope="function")
+def atomic_result(atomic_input):
+    result = AtomicResult(
+        **atomic_input.dict(),
+        return_result=123.123,
+        success=True,
+        properties=AtomicResultProperties(return_energy=123.123),
+    )
+    result.extras[tcpb_settings.extras_job_kwarg] = {"job_dir": "job_1"}
+    return result
 
 
 @pytest.fixture

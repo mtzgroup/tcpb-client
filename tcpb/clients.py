@@ -17,7 +17,7 @@ import socket
 import struct
 import warnings
 from time import sleep
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 import httpx
@@ -34,7 +34,6 @@ from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
 from . import terachem_server_pb2 as pb
 from .config import settings
 from .exceptions import ServerError
-from .molden_constructor import tcpb_imd_fields2molden_string
 
 logger = logging.getLogger(__name__)
 
@@ -416,9 +415,6 @@ class TCProtobufClient:
                         )
                     )
                 results["cis_transition_dipoles"] = tDips
-
-        if len(output.compressed_mo_vector):
-            results["molden"] = tcpb_imd_fields2molden_string(output)
 
         # Save results for user access later
         self.prev_results = results
@@ -847,10 +843,12 @@ class TCProtobufClient:
 
 
 class TCFrontEndClient(TCProtobufClient):
-    """Client for interating with TeraChem FrontEnd.
+    """Client for interacting with TeraChem FrontEnd.
 
-    TeraChem FrontEnd proxies calls to a TeraChem Protocol Buffer Server and provides
-    access to the underlying files created by TeraChem from a compute job.
+    TeraChemFrontEndClient communicates with a TeraChem Protocol Buffer Server for
+    QC compute jobs and with a file server to get/put files to the server. A file may
+    be put to the server e.g., to use as an initial wave function guess, or any output
+    file retrieved after a computation.
     """
 
     def __init__(
@@ -858,10 +856,12 @@ class TCFrontEndClient(TCProtobufClient):
         host: str = "127.0.0.1",
         port: int = 11111,
         frontend_port: int = 80,
+        frontend_host: Optional[str] = None,
         uploads_prefix: str = "uploads",
         debug=False,
         trace=False,
     ):
+        self.frontend_host = frontend_host or host
         self.frontend_port = frontend_port
         self.uploads_prefix = uploads_prefix
 
@@ -870,13 +870,10 @@ class TCFrontEndClient(TCProtobufClient):
     def _request(self, method: str, path: str, **kwargs) -> httpx.Response:
         """Main method for sending requests to the TCFrontEnd file server"""
 
-        if path.startswith("/"):
-            raise ValueError("Path cannot start with '/'")
-
         with httpx.Client() as client:
             res = client.request(
                 method.upper(),
-                f"http://{self.host}:{self.frontend_port}/{path}",
+                f"http://{self.frontend_host}:{self.frontend_port}/{path}",
                 **kwargs,
             )
         res.raise_for_status()
@@ -945,6 +942,7 @@ class TCFrontEndClient(TCProtobufClient):
                     after a computation
                 3. 'uploads_messy': bool If True client will not delete uploaded c0
                     file(s) after a computation
+                4. 'native_files': list[str] of filesnames to collect
 
         Parameters:
             atomic_input: AtomicInput object specifying the computation
@@ -979,7 +977,7 @@ class TCFrontEndClient(TCProtobufClient):
                 # ca0 and cb0 both exist
                 ca0_path = self.put("ca0", tcfe_config["ca0"])
                 cb0_path = self.put("cb0", tcfe_config["cb0"])
-                path = f"{ca0_path} {cb0_path}"
+                path = f"{ca0_path} {cb0_path}"  # TC wants two, space separated paths
 
             # 'keywords' will exist because AtomicInput defaults it to {} if empty
             ai_dict["keywords"]["guess"] = path
@@ -1003,26 +1001,12 @@ class TCFrontEndClient(TCProtobufClient):
 
         # Retreive tc.out if requested
         if result.protocols.stdout:
-            req = self._request("GET", f"{job_dir}/tc.out")
-            result_dict["stdout"] = req.text
+            result_dict["stdout"] = self.get(f"{job_dir}/tc.out").decode()
 
         # Retrieve native_files if requested (files produced by TeraChem that don't fit
         # cleanly into the QCSchema json)
         if result.protocols.native_files in {NativeFilesProtocolEnum.all}:
-            # Assume no native_files added previously
-            result_dict["native_files"] = {}
-
-            # Collect Files; "all" is shorthand for the files collected below
-            orb1a_path = result.extras[settings.extras_job_kwarg]["orb1afile"]
-            orb1a_name = orb1a_path.split("/")[-1]
-            req = self._request("GET", orb1a_path)
-            result_dict["native_files"][orb1a_name] = req.content
-
-            orb1b_path = result.extras[settings.extras_job_kwarg]["orb1bfile"]
-            if orb1b_path:
-                orb1b_name = orb1b_path.split("/")[-1]
-                req = self._request("GET", orb1b_path)
-                result_dict["native_files"][orb1b_name] = req.content
+            self._collect_files(result_dict)
 
         # Cleanup uploads
         if self.uploads_prefix in result.keywords.get(
@@ -1030,10 +1014,42 @@ class TCFrontEndClient(TCProtobufClient):
         ) and not tcfe_config.get("uploads_messy"):
             # Files were uploaded and put in "guess" keyword; also no request to maintain files
             for path in result.keywords["guess"].split():
-                req = self._request("DELETE", f"{path}")
+                self._request("DELETE", f"{path}")
 
         # Cleanup Scratch Directory
         if not tcfe_config.get("scratch_messy"):
             self._request("DELETE", f"{job_dir}/")
 
         return AtomicResult(**result_dict)
+
+    def _collect_files(self, result_dict: Dict[str, Any]) -> None:
+        """Collects requested native_files.
+
+        Parameters:
+            result_dict: Dictionary representation of an AtomicResult
+
+        Returns:
+            None: Modified result dictionary in place
+        """
+        tcfe_config = result_dict["extras"].get(settings.tcfe_config_kwarg, {})
+        scr_dir = result_dict["extras"][settings.extras_job_kwarg]["job_scr_dir"]
+
+        # Assume no native_files added previously
+        result_dict[settings.tcfe_config_native_files] = {}
+
+        if not tcfe_config.get("native_files"):
+            # Specific files not requested, return all
+            tcfe_config[settings.tcfe_config_native_files] = [
+                file_desc["name"]
+                for file_desc in self.ls(scr_dir)
+                if file_desc["type"] == "file"
+            ]
+
+        for output_file in tcfe_config[settings.tcfe_config_native_files]:
+            data = self.get(f"{scr_dir}/{output_file}")
+            try:
+                data = data.decode()
+            except UnicodeDecodeError:
+                # File is binary
+                pass
+            result_dict[settings.tcfe_config_native_files][output_file] = data
