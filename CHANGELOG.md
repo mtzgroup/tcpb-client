@@ -8,9 +8,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.9.0]
+
+### Added
+
+- Configuration parameters for controlling `TCFrontEndClient` behavior:
+
+  1. `native_files`: list[str] - List of natives files to collect. If none passed, all files will be collected.
+
+- Tests for `TCFrontEndClient` file put/get behaviors.
+
+### Changed
+
+- Refactored `TCFrontEndClient`
+
+### Removed
+
+- Construction of molden file from protocol buffer outputs. Molden files can now be requested directly from the Frontend client.
+
+## [0.8.1]
+
+### Added
+
 - `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particular `c0` files as initial wavefunction guesses.
 
-  - Configuration parameters for controlling TCFrontEndClient behavior are
+  - Configuration parameters for controlling `TCFrontEndClient` behavior are
     found in AtomicInput.extras['tcfe:config'] and include:
     1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess
        wavefunction
@@ -18,18 +44,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
        after a computation
     3. `uploads_messy`: `bool` - If `True` client will not delete uploaded c0
        file(s) after a computation
-    4. `native_files`: list[str] - List of natives files to collect. If none passed, all files will be collected.
   - Client also supports [AtomicResultProtocols](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/qcelemental/models/results.py#L538) `stdout` and `native_files`.
-
-- Tests for `TCFrontEndClient` file put/get behaviors.
 
 ### Changed
 
 - `qcelemental` required version bumped from `>=0.17.0` to `>=0.24.0` to support `native_files` field for returning files. See [qcelemental note](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/docs/source/changelog.rst#0240--2021-11-18). Note I am breaking the convention and returning binary data as well since I have more control over file access via the `TCFrontEndClient` than anticipated in the `qcelemental`/`qcengine` specification. Additionally I need the binary `c0` file to use as initial guesses for TeraChem computations.
 
 ### Removed
-
-- Construction of molden file from protocol buffer outputs. Molden files can now be requested directly from the Frontend client.
 
 ## [0.8.0] - 2021-05-26
 
@@ -91,7 +112,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.8.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.9.0...HEAD
+[0.9.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0
+[0.8.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1
 [0.8.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0
 [0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
 [0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
