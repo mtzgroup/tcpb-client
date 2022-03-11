@@ -1,12 +1,13 @@
 {
     "python.formatting.provider": "black",
     "cSpell.words": [
-        "Protobuf",
-        "TCPB",
         "casci",
         "orba",
         "orbb",
+        "Protobuf",
         "qcel",
+        "TCPB",
+        "Tera",
         "wavefunction"
     ]
 }

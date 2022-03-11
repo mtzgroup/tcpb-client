@@ -934,15 +934,18 @@ class TCFrontEndClient(TCProtobufClient):
         This method should be seen as an implementation of the QCEngine
         ProgramHarness.compute() method.
 
-        NOTE: Configuration parameters for controlling TCFrontEndClient behavior are
-            found in AtomicInput.extras['tcfe:config'] and include:
+        NOTE:
+            Configuration parameters for controlling TCFrontEndClient behavior are
+                found in AtomicInput.extras['tcfe:config']. They are all passed as
+                inputs and include:\n
                 1. 'c0' | 'ca0 and cb0': Binary files to use as an initial guess
                     wavefunction
                 2. 'scratch_messy': bool If True client will not delete files on server
                     after a computation
                 3. 'uploads_messy': bool If True client will not delete uploaded c0
                     file(s) after a computation
-                4. 'native_files': list[str] of filesnames to collect
+                4. 'native_files': list[str] of filenames that will be downloaded after
+                    a computation
 
         Parameters:
             atomic_input: AtomicInput object specifying the computation
