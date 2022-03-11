@@ -101,6 +101,7 @@ global___Status = Status
 
 class Mol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
     class _UnitType(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[UnitType.V],
         builtins.type,
@@ -108,6 +109,7 @@ class Mol(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         ANGSTROM = Mol.UnitType.V(0)
         BOHR = Mol.UnitType.V(1)
+
     class UnitType(metaclass=_UnitType):
         V = typing.NewType("V", builtins.int)
     ANGSTROM = Mol.UnitType.V(0)
@@ -166,6 +168,7 @@ global___Mol = Mol
 
 class JobInput(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
     class _RunType(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[RunType.V],
         builtins.type,
@@ -176,6 +179,7 @@ class JobInput(google.protobuf.message.Message):
         COUPLING = JobInput.RunType.V(14)
         TDCI = JobInput.RunType.V(16)
         CI_VEC_OVERLAP = JobInput.RunType.V(19)
+
     class RunType(metaclass=_RunType):
         V = typing.NewType("V", builtins.int)
     ENERGY = JobInput.RunType.V(0)
@@ -183,6 +187,7 @@ class JobInput(google.protobuf.message.Message):
     COUPLING = JobInput.RunType.V(14)
     TDCI = JobInput.RunType.V(16)
     CI_VEC_OVERLAP = JobInput.RunType.V(19)
+
     class _MethodType(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[MethodType.V],
         builtins.type,
@@ -215,6 +220,7 @@ class JobInput(google.protobuf.message.Message):
         WB97XD3 = JobInput.MethodType.V(23)
         GFNXTB = JobInput.MethodType.V(24)
         GFN2XTB = JobInput.MethodType.V(25)
+
     class MethodType(metaclass=_MethodType):
         V = typing.NewType("V", builtins.int)
     HF = JobInput.MethodType.V(0)
@@ -244,6 +250,7 @@ class JobInput(google.protobuf.message.Message):
     WB97XD3 = JobInput.MethodType.V(23)
     GFNXTB = JobInput.MethodType.V(24)
     GFN2XTB = JobInput.MethodType.V(25)
+
     class _ImdType(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdType.V],
         builtins.type,
@@ -253,12 +260,14 @@ class JobInput(google.protobuf.message.Message):
         IMD_NEW_CONDITION = JobInput.ImdType.V(1)
         IMD_CONTINUE = JobInput.ImdType.V(2)
         IMD_HESSIAN = JobInput.ImdType.V(3)
+
     class ImdType(metaclass=_ImdType):
         V = typing.NewType("V", builtins.int)
     NOT_IMD = JobInput.ImdType.V(0)
     IMD_NEW_CONDITION = JobInput.ImdType.V(1)
     IMD_CONTINUE = JobInput.ImdType.V(2)
     IMD_HESSIAN = JobInput.ImdType.V(3)
+
     class _ImdOrbitalType(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ImdOrbitalType.V],
         builtins.type,
@@ -270,6 +279,7 @@ class JobInput(google.protobuf.message.Message):
         ALPHA_DENSITY = JobInput.ImdOrbitalType.V(3)
         BETA_DENSITY = JobInput.ImdOrbitalType.V(4)
         WHOLE_C = JobInput.ImdOrbitalType.V(5)
+
     class ImdOrbitalType(metaclass=_ImdOrbitalType):
         V = typing.NewType("V", builtins.int)
     NO_ORBITAL = JobInput.ImdOrbitalType.V(0)
@@ -278,6 +288,7 @@ class JobInput(google.protobuf.message.Message):
     ALPHA_DENSITY = JobInput.ImdOrbitalType.V(3)
     BETA_DENSITY = JobInput.ImdOrbitalType.V(4)
     WHOLE_C = JobInput.ImdOrbitalType.V(5)
+
     class _ImdAdditionalOption(
         google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[
             ImdAdditionalOption.V
@@ -287,6 +298,7 @@ class JobInput(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
         IMD_NORMAL_MD = JobInput.ImdAdditionalOption.V(0)
         IMD_MECI_OPT_GRADIENT = JobInput.ImdAdditionalOption.V(1)
+
     class ImdAdditionalOption(metaclass=_ImdAdditionalOption):
         V = typing.NewType("V", builtins.int)
     IMD_NORMAL_MD = JobInput.ImdAdditionalOption.V(0)

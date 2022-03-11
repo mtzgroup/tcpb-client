@@ -7,20 +7,6 @@ from qcelemental.models import AtomicInput
 from tcpb import TCProtobufClient as TCPBClient
 
 
-def test_molden_file_creation(settings, atomic_input, test_data_dir):
-    # Add molden keywords
-    atomic_input.keywords.update({"mo_output": True, "molden": True})
-    with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as TC:
-        result = TC.compute(atomic_input)
-
-    with open(test_data_dir / "water.molden") as f:
-        correct_molden = f.read()
-
-    with open("output.molden", "w") as f:
-        f.write(result.extras["molden"])
-    assert result.extras["molden"] == correct_molden
-
-
 @pytest.mark.skip(
     reason="You can see in the tc.in/out files the convergence is set correctly. Yes a"
     "looser convergence doesn't always produce a shorter computation time."

@@ -8,8 +8,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particulat `c0` files as initial wavefunction guesses.
-  - Configuration parameters for controlling TCFrontEndClient behavior are
+### Changed
+
+### Removed
+
+## [0.9.0]
+
+### Added
+
+- Configuration parameters for controlling `TCFrontEndClient` behavior:
+
+  1. `native_files`: list[str] - List of natives files to collect. If none passed, all files will be collected.
+
+- Tests for `TCFrontEndClient` file put/get behaviors.
+
+### Changed
+
+- Refactored `TCFrontEndClient`
+
+### Removed
+
+- Construction of molden file from protocol buffer outputs. Molden files can now be requested directly from the Frontend client.
+
+## [0.8.1]
+
+### Added
+
+- `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particular `c0` files as initial wavefunction guesses.
+
+  - Configuration parameters for controlling `TCFrontEndClient` behavior are
     found in AtomicInput.extras['tcfe:config'] and include:
     1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess
        wavefunction
@@ -85,7 +112,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.8.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.9.0...HEAD
+[0.9.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0
+[0.8.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1
 [0.8.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0
 [0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
 [0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
