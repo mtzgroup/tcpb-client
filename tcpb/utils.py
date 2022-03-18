@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from google.protobuf.json_format import MessageToDict
 from numpy import array
@@ -11,7 +11,7 @@ from qcelemental.models.results import (
 )
 
 from . import terachem_server_pb2 as pb
-from .config import settings
+from .config import settings, TCFEKeywords
 
 SUPPORTED_DRIVERS = {"ENERGY", "GRADIENT"}
 
@@ -188,3 +188,9 @@ def to_wavefunction_properties(
         scf_eigenvalues_b=jo_dict.get("orbb_energies", []),
         scf_occupations_b=jo_dict.get("orbb_occupations", []),
     )
+
+
+def _validate_tcfe_keywords(tcfe_keywords: Dict[str, Any]) -> None:
+    """Validates tcfe:keywords"""
+    for key in tcfe_keywords.keys():
+        TCFEKeywords(key)

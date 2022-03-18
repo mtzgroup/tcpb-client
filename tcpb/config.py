@@ -1,4 +1,6 @@
-from pydantic import BaseSettings
+from enum import Enum
+from typing import Optional
+from pydantic import BaseModel, BaseSettings, Field
 
 
 class Settings(BaseSettings):
@@ -9,8 +11,19 @@ class Settings(BaseSettings):
 
     extras_qcvars_kwarg: str = "qcvars"
     extras_job_kwarg: str = "job_extras"
-    tcfe_config_kwarg: str = "tcfe:config"
+    tcfe_keywords: str = "tcfe:keywords"
     tcfe_config_native_files: str = "native_files"
 
 
 settings = Settings()
+
+
+class TCFEKeywords(str, Enum):
+    """Supported keywords for the TCFrontEndClient"""
+
+    c0 = "c0"
+    ca0 = "ca0"
+    cb0 = "cb0"
+    scratch_messy = "scratch_messy"
+    uploads_messy = "uploads_messy"
+    native_files = "native_files"

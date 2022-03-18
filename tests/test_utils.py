@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 import numpy as np
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
@@ -12,6 +13,7 @@ from tcpb.utils import (
     atomic_input_to_job_input,
     job_output_to_atomic_result,
     mol_to_molecule,
+    _validate_tcfe_keywords,
 )
 
 from .conftest import _round
@@ -136,3 +138,10 @@ def test_mol_to_molecule_angstrom():
         [coord for coord in geom_bohr]
     )
     assert molecule.molecular_multiplicity == mol.multiplicity
+
+
+def test_validate_tcfe_keywords():
+    with pytest.raises(ValueError):
+        _validate_tcfe_keywords({"not_good": 123})
+
+    assert _validate_tcfe_keywords({"c0": b"123"}) is None
