@@ -288,6 +288,61 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords" class="md-nav__link">
+    TCFEKeywords
+  </a>
+  
+    <nav class="md-nav" aria-label="TCFEKeywords">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.c0" class="md-nav__link">
+    c0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.ca0" class="md-nav__link">
+    ca0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.cb0" class="md-nav__link">
+    cb0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.native_files" class="md-nav__link">
+    native_files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.scratch_messy" class="md-nav__link">
+    scratch_messy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.uploads_messy" class="md-nav__link">
+    uploads_messy
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -504,6 +559,61 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords" class="md-nav__link">
+    TCFEKeywords
+  </a>
+  
+    <nav class="md-nav" aria-label="TCFEKeywords">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.c0" class="md-nav__link">
+    c0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.ca0" class="md-nav__link">
+    ca0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.cb0" class="md-nav__link">
+    cb0
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.native_files" class="md-nav__link">
+    native_files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.scratch_messy" class="md-nav__link">
+    scratch_messy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.config.TCFEKeywords.uploads_messy" class="md-nav__link">
+    uploads_messy
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -525,7 +635,7 @@
 <h1 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">🔗</a></h1>
 <p>Important keywords for controlling the behavior of the clients.</p>
 <h2 id="tcfrontendclient">TCFrontEndClient<a class="headerlink" href="#tcfrontendclient" title="Permanent link">🔗</a></h2>
-<p>All keywords for controlling the [TCFrontEndClient][tcpb.clients.tcfrontendclient] should be placed in <code>AtomicInput.extras["tcfe:config"]</code> under the keys noted below:</p>
+<p>All keywords for controlling the <a href="../clients/#tcpb.clients.TCFrontEndClient">TCFrontEndClient</a> should be placed in <code>AtomicInput.extras["tcfe:keywords"]</code> under the keys noted below:</p>
 <table>
 <thead>
 <tr>
@@ -562,6 +672,166 @@
 </tr>
 </tbody>
 </table>
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 class="doc doc-heading" id="tcpb.config.TCFEKeywords">
+        <code>
+tcpb.config.TCFEKeywords            (<span title="str">str</span>, <span title="enum.Enum">Enum</span>)
+        </code>
+
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords" title="Permanent link">🔗</a></h2>
+
+    <div class="doc doc-contents first">
+
+      <p>Supported keywords for the TCFrontEndClient</p>
+
+        <details class="quote">
+          <summary>Source code in <code>tcpb/config.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TCFEKeywords</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Supported keywords for the TCFrontEndClient&quot;&quot;&quot;</span>
+
+    <span class="n">c0</span> <span class="o">=</span> <span class="s2">&quot;c0&quot;</span>
+    <span class="n">ca0</span> <span class="o">=</span> <span class="s2">&quot;ca0&quot;</span>
+    <span class="n">cb0</span> <span class="o">=</span> <span class="s2">&quot;cb0&quot;</span>
+    <span class="n">scratch_messy</span> <span class="o">=</span> <span class="s2">&quot;scratch_messy&quot;</span>
+    <span class="n">uploads_messy</span> <span class="o">=</span> <span class="s2">&quot;uploads_messy&quot;</span>
+    <span class="n">native_files</span> <span class="o">=</span> <span class="s2">&quot;native_files&quot;</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.c0">
+<code class="highlight language-python"><span class="n">c0</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.c0" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.ca0">
+<code class="highlight language-python"><span class="n">ca0</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.ca0" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.cb0">
+<code class="highlight language-python"><span class="n">cb0</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.cb0" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.native_files">
+<code class="highlight language-python"><span class="n">native_files</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.native_files" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.scratch_messy">
+<code class="highlight language-python"><span class="n">scratch_messy</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.scratch_messy" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.config.TCFEKeywords.uploads_messy">
+<code class="highlight language-python"><span class="n">uploads_messy</span></code>
+
+
+<a class="headerlink" href="#tcpb.config.TCFEKeywords.uploads_messy" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
 
               
             </article>
