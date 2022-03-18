@@ -34,6 +34,7 @@ from tcpb.utils import atomic_input_to_job_input, job_output_to_atomic_result
 from . import terachem_server_pb2 as pb
 from .config import settings
 from .exceptions import ServerError
+from .utils import _validate_tcfe_keywords
 
 logger = logging.getLogger(__name__)
 
@@ -935,14 +936,15 @@ class TCFrontEndClient(TCProtobufClient):
         ProgramHarness.compute() method.
 
         NOTE: Configuration parameters for controlling TCFrontEndClient behavior are
-            found in AtomicInput.extras['tcfe:config'] and include:
+            found in AtomicInput.extras['tcfe:keywords'] and include:
                 1. 'c0' | 'ca0 and cb0': Binary files to use as an initial guess
                     wavefunction
                 2. 'scratch_messy': bool If True client will not delete files on server
                     after a computation
                 3. 'uploads_messy': bool If True client will not delete uploaded c0
                     file(s) after a computation
-                4. 'native_files': list[str] of filesnames to collect
+                4. 'native_files': list[str] of filenames that will be downloaded after
+                    a computation
 
         Parameters:
             atomic_input: AtomicInput object specifying the computation
@@ -960,23 +962,26 @@ class TCFrontEndClient(TCProtobufClient):
         """Tasks to be performed prior to submitting computation to TeraChem PBS
 
         Currently this involves:
-            1. If binary data found in AtomicInput.extras['tcfe:config']['c0|ca0/cb0']
+            1. If binary data found in AtomicInput.extras['tcfe:keywords']['c0|ca0/cb0']
                 it is uploaded to the server and the path is set as the `guess` value
                 in AtomicInput.keywords
         """
-        tcfe_config = atomic_input.extras.get(settings.tcfe_config_kwarg, {})
+        tcfe_keywords = atomic_input.extras.get(settings.tcfe_keywords, {})
+
+        _validate_tcfe_keywords(tcfe_keywords)
+
         ai_dict = atomic_input.dict()
 
         # Upload c0|ca0/cb0 (wavefunction) data if provided
-        if any(key in {"c0", "ca0", "cb0"} for key in tcfe_config.keys()):
+        if any(key in {"c0", "ca0", "cb0"} for key in tcfe_keywords.keys()):
 
-            if "c0" in tcfe_config:
-                path = self.put("c0", tcfe_config["c0"])
+            if "c0" in tcfe_keywords:
+                path = self.put("c0", tcfe_keywords["c0"])
 
             else:
                 # ca0 and cb0 both exist
-                ca0_path = self.put("ca0", tcfe_config["ca0"])
-                cb0_path = self.put("cb0", tcfe_config["cb0"])
+                ca0_path = self.put("ca0", tcfe_keywords["ca0"])
+                cb0_path = self.put("cb0", tcfe_keywords["cb0"])
                 path = f"{ca0_path} {cb0_path}"  # TC wants two, space separated paths
 
             # 'keywords' will exist because AtomicInput defaults it to {} if empty
@@ -993,7 +998,7 @@ class TCFrontEndClient(TCProtobufClient):
             3. Deleting the files on the server unless scratch_messy = True
             4. Deleting uploaded files on the server unless uploads_messy = True
         """
-        tcfe_config = result.extras.get(settings.tcfe_config_kwarg, {})
+        tcfe_keywords = result.extras.get(settings.tcfe_keywords, {})
         job_dir = result.extras[settings.extras_job_kwarg]["job_dir"]
 
         # dict for modifying attributes
@@ -1011,13 +1016,13 @@ class TCFrontEndClient(TCProtobufClient):
         # Cleanup uploads
         if self.uploads_prefix in result.keywords.get(
             "guess", ""
-        ) and not tcfe_config.get("uploads_messy"):
+        ) and not tcfe_keywords.get("uploads_messy"):
             # Files were uploaded and put in "guess" keyword; also no request to maintain files
             for path in result.keywords["guess"].split():
                 self._request("DELETE", f"{path}")
 
         # Cleanup Scratch Directory
-        if not tcfe_config.get("scratch_messy"):
+        if not tcfe_keywords.get("scratch_messy"):
             self._request("DELETE", f"{job_dir}/")
 
         return AtomicResult(**result_dict)
@@ -1031,25 +1036,27 @@ class TCFrontEndClient(TCProtobufClient):
         Returns:
             None: Modified result dictionary in place
         """
-        tcfe_config = result_dict["extras"].get(settings.tcfe_config_kwarg, {})
+        tcfe_config = result_dict["extras"].get(settings.tcfe_keywords, {})
         scr_dir = result_dict["extras"][settings.extras_job_kwarg]["job_scr_dir"]
 
         # Assume no native_files added previously
         result_dict[settings.tcfe_config_native_files] = {}
 
-        if not tcfe_config.get("native_files"):
+        requested_files = tcfe_config.get("native_files")
+
+        if not requested_files:
             # Specific files not requested, return all
-            tcfe_config[settings.tcfe_config_native_files] = [
+            requested_files = [
                 file_desc["name"]
                 for file_desc in self.ls(scr_dir)
                 if file_desc["type"] == "file"
             ]
 
-        for output_file in tcfe_config[settings.tcfe_config_native_files]:
-            data = self.get(f"{scr_dir}/{output_file}")
+        for filename in requested_files:
+            data = self.get(f"{scr_dir}/{filename}")
             try:
                 data = data.decode()
             except UnicodeDecodeError:
                 # File is binary
                 pass
-            result_dict[settings.tcfe_config_native_files][output_file] = data
+            result_dict[settings.tcfe_config_native_files][filename] = data
