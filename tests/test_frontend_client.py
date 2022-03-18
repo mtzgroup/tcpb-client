@@ -17,7 +17,7 @@ def test_pre_compute_tasks_upload_c0(atomic_input, mocker):
     filename = "c0"
     filedata = b"123"
 
-    atomic_input.extras[settings.tcfe_config_kwarg] = {filename: filedata}
+    atomic_input.extras[settings.tcfe_keywords] = {filename: filedata}
 
     spy = mocker.patch("tcpb.TCFrontEndClient.put")
 
@@ -34,7 +34,7 @@ def test_pre_compute_tasks_upload_ca0_cb0(atomic_input, mocker):
     filename_b = "cb0"
     filedata_b = b"xyz"
 
-    atomic_input.extras[settings.tcfe_config_kwarg] = {
+    atomic_input.extras[settings.tcfe_keywords] = {
         filename_a: filedata_a,
         filename_b: filedata_b,
     }
@@ -70,7 +70,7 @@ def test_post_compute_tasks_retains_job_dir_is_scratch_messy(atomic_result, mock
     # Set stdout False so tc.out not retrieved
     modified_result = atomic_result.dict()
     modified_result["protocols"]["stdout"] = False
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
 
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
@@ -92,7 +92,7 @@ def test_post_compute_tasks_guess_not_removed_if_not_in_uploads_dir(
     modified_result["protocols"]["stdout"] = False
 
     # Set Scratch messy so no calls for removing scratch directory
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
 
     # Set guess value NOT from a client upload (no client.uploads_prefix in path)
     client = TCFrontEndClient()
@@ -112,7 +112,7 @@ def test_post_compute_tasks_cleans_uploads_single_c0(atomic_result, mocker):
     modified_result["protocols"]["stdout"] = False
 
     # Set Scratch messy so no calls for removing scratch directory
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
 
     # Set guess value to trigger uploads cleaning
     client = TCFrontEndClient()
@@ -133,7 +133,7 @@ def test_post_compute_tasks_cleans_uploads_ca0_cb0(atomic_result, mocker):
     modified_result["protocols"]["stdout"] = False
 
     # Set Scratch messy so no calls for removing scratch directory
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
 
     # Set guess value to trigger uploads cleaning
     client = TCFrontEndClient()
@@ -158,7 +158,7 @@ def test_post_compute_tasks_retrieves_stdout(atomic_result, mocker):
 
     # Set Scratch messy so no calls for removing scratch directory
     modified_result = atomic_result.dict()
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
 
     stdout = b"my fake stdout"
 
@@ -183,7 +183,7 @@ def test_post_compute_tasks_does_not_retrieve_stdout_or_native_files(
 ):
     # Set Scratch messy so no calls for removing scratch directory
     modified_result = atomic_result.dict()
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
     modified_result["protocols"]["stdout"] = False
 
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
@@ -197,7 +197,7 @@ def test_post_compute_tasks_does_not_retrieve_stdout_or_native_files(
 def test_post_compute_tasks_no_files_collected_native_files(atomic_result, mocker):
     # Set Scratch messy so no calls for removing scratch directory
     modified_result = atomic_result.dict()
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"scratch_messy": True}
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
     modified_result["protocols"]["stdout"] = False
     modified_result["protocols"]["native_files"] = "none"
 
@@ -227,7 +227,7 @@ def test_collect_files_only_collects_specified_files_if_passed(atomic_result, mo
     job_scr_dir = "fake_scr_dir"
     modified_result["extras"][settings.extras_job_kwarg]["job_scr_dir"] = job_scr_dir
     filenames = ["file1", "file2"]
-    modified_result["extras"][settings.tcfe_config_kwarg] = {"native_files": filenames}
+    modified_result["extras"][settings.tcfe_keywords] = {"native_files": filenames}
 
     lsspy = mocker.patch("tcpb.TCFrontEndClient.ls")
     getspy = mocker.patch("tcpb.TCFrontEndClient.get")

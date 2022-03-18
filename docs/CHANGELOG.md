@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- Renamed `AtomicInput.extras['tcfe:config']` -> `AtomicInput.extras['tcfe:keywords']`
+
 ### Removed
 
 ## [0.9.0]
@@ -39,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particular `c0` files as initial wavefunction guesses.
 
   - Configuration parameters for controlling `TCFrontEndClient` behavior are
-    found in AtomicInput.extras['tcfe:config'] and include:
+    found in `AtomicInput.extras['tcfe:config']` and include:
     1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess
        wavefunction
     2. `scratch_messy`: `bool` - If `True` client will not delete files on server

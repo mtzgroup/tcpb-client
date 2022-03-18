@@ -34,9 +34,9 @@ with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
     result = client.compute(atomic_input)
 
 atomic_input_2 = atomic_input.dict()
-atomic_input_2["extras"] = {settings.tcfe_config_kwarg: {}}
-atomic_input_2["extras"][settings.tcfe_config_kwarg]["c0"] = result.native_files["c0"]
-atomic_input_2["extras"][settings.tcfe_config_kwarg]["uploads_messy"] = False
+atomic_input_2["extras"] = {settings.tcfe_keywords: {}}
+atomic_input_2["extras"][settings.tcfe_keywords]["c0"] = result.native_files["c0"]
+atomic_input_2["extras"][settings.tcfe_keywords]["uploads_messy"] = False
 
 with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
     result2 = client.compute(AtomicInput(**atomic_input_2))
