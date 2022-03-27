@@ -1,19 +1,18 @@
 from pathlib import Path
 
-import pytest
 import numpy as np
+import pytest
 import qcelemental as qcel
 from qcelemental.models import AtomicInput, Molecule
 from qcelemental.models.results import AtomicResult
 
 from tcpb import terachem_server_pb2 as pb
-from tcpb.clients import TCProtobufClient
+from tcpb.clients import TCFrontEndClient, TCProtobufClient
 from tcpb.config import settings
 from tcpb.utils import (
-    atomic_input_to_job_input,
-    job_output_to_atomic_result,
-    mol_to_molecule,
     _validate_tcfe_keywords,
+    atomic_input_to_job_input,
+    mol_to_molecule,
 )
 
 from .conftest import _round
@@ -82,7 +81,8 @@ def test_atomic_input_to_job_input_cisco_casci_similarity(ethylene):
 
 
 def test_job_output_to_atomic_result(atomic_input, job_output):
-    atomic_result = job_output_to_atomic_result(
+    client = TCProtobufClient()
+    atomic_result = client.job_output_to_atomic_result(
         atomic_input=atomic_input, job_output=job_output
     )
     assert isinstance(atomic_result, AtomicResult)
@@ -105,9 +105,36 @@ def test_job_output_to_atomic_result(atomic_input, job_output):
         )
 
 
+def test_job_output_to_atomic_result_correctly_sets_provenance(
+    atomic_input, job_output
+):
+    pb_client = TCProtobufClient()
+    atomic_result = pb_client.job_output_to_atomic_result(
+        atomic_input=atomic_input, job_output=job_output
+    )
+    assert isinstance(atomic_result, AtomicResult)
+    assert atomic_result.provenance.creator == pb_client.creator
+    assert (
+        atomic_result.provenance.routine
+        == f"tcpb.{pb_client.__class__.__name__}.compute"
+    )
+
+    fe_client = TCFrontEndClient()
+    atomic_result = fe_client.job_output_to_atomic_result(
+        atomic_input=atomic_input, job_output=job_output
+    )
+    assert isinstance(atomic_result, AtomicResult)
+    assert atomic_result.provenance.creator == fe_client.creator
+    assert (
+        atomic_result.provenance.routine
+        == f"tcpb.{fe_client.__class__.__name__}.compute"
+    )
+
+
 def test_job_output_to_atomic_result_maintains_extras(atomic_input, job_output):
+    client = TCProtobufClient()
     atomic_input.extras["mytag"] = "fake_value"
-    atomic_result = job_output_to_atomic_result(
+    atomic_result = client.job_output_to_atomic_result(
         atomic_input=atomic_input, job_output=job_output
     )
     assert "mytag" in atomic_result.extras

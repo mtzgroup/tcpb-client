@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import Optional
-from pydantic import BaseModel, BaseSettings, Field
+
+from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):

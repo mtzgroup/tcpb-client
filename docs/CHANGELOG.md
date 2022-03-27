@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1]
+
+### Changed
+
+- Moved `job_output_to_atomic_result` to be method on client objects so that `AtomicResult.provenance` can be dynamically set correctly depending on which client is used.
+
 ## [0.10.0]
 
 ### Added
@@ -114,7 +120,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.10.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.10.1...HEAD
+[0.10.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1
 [0.10.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0
 [0.9.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0
 [0.8.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1
