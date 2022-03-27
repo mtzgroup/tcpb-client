@@ -1,17 +1,13 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 
 from google.protobuf.json_format import MessageToDict
 from numpy import array
 from qcelemental import Datum
-from qcelemental.models import AtomicInput, AtomicResult, BasisSet, Molecule
-from qcelemental.models.results import (
-    AtomicResultProperties,
-    Provenance,
-    WavefunctionProperties,
-)
+from qcelemental.models import AtomicInput, BasisSet, Molecule
+from qcelemental.models.results import AtomicResultProperties, WavefunctionProperties
 
 from . import terachem_server_pb2 as pb
-from .config import settings, TCFEKeywords
+from .config import TCFEKeywords
 
 SUPPORTED_DRIVERS = {"ENERGY", "GRADIENT"}
 
@@ -87,74 +83,77 @@ def mol_to_molecule(mol: pb.Mol) -> Molecule:
     )
 
 
-def job_output_to_atomic_result(
-    *, atomic_input: AtomicInput, job_output: pb.JobOutput
-) -> AtomicResult:
-    """Convert JobOutput to AtomicResult"""
-    # Convert job_output to python types
-    # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
-    jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
+# def job_output_to_atomic_result(
+#     *,
+#     atomic_input: AtomicInput,
+#     job_output: pb.JobOutput,
+#     creator: str,
+# ) -> AtomicResult:
+#     """Convert JobOutput to AtomicResult"""
+#     # Convert job_output to python types
+#     # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
+#     jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
 
-    if atomic_input.driver.upper() == "ENERGY":
-        # Select first element in list (ground state); may need to modify for excited
-        # states
-        return_result: Union[float, List[float]] = jo_dict["energy"][0]
+#     if atomic_input.driver.upper() == "ENERGY":
+#         # Select first element in list (ground state); may need to modify for excited
+#         # states
+#         return_result: Union[float, List[float]] = jo_dict["energy"][0]
 
-    elif atomic_input.driver.upper() == "GRADIENT":
-        return_result = jo_dict["gradient"]
+#     elif atomic_input.driver.upper() == "GRADIENT":
+#         return_result = jo_dict["gradient"]
 
-    else:
-        raise ValueError(
-            f"Unsupported driver: {atomic_input.driver.upper()}, supported drivers "
-            f"include: {SUPPORTED_DRIVERS}"
-        )
+#     else:
+#         raise ValueError(
+#             f"Unsupported driver: {atomic_input.driver.upper()}, supported drivers "
+#             f"include: {SUPPORTED_DRIVERS}"
+#         )
 
-    # Prepare AtomicInput to be base input for AtomicResult
-    atomic_input_dict = atomic_input.dict()
-    atomic_input_dict.pop("provenance", None)
+#     # Prepare AtomicInput to be base input for AtomicResult
+#     atomic_input_dict = atomic_input.dict()
+#     atomic_input_dict.pop("provenance", None)
 
-    # Create AtomicResult as superset of AtomicInput values
-    atomic_result = AtomicResult(
-        **atomic_input_dict,
-        # Create new provenance object
-        provenance=Provenance(
-            creator="terachem_pbs",
-            version="1.9-2021.01-dev",
-            routine="tcpb.TCProtobufClient.compute",
-        ),
-        return_result=return_result,
-        properties=to_atomic_result_properties(job_output),
-        # NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != 'none'
-        wavefunction=to_wavefunction_properties(job_output, atomic_input),
-        success=True,
-    )
-    # And extend extras to include values additional to input extras
-    atomic_result.extras.update(
-        {
-            settings.extras_qcvars_kwarg: {
-                "charges": jo_dict.get("charges"),
-                "spins": jo_dict.get("spins"),
-                "meyer_bond_order": jo_dict.get("bond_order"),
-                "orb_size": jo_dict.get("orb_size"),
-                "excited_state_energies": jo_dict.get("energy"),
-                "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
-                "compressed_bond_order": jo_dict.get("compressed_bond_order"),
-                "compressed_hessian": jo_dict.get("compressed_hessian"),
-                "compressed_ao_data": jo_dict.get("compressed_ao_data"),
-                "compressed_primitive_data": jo_dict.get("compressed_primitive_data"),
-                "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
-                "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
-            },
-            settings.extras_job_kwarg: {
-                "job_dir": jo_dict.get("job_dir"),
-                "job_scr_dir": jo_dict.get("job_scr_dir"),
-                "server_job_id": jo_dict.get("server_job_id"),
-                "orb1afile": jo_dict.get("orb1afile"),
-                "orb1bfile": jo_dict.get("orb1bfile"),
-            },
-        }
-    )
-    return atomic_result
+#     # Create AtomicResult as superset of AtomicInput values
+#     atomic_result = AtomicResult(
+#         **atomic_input_dict,
+#         # Create new provenance object
+#         provenance=Provenance(
+#             creator=creator,
+#             version="",
+#             routine="tcpb.TCProtobufClient | TCFrontEndClient.compute",
+#         ),
+#         return_result=return_result,
+#         properties=to_atomic_result_properties(job_output),
+#         # NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != 'none'
+#         wavefunction=to_wavefunction_properties(job_output, atomic_input),
+#         success=True,
+#     )
+#     # And extend extras to include values additional to input extras
+#     atomic_result.extras.update(
+#         {
+#             settings.extras_qcvars_kwarg: {
+#                 "charges": jo_dict.get("charges"),
+#                 "spins": jo_dict.get("spins"),
+#                 "meyer_bond_order": jo_dict.get("bond_order"),
+#                 "orb_size": jo_dict.get("orb_size"),
+#                 "excited_state_energies": jo_dict.get("energy"),
+#                 "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
+#                 "compressed_bond_order": jo_dict.get("compressed_bond_order"),
+#                 "compressed_hessian": jo_dict.get("compressed_hessian"),
+#                 "compressed_ao_data": jo_dict.get("compressed_ao_data"),
+#                 "compressed_primitive_data": jo_dict.get("compressed_primitive_data"),
+#                 "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
+#                 "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
+#             },
+#             settings.extras_job_kwarg: {
+#                 "job_dir": jo_dict.get("job_dir"),
+#                 "job_scr_dir": jo_dict.get("job_scr_dir"),
+#                 "server_job_id": jo_dict.get("server_job_id"),
+#                 "orb1afile": jo_dict.get("orb1afile"),
+#                 "orb1bfile": jo_dict.get("orb1bfile"),
+#             },
+#         }
+#     )
+#     return atomic_result
 
 
 def to_atomic_result_properties(job_output: pb.JobOutput) -> AtomicResultProperties:

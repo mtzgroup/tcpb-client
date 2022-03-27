@@ -2,13 +2,16 @@
     "python.formatting.provider": "black",
     "cSpell.words": [
         "casci",
+        "httpx",
         "molden",
         "orba",
         "orbb",
         "Protobuf",
         "qcel",
+        "qcelemental",
         "TCPB",
         "Tera",
+        "terachem",
         "wavefunction"
     ]
 }
