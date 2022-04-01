@@ -11,8 +11,8 @@ class Settings(BaseSettings):
 
     extras_qcvars_kwarg: str = "qcvars"
     extras_job_kwarg: str = "job_extras"
+    tcfe_extras: str = "tcfe"
     tcfe_keywords: str = "tcfe:keywords"
-    tcfe_config_native_files: str = "native_files"
 
 
 settings = Settings()
