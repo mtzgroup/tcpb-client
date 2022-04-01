@@ -275,6 +275,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#tcpb.clients.TCFrontEndClient.creator" class="md-nav__link">
+    creator
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tcpb.clients.TCFrontEndClient-methods" class="md-nav__link">
     Methods
   </a>
@@ -381,6 +388,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#tcpb.clients.TCFrontEndClient.job_output_to_atomic_result" class="md-nav__link">
+    job_output_to_atomic_result()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tcpb.clients.TCFrontEndClient.ls" class="md-nav__link">
     ls()
   </a>
@@ -425,6 +439,13 @@
   
     <nav class="md-nav" aria-label="TCProtobufClient">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.clients.TCProtobufClient.creator" class="md-nav__link">
+    creator
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#tcpb.clients.TCProtobufClient-methods" class="md-nav__link">
@@ -514,6 +535,13 @@
           <li class="md-nav__item">
   <a href="#tcpb.clients.TCProtobufClient.is_available" class="md-nav__link">
     is_available()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.clients.TCProtobufClient.job_output_to_atomic_result" class="md-nav__link">
+    job_output_to_atomic_result()
   </a>
   
 </li>
@@ -775,6 +803,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#tcpb.clients.TCFrontEndClient.creator" class="md-nav__link">
+    creator
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tcpb.clients.TCFrontEndClient-methods" class="md-nav__link">
     Methods
   </a>
@@ -881,6 +916,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#tcpb.clients.TCFrontEndClient.job_output_to_atomic_result" class="md-nav__link">
+    job_output_to_atomic_result()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tcpb.clients.TCFrontEndClient.ls" class="md-nav__link">
     ls()
   </a>
@@ -925,6 +967,13 @@
   
     <nav class="md-nav" aria-label="TCProtobufClient">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcpb.clients.TCProtobufClient.creator" class="md-nav__link">
+    creator
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#tcpb.clients.TCProtobufClient-methods" class="md-nav__link">
@@ -1019,6 +1068,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#tcpb.clients.TCProtobufClient.job_output_to_atomic_result" class="md-nav__link">
+    job_output_to_atomic_result()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tcpb.clients.TCProtobufClient.recv_job_async" class="md-nav__link">
     recv_job_async()
   </a>
@@ -1095,11 +1151,13 @@ file retrieved after a computation.</p>
 <span class="sd">    file retrieved after a computation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">creator</span> <span class="o">=</span> <span class="s2">&quot;terachem_fe&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
         <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11111</span><span class="p">,</span>
-        <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
+        <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8080</span><span class="p">,</span>
         <span class="n">frontend_host</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">uploads_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;uploads&quot;</span><span class="p">,</span>
         <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1122,6 +1180,13 @@ file retrieved after a computation.</p>
             <span class="p">)</span>
         <span class="n">res</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">_try_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Try to delete a file, do not raise exception if file not found&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not delete file at path: &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;List directories on TeraChem Server</span>
@@ -1172,7 +1237,11 @@ file retrieved after a computation.</p>
             <span class="p">)</span>
         <span class="n">req</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span>
+        <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Top level method for performing computations with QCSchema inputs/outputs</span>
 
 <span class="sd">        This method should be seen as an implementation of the QCEngine</span>
@@ -1195,7 +1264,7 @@ file retrieved after a computation.</p>
         <span class="c1"># Do pre-compute work</span>
         <span class="n">atomic_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_compute_tasks</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
         <span class="c1"># Send calculation to TCPBS</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="n">raise_error</span><span class="p">)</span>
 
         <span class="c1"># Do post-compute work</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_compute_tasks</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -1216,15 +1285,18 @@ file retrieved after a computation.</p>
         <span class="n">ai_dict</span> <span class="o">=</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
 
         <span class="c1"># Upload c0|ca0/cb0 (wavefunction) data if provided</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="s2">&quot;ca0&quot;</span><span class="p">,</span> <span class="s2">&quot;cb0&quot;</span><span class="p">}</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">key</span> <span class="ow">in</span> <span class="p">{</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">ca0</span><span class="p">,</span> <span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">cb0</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">):</span>
 
-            <span class="k">if</span> <span class="s2">&quot;c0&quot;</span> <span class="ow">in</span> <span class="n">tcfe_keywords</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">c0</span> <span class="ow">in</span> <span class="n">tcfe_keywords</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">c0</span><span class="p">])</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># ca0 and cb0 both exist</span>
-                <span class="n">ca0_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;ca0&quot;</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="s2">&quot;ca0&quot;</span><span class="p">])</span>
-                <span class="n">cb0_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s2">&quot;cb0&quot;</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="s2">&quot;cb0&quot;</span><span class="p">])</span>
+                <span class="n">ca0_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">ca0</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">ca0</span><span class="p">])</span>
+                <span class="n">cb0_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">cb0</span><span class="p">,</span> <span class="n">tcfe_keywords</span><span class="p">[</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">cb0</span><span class="p">])</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ca0_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">cb0_path</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># TC wants two, space separated paths</span>
 
             <span class="c1"># &#39;keywords&#39; will exist because AtomicInput defaults it to {} if empty</span>
@@ -1232,7 +1304,9 @@ file retrieved after a computation.</p>
 
         <span class="k">return</span> <span class="n">AtomicInput</span><span class="p">(</span><span class="o">**</span><span class="n">ai_dict</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_post_compute_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">AtomicResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_post_compute_tasks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Tasks to be performed after receiving a result from Terachem PBS</span>
 
 <span class="sd">        Currently this involves:</span>
@@ -1241,34 +1315,62 @@ file retrieved after a computation.</p>
 <span class="sd">            3. Deleting the files on the server unless scratch_messy = True</span>
 <span class="sd">            4. Deleting uploaded files on the server unless uploads_messy = True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tcfe_keywords</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_keywords</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">job_dir</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">extras</span><span class="p">[</span><span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">][</span><span class="s2">&quot;job_dir&quot;</span><span class="p">]</span>
+        <span class="c1"># AtomicInput at different locations for AtomicResult and FailedOperation</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">AtomicResult</span><span class="p">):</span>
+            <span class="n">inp_data</span><span class="p">:</span> <span class="n">AtomicInput</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="n">job_dir</span> <span class="o">=</span> <span class="n">inp_data</span><span class="o">.</span><span class="n">extras</span><span class="p">[</span><span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">][</span><span class="s2">&quot;job_dir&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># FailedOperation</span>
+            <span class="n">inp_data</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">input_data</span>
+            <span class="c1"># Hacking job_dir since Server currently sends wrong values intially and</span>
+            <span class="c1"># may crash before returning correct values</span>
+            <span class="c1"># https://github.com/mtzgroup/terachem/issues/138</span>
+            <span class="n">job_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_job_dir</span> <span class="ow">or</span> <span class="s2">&quot;/no/job/dir&quot;</span>
+
+        <span class="n">tcfe_keywords</span> <span class="o">=</span> <span class="n">inp_data</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_keywords</span><span class="p">,</span> <span class="p">{})</span>
 
         <span class="c1"># dict for modifying attributes</span>
         <span class="n">result_dict</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
 
         <span class="c1"># Retreive tc.out if requested</span>
-        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
-            <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">job_dir</span><span class="si">}</span><span class="s2">/tc.out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">inp_data</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">job_dir</span><span class="si">}</span><span class="s2">/tc.out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span><span class="p">:</span>
+                <span class="n">stdout</span> <span class="o">=</span> <span class="s2">&quot;No stdout created by the job request.&quot;</span>
 
-        <span class="c1"># Retrieve native_files if requested (files produced by TeraChem that don&#39;t fit</span>
-        <span class="c1"># cleanly into the QCSchema json)</span>
-        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">native_files</span> <span class="ow">in</span> <span class="p">{</span><span class="n">NativeFilesProtocolEnum</span><span class="o">.</span><span class="n">all</span><span class="p">}:</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+                <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stdout</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># FailedOperation</span>
+                <span class="c1"># import pdb</span>
+
+                <span class="c1"># pdb.set_trace()</span>
+                <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;extras&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_extras</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="n">stdout</span><span class="p">}}</span>
+
+        <span class="c1"># Retrieve native_files</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">native_files</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="n">NativeFilesProtocolEnum</span><span class="o">.</span><span class="n">all</span>
+        <span class="p">}:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_collect_files</span><span class="p">(</span><span class="n">result_dict</span><span class="p">)</span>
 
         <span class="c1"># Cleanup uploads</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uploads_prefix</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uploads_prefix</span> <span class="ow">in</span> <span class="n">inp_data</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;guess&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
-        <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;uploads_messy&quot;</span><span class="p">):</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">uploads_messy</span><span class="p">):</span>
             <span class="c1"># Files were uploaded and put in &quot;guess&quot; keyword; also no request to maintain files</span>
             <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s2">&quot;guess&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_try_delete</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="c1"># Cleanup Scratch Directory</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scratch_messy&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">job_dir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tcfe_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">scratch_messy</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_try_delete</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">job_dir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">AtomicResult</span><span class="p">(</span><span class="o">**</span><span class="n">result_dict</span><span class="p">)</span>
+        <span class="c1"># Fix QCElemental mistake on .input_data not being AtomicInput</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">):</span>
+            <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;input_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">AtomicInput</span><span class="p">(</span><span class="o">**</span><span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;input_data&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="o">**</span><span class="n">result_dict</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_collect_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Collects requested native_files.</span>
@@ -1279,13 +1381,16 @@ file retrieved after a computation.</p>
 <span class="sd">        Returns:</span>
 <span class="sd">            None: Modified result dictionary in place</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ar_native_files_key</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;native_files&quot;</span>  <span class="c1"># to match QCElemental AtomicResult.native_files</span>
+        <span class="p">)</span>
         <span class="n">tcfe_config</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;extras&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_keywords</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">scr_dir</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;extras&quot;</span><span class="p">][</span><span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">][</span><span class="s2">&quot;job_scr_dir&quot;</span><span class="p">]</span>
 
         <span class="c1"># Assume no native_files added previously</span>
-        <span class="n">result_dict</span><span class="p">[</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_config_native_files</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">ar_native_files_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">requested_files</span> <span class="o">=</span> <span class="n">tcfe_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;native_files&quot;</span><span class="p">)</span>
+        <span class="n">requested_files</span> <span class="o">=</span> <span class="n">tcfe_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TCFEKeywords</span><span class="o">.</span><span class="n">native_files</span><span class="p">)</span>  <span class="c1"># tcfe input key</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">requested_files</span><span class="p">:</span>
             <span class="c1"># Specific files not requested, return all</span>
@@ -1296,13 +1401,18 @@ file retrieved after a computation.</p>
             <span class="p">]</span>
 
         <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">requested_files</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scr_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">b_data</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scr_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span><span class="p">:</span>
+                <span class="n">b_data</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not find file: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">b_data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
                 <span class="c1"># File is binary</span>
-                <span class="k">pass</span>
-            <span class="n">result_dict</span><span class="p">[</span><span class="n">settings</span><span class="o">.</span><span class="n">tcfe_config_native_files</span><span class="p">][</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">b_data</span>
+
+            <span class="n">result_dict</span><span class="p">[</span><span class="n">ar_native_files_key</span><span class="p">][</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
 </code></pre></div>
         </details>
 
@@ -1315,6 +1425,24 @@ file retrieved after a computation.</p>
 
 
 
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.clients.TCFrontEndClient.creator">
+<code class="highlight language-python"><span class="n">creator</span></code>
+
+
+<a class="headerlink" href="#tcpb.clients.TCFrontEndClient.creator" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
 
 <h3 id="tcpb.clients.TCFrontEndClient-methods">Methods<a class="headerlink" href="#tcpb.clients.TCFrontEndClient-methods" title="Permanent link">🔗</a></h3>
 
@@ -1323,7 +1451,7 @@ file retrieved after a computation.</p>
 
 
 <h4 class="doc doc-heading" id="tcpb.clients.TCFrontEndClient.__init__">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11111</span><span class="p">,</span> <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="n">frontend_host</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uploads_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;uploads&#39;</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">trace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11111</span><span class="p">,</span> <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8080</span><span class="p">,</span> <span class="n">frontend_host</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uploads_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;uploads&#39;</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">trace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1340,7 +1468,7 @@ file retrieved after a computation.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
     <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11111</span><span class="p">,</span>
-    <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
+    <span class="n">frontend_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8080</span><span class="p">,</span>
     <span class="n">frontend_host</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">uploads_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;uploads&quot;</span><span class="p">,</span>
     <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1438,7 +1566,7 @@ or had some other issue</p>
 
 
 <h4 class="doc doc-heading" id="tcpb.clients.TCFrontEndClient.compute">
-<code class="highlight language-python"><span class="n">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span></code>
+<code class="highlight language-python"><span class="n">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">qcelemental</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">qcelemental</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">common_models</span><span class="o">.</span><span class="n">FailedOperation</span><span class="p">]</span></code>
 
 
 <a class="headerlink" href="#tcpb.clients.TCFrontEndClient.compute" title="Permanent link">🔗</a></h4>
@@ -1482,7 +1610,11 @@ ProgramHarness.compute() method.</p>
 </table>
         <details class="quote">
           <summary>Source code in <code>tcpb/clients.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span>
+    <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Top level method for performing computations with QCSchema inputs/outputs</span>
 
 <span class="sd">    This method should be seen as an implementation of the QCEngine</span>
@@ -1505,7 +1637,7 @@ ProgramHarness.compute() method.</p>
     <span class="c1"># Do pre-compute work</span>
     <span class="n">atomic_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_compute_tasks</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
     <span class="c1"># Send calculation to TCPBS</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="n">raise_error</span><span class="p">)</span>
 
     <span class="c1"># Do post-compute work</span>
     <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_compute_tasks</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -2412,6 +2544,107 @@ Note that this does not reserve the server, and the status could change after th
 
 
 
+<h4 class="doc doc-heading" id="tcpb.clients.TCFrontEndClient.job_output_to_atomic_result">
+<code class="highlight language-python"><span class="n">job_output_to_atomic_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">job_output</span><span class="p">:</span> <span class="n">JobOutput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-inherited"><code>inherited</code></small>
+  </span>
+
+<a class="headerlink" href="#tcpb.clients.TCFrontEndClient.job_output_to_atomic_result" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Convert JobOutput to AtomicResult</p>
+
+        <details class="quote">
+          <summary>Source code in <code>tcpb/clients.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">job_output_to_atomic_result</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span>
+    <span class="n">job_output</span><span class="p">:</span> <span class="n">pb</span><span class="o">.</span><span class="n">JobOutput</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert JobOutput to AtomicResult&quot;&quot;&quot;</span>
+    <span class="c1"># Convert job_output to python types</span>
+    <span class="c1"># NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.</span>
+    <span class="n">jo_dict</span> <span class="o">=</span> <span class="n">MessageToDict</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">preserving_proto_field_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">:</span>
+        <span class="c1"># Select first element in list (ground state); may need to modify for excited</span>
+        <span class="c1"># states</span>
+        <span class="n">return_result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;GRADIENT&quot;</span><span class="p">:</span>
+        <span class="n">return_result</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;gradient&quot;</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported driver: </span><span class="si">{</span><span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">, supported drivers &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;include: </span><span class="si">{</span><span class="n">SUPPORTED_DRIVERS</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Prepare AtomicInput to be base input for AtomicResult</span>
+    <span class="n">atomic_input_dict</span> <span class="o">=</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+    <span class="n">atomic_input_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;provenance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Create AtomicResult as superset of AtomicInput values</span>
+    <span class="n">atomic_result</span> <span class="o">=</span> <span class="n">AtomicResult</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">atomic_input_dict</span><span class="p">,</span>
+        <span class="c1"># Create new provenance object</span>
+        <span class="n">provenance</span><span class="o">=</span><span class="n">Provenance</span><span class="p">(</span>
+            <span class="n">creator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">routine</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;tcpb.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.compute&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">return_result</span><span class="o">=</span><span class="n">return_result</span><span class="p">,</span>
+        <span class="n">properties</span><span class="o">=</span><span class="n">to_atomic_result_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">),</span>
+        <span class="c1"># NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != &#39;none&#39;</span>
+        <span class="n">wavefunction</span><span class="o">=</span><span class="n">to_wavefunction_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">),</span>
+        <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># And extend extras to include values additional to input extras</span>
+    <span class="n">atomic_result</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">extras_qcvars_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;charges&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;charges&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;spins&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spins&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;meyer_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bond_order&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb_size&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb_size&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;excited_state_energies&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_hessian&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_hessian&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_primitive_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;compressed_primitive_data&quot;</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;job_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_dir&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;job_scr_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_scr_dir&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;server_job_id&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_job_id&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb1afile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1afile&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb1bfile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1bfile&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atomic_result</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h4 class="doc doc-heading" id="tcpb.clients.TCFrontEndClient.ls">
 <code class="highlight language-python"><span class="n">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span></code>
 
@@ -2918,6 +3151,8 @@ tcpb.clients.TCProtobufClient        </code>
 <span class="sd">    (i.e. TeraChem was started with the -s|--server flag)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">creator</span> <span class="o">=</span> <span class="s2">&quot;terachem_pbs&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11111</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
@@ -3014,25 +3249,124 @@ tcpb.clients.TCProtobufClient        </code>
 
         <span class="k">return</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">busy</span>
 
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Top level method for performing computations with QCSchema inputs/outputs&quot;&quot;&quot;</span>
         <span class="c1"># Create protobuf message</span>
         <span class="n">job_input_msg</span> <span class="o">=</span> <span class="n">atomic_input_to_job_input</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
-        <span class="c1"># Send message to server; retry until accepted</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JobInput not accepted. Retrying...&quot;</span><span class="p">)</span>
-            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Send message to server; retry until accepted</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_job_complete</span><span class="p">():</span>
-            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JobInput not accepted. Retrying...&quot;</span><span class="p">)</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_job_complete</span><span class="p">():</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
-        <span class="n">job_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBOUTPUT</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">job_output_to_atomic_result</span><span class="p">(</span>
-            <span class="n">atomic_input</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">job_output</span><span class="o">=</span><span class="n">job_output</span>
+            <span class="c1"># Collect output from server</span>
+            <span class="n">job_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBOUTPUT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">FailedOperation</span><span class="p">(</span>
+                    <span class="n">input_data</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span>
+                    <span class="n">error</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="s2">&quot;terachem_server_error&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;The TeraChem server at &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&#39; crashed &quot;</span>
+                            <span class="s2">&quot;during the calculation. This is likely due to bad inputs. &quot;</span>
+                            <span class="s2">&quot;If you are confident your inputs are correct, perhaps a bug &quot;</span>
+                            <span class="s2">&quot;in TeraChem caused your calculation to fail. If using &quot;</span>
+                            <span class="s2">&quot;TCFrontEndClient check .extras[&#39;tcfe:keywords&#39;][&#39;stdout&#39;] to &quot;</span>
+                            <span class="s2">&quot;see the tc.out file.&quot;</span>
+                        <span class="p">),</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_output_to_atomic_result</span><span class="p">(</span>
+                <span class="n">atomic_input</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">job_output</span><span class="o">=</span><span class="n">job_output</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">job_output_to_atomic_result</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span>
+        <span class="n">job_output</span><span class="p">:</span> <span class="n">pb</span><span class="o">.</span><span class="n">JobOutput</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Convert JobOutput to AtomicResult&quot;&quot;&quot;</span>
+        <span class="c1"># Convert job_output to python types</span>
+        <span class="c1"># NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.</span>
+        <span class="n">jo_dict</span> <span class="o">=</span> <span class="n">MessageToDict</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">preserving_proto_field_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">:</span>
+            <span class="c1"># Select first element in list (ground state); may need to modify for excited</span>
+            <span class="c1"># states</span>
+            <span class="n">return_result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;GRADIENT&quot;</span><span class="p">:</span>
+            <span class="n">return_result</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;gradient&quot;</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported driver: </span><span class="si">{</span><span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">, supported drivers &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;include: </span><span class="si">{</span><span class="n">SUPPORTED_DRIVERS</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Prepare AtomicInput to be base input for AtomicResult</span>
+        <span class="n">atomic_input_dict</span> <span class="o">=</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+        <span class="n">atomic_input_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;provenance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Create AtomicResult as superset of AtomicInput values</span>
+        <span class="n">atomic_result</span> <span class="o">=</span> <span class="n">AtomicResult</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">atomic_input_dict</span><span class="p">,</span>
+            <span class="c1"># Create new provenance object</span>
+            <span class="n">provenance</span><span class="o">=</span><span class="n">Provenance</span><span class="p">(</span>
+                <span class="n">creator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">routine</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;tcpb.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.compute&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">return_result</span><span class="o">=</span><span class="n">return_result</span><span class="p">,</span>
+            <span class="n">properties</span><span class="o">=</span><span class="n">to_atomic_result_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">),</span>
+            <span class="c1"># NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != &#39;none&#39;</span>
+            <span class="n">wavefunction</span><span class="o">=</span><span class="n">to_wavefunction_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">),</span>
+            <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># And extend extras to include values additional to input extras</span>
+        <span class="n">atomic_result</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">extras_qcvars_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;charges&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;charges&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;spins&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spins&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;meyer_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bond_order&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;orb_size&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb_size&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;excited_state_energies&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;compressed_hessian&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_hessian&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;compressed_primitive_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s2">&quot;compressed_primitive_data&quot;</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">),</span>
+                <span class="p">},</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;job_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_dir&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;job_scr_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_scr_dir&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;server_job_id&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_job_id&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;orb1afile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1afile&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;orb1bfile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1bfile&quot;</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">atomic_result</span>
 
     <span class="k">def</span> <span class="nf">send_job_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jobType</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="n">geom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unitType</span><span class="o">=</span><span class="s2">&quot;bohr&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.</span>
@@ -3083,8 +3417,9 @@ tcpb.clients.TCProtobufClient        </code>
     <span class="k">def</span> <span class="nf">_set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_msg</span><span class="p">:</span> <span class="n">pb</span><span class="o">.</span><span class="n">Status</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets status on self if job is accepted&quot;&quot;&quot;</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;The status returned from the TCPB Server is off by one. The status &quot;</span>
-            <span class="s2">&quot;returned contains actually contains values for the previous job.&quot;</span>
+            <span class="s2">&quot;The status returned from the TCPB Server may be off by one. The status &quot;</span>
+            <span class="s2">&quot;returned actually contains values for the previous job initially, then &quot;</span>
+            <span class="s2">&quot;gets updated.&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">curr_job_dir</span> <span class="o">=</span> <span class="n">status_msg</span><span class="o">.</span><span class="n">job_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">curr_job_scr_dir</span> <span class="o">=</span> <span class="n">status_msg</span><span class="o">.</span><span class="n">job_scr_dir</span>
@@ -3727,6 +4062,24 @@ tcpb.clients.TCProtobufClient        </code>
 
 
 
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.clients.TCProtobufClient.creator">
+<code class="highlight language-python"><span class="n">creator</span></code>
+
+
+<a class="headerlink" href="#tcpb.clients.TCProtobufClient.creator" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
+
+
+
 
 <h3 id="tcpb.clients.TCProtobufClient-methods">Methods<a class="headerlink" href="#tcpb.clients.TCProtobufClient-methods" title="Permanent link">🔗</a></h3>
 
@@ -3902,7 +4255,7 @@ or had some other issue</p>
 
 
 <h4 class="doc doc-heading" id="tcpb.clients.TCProtobufClient.compute">
-<code class="highlight language-python"><span class="n">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span></code>
+<code class="highlight language-python"><span class="n">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">qcelemental</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">qcelemental</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">common_models</span><span class="o">.</span><span class="n">FailedOperation</span><span class="p">]</span></code>
 
 
 <a class="headerlink" href="#tcpb.clients.TCProtobufClient.compute" title="Permanent link">🔗</a></h4>
@@ -3913,25 +4266,49 @@ or had some other issue</p>
 
         <details class="quote">
           <summary>Source code in <code>tcpb/clients.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compute</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">AtomicResult</span><span class="p">,</span> <span class="n">FailedOperation</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Top level method for performing computations with QCSchema inputs/outputs&quot;&quot;&quot;</span>
     <span class="c1"># Create protobuf message</span>
     <span class="n">job_input_msg</span> <span class="o">=</span> <span class="n">atomic_input_to_job_input</span><span class="p">(</span><span class="n">atomic_input</span><span class="p">)</span>
-    <span class="c1"># Send message to server; retry until accepted</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
-    <span class="k">while</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JobInput not accepted. Retrying...&quot;</span><span class="p">)</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Send message to server; retry until accepted</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
-    <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_job_complete</span><span class="p">():</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JobInput not accepted. Retrying...&quot;</span><span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBINPUT</span><span class="p">,</span> <span class="n">job_input_msg</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_job_complete</span><span class="p">():</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
-    <span class="n">job_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBOUTPUT</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">job_output_to_atomic_result</span><span class="p">(</span>
-        <span class="n">atomic_input</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">job_output</span><span class="o">=</span><span class="n">job_output</span>
-    <span class="p">)</span>
+        <span class="c1"># Collect output from server</span>
+        <span class="n">job_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">JOBOUTPUT</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FailedOperation</span><span class="p">(</span>
+                <span class="n">input_data</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="s2">&quot;terachem_server_error&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;The TeraChem server at &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&#39; crashed &quot;</span>
+                        <span class="s2">&quot;during the calculation. This is likely due to bad inputs. &quot;</span>
+                        <span class="s2">&quot;If you are confident your inputs are correct, perhaps a bug &quot;</span>
+                        <span class="s2">&quot;in TeraChem caused your calculation to fail. If using &quot;</span>
+                        <span class="s2">&quot;TCFrontEndClient check .extras[&#39;tcfe:keywords&#39;][&#39;stdout&#39;] to &quot;</span>
+                        <span class="s2">&quot;see the tc.out file.&quot;</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_output_to_atomic_result</span><span class="p">(</span>
+            <span class="n">atomic_input</span><span class="o">=</span><span class="n">atomic_input</span><span class="p">,</span> <span class="n">job_output</span><span class="o">=</span><span class="n">job_output</span>
+        <span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -4705,6 +5082,104 @@ Note that this does not reserve the server, and the status could change after th
     <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_msg</span><span class="p">(</span><span class="n">pb</span><span class="o">.</span><span class="n">STATUS</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">busy</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h4 class="doc doc-heading" id="tcpb.clients.TCProtobufClient.job_output_to_atomic_result">
+<code class="highlight language-python"><span class="n">job_output_to_atomic_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span> <span class="n">job_output</span><span class="p">:</span> <span class="n">JobOutput</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span></code>
+
+
+<a class="headerlink" href="#tcpb.clients.TCProtobufClient.job_output_to_atomic_result" title="Permanent link">🔗</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Convert JobOutput to AtomicResult</p>
+
+        <details class="quote">
+          <summary>Source code in <code>tcpb/clients.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">job_output_to_atomic_result</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">atomic_input</span><span class="p">:</span> <span class="n">AtomicInput</span><span class="p">,</span>
+    <span class="n">job_output</span><span class="p">:</span> <span class="n">pb</span><span class="o">.</span><span class="n">JobOutput</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomicResult</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert JobOutput to AtomicResult&quot;&quot;&quot;</span>
+    <span class="c1"># Convert job_output to python types</span>
+    <span class="c1"># NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.</span>
+    <span class="n">jo_dict</span> <span class="o">=</span> <span class="n">MessageToDict</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">preserving_proto_field_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">:</span>
+        <span class="c1"># Select first element in list (ground state); may need to modify for excited</span>
+        <span class="c1"># states</span>
+        <span class="n">return_result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;GRADIENT&quot;</span><span class="p">:</span>
+        <span class="n">return_result</span> <span class="o">=</span> <span class="n">jo_dict</span><span class="p">[</span><span class="s2">&quot;gradient&quot;</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported driver: </span><span class="si">{</span><span class="n">atomic_input</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">, supported drivers &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;include: </span><span class="si">{</span><span class="n">SUPPORTED_DRIVERS</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Prepare AtomicInput to be base input for AtomicResult</span>
+    <span class="n">atomic_input_dict</span> <span class="o">=</span> <span class="n">atomic_input</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+    <span class="n">atomic_input_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;provenance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Create AtomicResult as superset of AtomicInput values</span>
+    <span class="n">atomic_result</span> <span class="o">=</span> <span class="n">AtomicResult</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">atomic_input_dict</span><span class="p">,</span>
+        <span class="c1"># Create new provenance object</span>
+        <span class="n">provenance</span><span class="o">=</span><span class="n">Provenance</span><span class="p">(</span>
+            <span class="n">creator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">routine</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;tcpb.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.compute&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">return_result</span><span class="o">=</span><span class="n">return_result</span><span class="p">,</span>
+        <span class="n">properties</span><span class="o">=</span><span class="n">to_atomic_result_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">),</span>
+        <span class="c1"># NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != &#39;none&#39;</span>
+        <span class="n">wavefunction</span><span class="o">=</span><span class="n">to_wavefunction_properties</span><span class="p">(</span><span class="n">job_output</span><span class="p">,</span> <span class="n">atomic_input</span><span class="p">),</span>
+        <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># And extend extras to include values additional to input extras</span>
+    <span class="n">atomic_result</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">extras_qcvars_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;charges&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;charges&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;spins&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spins&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;meyer_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bond_order&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb_size&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb_size&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;excited_state_energies&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cis_transition_dipoles&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_bond_order&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_hessian&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_hessian&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_ao_data&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;compressed_primitive_data&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;compressed_primitive_data&quot;</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compressed_mo_vector&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imd_mmatom_gradient&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">extras_job_kwarg</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;job_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_dir&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;job_scr_dir&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;job_scr_dir&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;server_job_id&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_job_id&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb1afile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1afile&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;orb1bfile&quot;</span><span class="p">:</span> <span class="n">jo_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orb1bfile&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atomic_result</span>
 </code></pre></div>
         </details>
     </div>
