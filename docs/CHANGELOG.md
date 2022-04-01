@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.11.0]
+
 ### Changed
 
 - Return `FailedOperation` instead of raising exceptions in `.compute()` methods.
@@ -128,7 +130,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.10.1...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.11.0...HEAD
+[0.11.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0
 [0.10.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1
 [0.10.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0
 [0.9.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0
