@@ -1,4 +1,4 @@
-from qcelemental.models import AtomicResult
+from qcelemental.models import AtomicInput, AtomicResult, FailedOperation
 
 from tcpb import TCFrontEndClient
 from tcpb.config import settings
@@ -176,6 +176,39 @@ def test_post_compute_tasks_retrieves_stdout(atomic_result, mocker):
     )
 
     assert post_compute_result.stdout == stdout.decode()
+
+
+def test_post_compute_tasks_retrieves_stdout_failed_operation(atomic_input, mocker):
+    """stdout set True be default on AtomicResultProtocols, should be retrieved by
+    default"""
+
+    # Set Scratch messy so no calls for removing scratch directory
+    modified_result = atomic_input.dict()
+    modified_result["extras"][settings.tcfe_keywords] = {"scratch_messy": True}
+
+    stdout = b"my fake stdout"
+
+    class fakerequest:
+        text = stdout
+
+    spy = mocker.patch("tcpb.TCFrontEndClient.get")
+    spy.return_value = stdout
+
+    client = TCFrontEndClient()
+    post_compute_result = client._post_compute_tasks(
+        FailedOperation(
+            input_data=AtomicInput(**modified_result),
+            error={
+                "error_type": "terachem_server_error",
+                "error_message": "Server crashed",
+            },
+        )
+    )
+    spy.assert_called_with(
+        f"/no/job/dir/tc.out",
+    )
+
+    assert post_compute_result.extras[settings.tcfe_extras]["stdout"] == stdout.decode()
 
 
 def test_post_compute_tasks_does_not_retrieve_stdout_or_native_files(

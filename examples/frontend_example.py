@@ -5,7 +5,7 @@ import sys
 from qcelemental.models import AtomicInput, Molecule
 
 from tcpb import TCFrontEndClient
-from tcpb.config import settings
+from tcpb.config import TCFEKeywords, settings
 
 if len(sys.argv) != 3:
     print(f"Usage: {sys.argv[0]} host port")
@@ -29,7 +29,7 @@ atomic_input = AtomicInput(
     # TCFrontEnd can also collect native_files produced by TeraCHem from the computation
     protocols={"wavefunction": "all", "stdout": True, "native_files": "all"},
     # TCFrontEndClient will delete scratch unless scratch_messy: True
-    extras={settings.tcfe_keywords: {"scratch_messy": False}},
+    extras={settings.tcfe_keywords: {TCFEKeywords.scratch_messy: False}},
 )
 
 with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:

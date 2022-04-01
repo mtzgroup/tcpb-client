@@ -23,12 +23,8 @@ from uuid import uuid4
 import httpx
 import numpy as np
 from google.protobuf.json_format import MessageToDict
-from qcelemental.models.results import (
-    AtomicInput,
-    AtomicResult,
-    NativeFilesProtocolEnum,
-    Provenance,
-)
+from qcelemental.models import AtomicInput, AtomicResult, FailedOperation
+from qcelemental.models.results import NativeFilesProtocolEnum, Provenance
 
 from tcpb.utils import (  # job_output_to_atomic_result,
     SUPPORTED_DRIVERS,
@@ -39,7 +35,7 @@ from tcpb.utils import (  # job_output_to_atomic_result,
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
-from .config import settings
+from .config import TCFEKeywords, settings
 from .exceptions import ServerError
 from .utils import _validate_tcfe_keywords
 
@@ -149,25 +145,49 @@ class TCProtobufClient:
 
         return not status.busy
 
-    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
+    def compute(
+        self, atomic_input: AtomicInput, raise_error: bool = False
+    ) -> Union[AtomicResult, FailedOperation]:
         """Top level method for performing computations with QCSchema inputs/outputs"""
         # Create protobuf message
         job_input_msg = atomic_input_to_job_input(atomic_input)
-        # Send message to server; retry until accepted
-        self._send_msg(pb.JOBINPUT, job_input_msg)
-        status = self._recv_msg(pb.STATUS)
-        while not status.accepted:
-            print("JobInput not accepted. Retrying...")
-            sleep(0.5)
+
+        try:
+            # Send message to server; retry until accepted
             self._send_msg(pb.JOBINPUT, job_input_msg)
             status = self._recv_msg(pb.STATUS)
-        while not self.check_job_complete():
-            sleep(0.5)
+            while not status.accepted:
+                print("JobInput not accepted. Retrying...")
+                sleep(0.5)
+                self._send_msg(pb.JOBINPUT, job_input_msg)
+                status = self._recv_msg(pb.STATUS)
+            while not self.check_job_complete():
+                sleep(0.5)
 
-        job_output = self._recv_msg(pb.JOBOUTPUT)
-        return self.job_output_to_atomic_result(
-            atomic_input=atomic_input, job_output=job_output
-        )
+            # Collect output from server
+            job_output = self._recv_msg(pb.JOBOUTPUT)
+        except ServerError as e:
+            if raise_error:
+                raise e
+            else:
+                return FailedOperation(
+                    input_data=atomic_input,
+                    error={
+                        "error_type": "terachem_server_error",
+                        "error_message": (
+                            f"The TeraChem server at '{self.host}:{self.port}' crashed "
+                            "during the calculation. This is likely due to bad inputs. "
+                            "If you are confident your inputs are correct, perhaps a bug "
+                            "in TeraChem caused your calculation to fail. If using "
+                            "TCFrontEndClient check .extras['tcfe:keywords']['stdout'] to "
+                            "see the tc.out file."
+                        ),
+                    },
+                )
+        else:
+            return self.job_output_to_atomic_result(
+                atomic_input=atomic_input, job_output=job_output
+            )
 
     def job_output_to_atomic_result(
         self,
@@ -293,8 +313,9 @@ class TCProtobufClient:
     def _set_status(self, status_msg: pb.Status):
         """Sets status on self if job is accepted"""
         warnings.warn(
-            "The status returned from the TCPB Server is off by one. The status "
-            "returned actually contains values for the previous job."
+            "The status returned from the TCPB Server may be off by one. The status "
+            "returned actually contains values for the previous job initially, then "
+            "gets updated."
         )
         self.curr_job_dir = status_msg.job_dir
         self.curr_job_scr_dir = status_msg.job_scr_dir
@@ -942,7 +963,7 @@ class TCFrontEndClient(TCProtobufClient):
         self,
         host: str = "127.0.0.1",
         port: int = 11111,
-        frontend_port: int = 80,
+        frontend_port: int = 8080,
         frontend_host: Optional[str] = None,
         uploads_prefix: str = "uploads",
         debug=False,
@@ -965,6 +986,13 @@ class TCFrontEndClient(TCProtobufClient):
             )
         res.raise_for_status()
         return res
+
+    def _try_delete(self, path: str) -> None:
+        """Try to delete a file, do not raise exception if file not found"""
+        try:
+            self._request("DELETE", f"{path}")
+        except httpx.HTTPStatusError:
+            logger.error(f"Could not delete file at path: '{path}'")
 
     def ls(self, path: str = "/") -> List[Dict[str, str]]:
         """List directories on TeraChem Server
@@ -1015,7 +1043,11 @@ class TCFrontEndClient(TCProtobufClient):
             )
         req.raise_for_status()
 
-    def compute(self, atomic_input: AtomicInput) -> AtomicResult:
+    def compute(
+        self,
+        atomic_input: AtomicInput,
+        raise_error: bool = False,
+    ) -> Union[AtomicResult, FailedOperation]:
         """Top level method for performing computations with QCSchema inputs/outputs
 
         This method should be seen as an implementation of the QCEngine
@@ -1038,7 +1070,7 @@ class TCFrontEndClient(TCProtobufClient):
         # Do pre-compute work
         atomic_input = self._pre_compute_tasks(atomic_input)
         # Send calculation to TCPBS
-        result = super().compute(atomic_input)
+        result = super().compute(atomic_input, raise_error=raise_error)
 
         # Do post-compute work
         result = self._post_compute_tasks(result)
@@ -1059,15 +1091,18 @@ class TCFrontEndClient(TCProtobufClient):
         ai_dict = atomic_input.dict()
 
         # Upload c0|ca0/cb0 (wavefunction) data if provided
-        if any(key in {"c0", "ca0", "cb0"} for key in tcfe_keywords.keys()):
+        if any(
+            key in {TCFEKeywords.c0, TCFEKeywords.ca0, TCFEKeywords.cb0}
+            for key in tcfe_keywords.keys()
+        ):
 
-            if "c0" in tcfe_keywords:
-                path = self.put("c0", tcfe_keywords["c0"])
+            if TCFEKeywords.c0 in tcfe_keywords:
+                path = self.put(TCFEKeywords.c0, tcfe_keywords[TCFEKeywords.c0])
 
             else:
                 # ca0 and cb0 both exist
-                ca0_path = self.put("ca0", tcfe_keywords["ca0"])
-                cb0_path = self.put("cb0", tcfe_keywords["cb0"])
+                ca0_path = self.put(TCFEKeywords.ca0, tcfe_keywords[TCFEKeywords.ca0])
+                cb0_path = self.put(TCFEKeywords.cb0, tcfe_keywords[TCFEKeywords.cb0])
                 path = f"{ca0_path} {cb0_path}"  # TC wants two, space separated paths
 
             # 'keywords' will exist because AtomicInput defaults it to {} if empty
@@ -1075,7 +1110,9 @@ class TCFrontEndClient(TCProtobufClient):
 
         return AtomicInput(**ai_dict)
 
-    def _post_compute_tasks(self, result: AtomicResult) -> AtomicResult:
+    def _post_compute_tasks(
+        self, result: Union[AtomicResult, FailedOperation]
+    ) -> Union[AtomicResult, FailedOperation]:
         """Tasks to be performed after receiving a result from Terachem PBS
 
         Currently this involves:
@@ -1084,34 +1121,62 @@ class TCFrontEndClient(TCProtobufClient):
             3. Deleting the files on the server unless scratch_messy = True
             4. Deleting uploaded files on the server unless uploads_messy = True
         """
-        tcfe_keywords = result.extras.get(settings.tcfe_keywords, {})
-        job_dir = result.extras[settings.extras_job_kwarg]["job_dir"]
+        # AtomicInput at different locations for AtomicResult and FailedOperation
+        if isinstance(result, AtomicResult):
+            inp_data: AtomicInput = result
+            job_dir = inp_data.extras[settings.extras_job_kwarg]["job_dir"]
+        else:
+            # FailedOperation
+            inp_data = result.input_data
+            # Hacking job_dir since Server currently sends wrong values intially and
+            # may crash before returning correct values
+            # https://github.com/mtzgroup/terachem/issues/138
+            job_dir = self.curr_job_dir or "/no/job/dir"
+
+        tcfe_keywords = inp_data.extras.get(settings.tcfe_keywords, {})
 
         # dict for modifying attributes
         result_dict = result.dict()
 
         # Retreive tc.out if requested
-        if result.protocols.stdout:
-            result_dict["stdout"] = self.get(f"{job_dir}/tc.out").decode()
+        if inp_data.protocols.stdout:
+            try:
+                stdout = self.get(f"{job_dir}/tc.out").decode()
+            except httpx.HTTPStatusError:
+                stdout = "No stdout created by the job request."
 
-        # Retrieve native_files if requested (files produced by TeraChem that don't fit
-        # cleanly into the QCSchema json)
-        if result.protocols.native_files in {NativeFilesProtocolEnum.all}:
+            if result.success:
+                result_dict["stdout"] = stdout
+            else:
+                # FailedOperation
+                # import pdb
+
+                # pdb.set_trace()
+                result_dict["extras"] = {settings.tcfe_extras: {"stdout": stdout}}
+
+        # Retrieve native_files
+        if result.success and result.protocols.native_files in {
+            NativeFilesProtocolEnum.all
+        }:
             self._collect_files(result_dict)
 
         # Cleanup uploads
-        if self.uploads_prefix in result.keywords.get(
+        if self.uploads_prefix in inp_data.keywords.get(
             "guess", ""
-        ) and not tcfe_keywords.get("uploads_messy"):
+        ) and not tcfe_keywords.get(TCFEKeywords.uploads_messy):
             # Files were uploaded and put in "guess" keyword; also no request to maintain files
             for path in result.keywords["guess"].split():
-                self._request("DELETE", f"{path}")
+                self._try_delete(path)
 
         # Cleanup Scratch Directory
-        if not tcfe_keywords.get("scratch_messy"):
-            self._request("DELETE", f"{job_dir}/")
+        if not tcfe_keywords.get(TCFEKeywords.scratch_messy):
+            self._try_delete(f"{job_dir}/")
 
-        return AtomicResult(**result_dict)
+        # Fix QCElemental mistake on .input_data not being AtomicInput
+        if isinstance(result, FailedOperation):
+            result_dict["input_data"] = AtomicInput(**result_dict["input_data"])
+
+        return result.__class__(**result_dict)
 
     def _collect_files(self, result_dict: Dict[str, Any]) -> None:
         """Collects requested native_files.
@@ -1122,13 +1187,16 @@ class TCFrontEndClient(TCProtobufClient):
         Returns:
             None: Modified result dictionary in place
         """
+        ar_native_files_key = (
+            "native_files"  # to match QCElemental AtomicResult.native_files
+        )
         tcfe_config = result_dict["extras"].get(settings.tcfe_keywords, {})
         scr_dir = result_dict["extras"][settings.extras_job_kwarg]["job_scr_dir"]
 
         # Assume no native_files added previously
-        result_dict[settings.tcfe_config_native_files] = {}
+        result_dict[ar_native_files_key] = {}
 
-        requested_files = tcfe_config.get("native_files")
+        requested_files = tcfe_config.get(TCFEKeywords.native_files)  # tcfe input key
 
         if not requested_files:
             # Specific files not requested, return all
@@ -1139,10 +1207,15 @@ class TCFrontEndClient(TCProtobufClient):
             ]
 
         for filename in requested_files:
-            data = self.get(f"{scr_dir}/{filename}")
+            data: Union[str, bytes]
             try:
-                data = data.decode()
+                b_data: bytes = self.get(f"{scr_dir}/{filename}")
+            except httpx.HTTPStatusError:
+                b_data = f"Could not find file: {filename}".encode()
+            try:
+                data = b_data.decode()
             except UnicodeDecodeError:
                 # File is binary
-                pass
-            result_dict[settings.tcfe_config_native_files][filename] = data
+                data = b_data
+
+            result_dict[ar_native_files_key][filename] = data
