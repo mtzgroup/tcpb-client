@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.12.0]
+
+### Changed
+
+- Bump support from python 3.6 -> 3.7 (3.6 has end-of-life'd)
+- Peg `protobuf` to `3.20.1` since newer versions do not support our outdated `_pb2.py` protobuf files.
+
 ## [0.11.0]
 
 ### Changed
@@ -130,7 +137,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.11.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.12.0...HEAD
+[0.12.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.0
 [0.11.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0
 [0.10.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1
 [0.10.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0
