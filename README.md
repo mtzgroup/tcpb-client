@@ -1,5 +1,7 @@
 # Python TeraChem Protocol Buffer (TCPB) Client
 
+[![PyPI version](https://badge.fury.io/py/tcpb.svg)](https://badge.fury.io/py/tcpb)
+
 See the [documentation](https://mtzgroup.github.io/tcpb-client/)
 
 Python client to communicate with TeraChem running in server mode.
