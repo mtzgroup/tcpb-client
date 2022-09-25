@@ -1,6 +1,6 @@
 # Python TeraChem Protocol Buffer (TCPB) Client
 
-[![PyPI version](https://badge.fury.io/py/tcpb.svg)](https://badge.fury.io/py/tcpb)
+[![PyPI version](https://badge.fury.io/py/tcpb.svg)](https://pypi.org/project/tcpb/)
 
 See the [documentation](https://mtzgroup.github.io/tcpb-client/)
 
