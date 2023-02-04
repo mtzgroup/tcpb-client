@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.12.1]
+
+### Changed
+
+- Hacked in a solution for the TeraChem server being off-by-one on the job directory so that we can collect stdout files when the server crashes. It's still impossible to collect stdout if its the first job (and a failed job) run by the server due to the server returning `-1` for the `job_dir` on the `status` message. Henry will look into fixing the server as per https://github.com/mtzgroup/terachem/issues/138.
+
 ## [0.12.0]
 
 ### Changed
@@ -137,7 +143,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.12.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.12.1...HEAD
+[0.12.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.1
 [0.12.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.0
 [0.11.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0
 [0.10.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1
