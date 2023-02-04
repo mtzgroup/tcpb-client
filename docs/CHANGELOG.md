@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.13.0]
+
+### Changed
+
+- Moved the `stdout` upon crashing of TeraChem server from `FailedOperation.extras` to `FailedOperation.error.extras`. This circumvents https://github.com/MolSSI/QCEngine/issues/397 and is probably a better place for the error data anyways.
+
 ## [0.12.1]
 
 ### Changed
@@ -143,7 +149,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.12.1...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.0
 [0.12.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.1
 [0.12.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.0
 [0.11.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0
