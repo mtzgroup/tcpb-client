@@ -180,9 +180,10 @@ class TCProtobufClient:
                             "during the calculation. This is likely due to bad inputs. "
                             "If you are confident your inputs are correct, perhaps a bug "
                             "in TeraChem caused your calculation to fail. If using "
-                            f"TCFrontEndClient check .extras['{settings.tcfe_extras}']['stdout'] to "
+                            f"TCFrontEndClient check .error.extras['stdout'] to "
                             "see the tc.out file."
                         ),
+                        "extras": {},  # Since ComputeError has default None for extras
                     },
                 )
         else:
@@ -1163,7 +1164,7 @@ class TCFrontEndClient(TCProtobufClient):
                 result_dict["stdout"] = stdout
             else:
                 # FailedOperation
-                result_dict["extras"] = {settings.tcfe_extras: {"stdout": stdout}}
+                result_dict["error"]["extras"] = {"stdout": stdout}
 
         # Retrieve native_files
         if result.success and result.protocols.native_files in {

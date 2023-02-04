@@ -204,11 +204,9 @@ def test_post_compute_tasks_retrieves_stdout_failed_operation(atomic_input, mock
             },
         )
     )
-    spy.assert_called_with(
-        f"/no/job/dir/tc.out",
-    )
+    spy.assert_called_with("/no/job/dir/tc.out")
 
-    assert post_compute_result.extras[settings.tcfe_extras]["stdout"] == stdout.decode()
+    assert post_compute_result.error.extras["stdout"] == stdout.decode()
 
 
 def test_post_compute_tasks_does_not_retrieve_stdout_or_native_files(
