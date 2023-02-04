@@ -156,6 +156,7 @@ class TCProtobufClient:
             # Send message to server; retry until accepted
             self._send_msg(pb.JOBINPUT, job_input_msg)
             status = self._recv_msg(pb.STATUS)
+            self._set_status(status)
             while not status.accepted:
                 print("JobInput not accepted. Retrying...")
                 sleep(0.5)
@@ -179,7 +180,7 @@ class TCProtobufClient:
                             "during the calculation. This is likely due to bad inputs. "
                             "If you are confident your inputs are correct, perhaps a bug "
                             "in TeraChem caused your calculation to fail. If using "
-                            "TCFrontEndClient check .extras['tcfe:keywords']['stdout'] to "
+                            f"TCFrontEndClient check .extras['{settings.tcfe_extras}']['stdout'] to "
                             "see the tc.out file."
                         ),
                     },
@@ -1128,30 +1129,40 @@ class TCFrontEndClient(TCProtobufClient):
         else:
             # FailedOperation
             inp_data = result.input_data
-            # Hacking job_dir since Server currently sends wrong values intially and
+            # Hacking job_dir since Server currently sends wrong values initially and
             # may crash before returning correct values
             # https://github.com/mtzgroup/terachem/issues/138
-            job_dir = self.curr_job_dir or "/no/job/dir"
+            if self.curr_job_dir:
+                # self.curr_job_dir will be off by one.
+                # Example string: server_2023-02-04-01.12.09/job_1
+                split = self.curr_job_dir.split("_")
+                real_job_num = int(split[-1]) + 1
+                split[-1] = str(real_job_num)
+                job_dir = "_".join(split)
+            else:
+                # If no curr_job_dir set that means this was the first job run by the
+                # TeraChem server and it does not return job_dir correctly.
+                job_dir = "/no/job/dir"
 
         tcfe_keywords = inp_data.extras.get(settings.tcfe_keywords, {})
 
         # dict for modifying attributes
         result_dict = result.dict()
-
-        # Retreive tc.out if requested
+        # Retrieve tc.out if requested
         if inp_data.protocols.stdout:
             try:
                 stdout = self.get(f"{job_dir}/tc.out").decode()
             except httpx.HTTPStatusError:
-                stdout = "No stdout created by the job request."
+                stdout = (
+                    "stdout could not be collected due to a bug in the TeraChem server "
+                    "which returns incorrect directory information. Log complaints and "
+                    "ask for a fix here: https://github.com/mtzgroup/terachem/issues/138"
+                )
 
             if result.success:
                 result_dict["stdout"] = stdout
             else:
                 # FailedOperation
-                # import pdb
-
-                # pdb.set_trace()
                 result_dict["extras"] = {settings.tcfe_extras: {"stdout": stdout}}
 
         # Retrieve native_files
