@@ -7,7 +7,7 @@ from qcelemental.models import AtomicInput, Molecule
 from tcpb import TCProtobufClient as TCPBClient
 
 if len(sys.argv) != 3:
-    print("Usage: {} host port".format(sys.argv[0]))
+    print("Usage: {} host port\n".format(sys.argv[0]))
     exit(1)
 
 
