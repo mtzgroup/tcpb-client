@@ -515,7 +515,7 @@ class TCProtobufClient:
 
             if len(output.cis_transition_dipoles):
                 tDips = []
-                for i in range((output.cis_states + 1) * output.cis_states / 2):
+                for i in range(int((output.cis_states + 1) * output.cis_states / 2)):
                     tDips.append(
                         np.array(
                             output.cis_transition_dipoles[4 * i : 4 * i + 3],
