@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.13.2]
+
+### Fixed
+
+- [Bugfix by Christopher Myers](https://github.com/mtzgroup/tcpb-client/pull/40) to correct for loop handing CIS states.
+
 ## [0.13.1]
 
 ### Changed
@@ -155,7 +161,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.13.1...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.13.2...HEAD
+[0.13.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.2
 [0.13.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.1
 [0.13.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.0
 [0.12.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.1
