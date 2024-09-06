@@ -1,5 +1,5 @@
 # clients.py
 
-::: tcpb.clients:TCFrontEndClient
+::: tcpb.clients.TCFrontEndClient
 
-::: tcpb.clients:TCProtobufClient
+::: tcpb.clients.TCProtobufClient

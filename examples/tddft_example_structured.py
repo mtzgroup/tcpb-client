@@ -3,7 +3,8 @@
 
 import sys
 
-from qcelemental.models import AtomicInput, Molecule
+from qcio import ProgramInput, Structure
+
 from tcpb import TCFrontEndClient as TCPBClient
 
 # Ethene system
@@ -33,14 +34,11 @@ if len(sys.argv) != 3:
     print("Usage: {} host port".format(sys.argv[0]))
     exit(1)
 
-molecule = Molecule(symbols=atoms, geometry=geom)
-atomic_input = AtomicInput(
-    molecule=molecule,
-    driver="gradient",
-    model={
-        "method": "wpbeh",
-        "basis": "6-31g",
-    },
+struct = Structure(symbols=atoms, geometry=geom)
+prog_inp = ProgramInput(
+    structure=struct,
+    calctype="gradient",  # type: ignore
+    model={"method": "wpbeh", "basis": "6-31g"},  # type: ignore
     keywords={
         "cis": "yes",
         "cistarget": 1,
@@ -53,12 +51,10 @@ atomic_input = AtomicInput(
         "cisnumstates": 3,
         "cisrelaxdipole": "yes",
     },
-    protocols={"wavefunction": "all", "native_files": "all"},
 )
 with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as TC:
-
     # Gradient calculation
-    result = TC.compute(atomic_input)
+    result = TC.compute(prog_inp)
     print("Grad Results:\n{}".format(result))
 
     # Coupling calculation

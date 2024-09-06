@@ -1,6 +1,6 @@
 """Python clients for communicating with TeraChem in Server Mode.
 
-Two clients exist, one for communicating direclty with the protocol buffer server run
+Two clients exist, one for communicating directly with the protocol buffer server run
 by TeraChem. One for communicating with the TeraChem Frontend server which provides
 increased functionality.
 
@@ -15,29 +15,24 @@ Second 4 bytes: int32 of packet size (not including the header)
 import logging
 import socket
 import struct
-import warnings
+import traceback
 from time import sleep
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 from uuid import uuid4
 
 import httpx
 import numpy as np
 from google.protobuf.json_format import MessageToDict
-from qcelemental.models import AtomicInput, AtomicResult, FailedOperation
-from qcelemental.models.results import NativeFilesProtocolEnum, Provenance
+from qcio import ProgramInput, ProgramOutput, Provenance
 
 from tcpb.utils import (  # job_output_to_atomic_result,
-    SUPPORTED_DRIVERS,
-    atomic_input_to_job_input,
-    to_atomic_result_properties,
-    to_wavefunction_properties,
+    prog_inp_to_job_inp,
+    to_single_point_results,
 )
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
-from .config import TCFEKeywords, settings
 from .exceptions import ServerError
-from .utils import _validate_tcfe_keywords
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +42,7 @@ class TCProtobufClient:
     (i.e. TeraChem was started with the -s|--server flag)
     """
 
-    creator = "terachem_pbs"
+    program = "terachem-pbs"
 
     def __init__(
         self, host: str = "127.0.0.1", port: int = 11111, debug=False, trace=False
@@ -106,7 +101,7 @@ class TCProtobufClient:
 
         try:
             self.tcsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.tcsock.settimeout(60.0)  # Timeout of 1 minute
+            self.tcsock.settimeout(10.0)  # Timeout of 10 seconds
             self.tcsock.connect((self.host, self.port))
         except socket.error as msg:
             raise ServerError(f"Problem connecting to server: {msg}", self)
@@ -146,11 +141,19 @@ class TCProtobufClient:
         return not status.busy
 
     def compute(
-        self, atomic_input: AtomicInput, raise_error: bool = False
-    ) -> Union[AtomicResult, FailedOperation]:
-        """Top level method for performing computations with QCSchema inputs/outputs"""
+        self, inp_data: ProgramInput, raise_error: bool = False, **kwargs
+    ) -> ProgramOutput:
+        """Top level method for performing computations with QCSchema inputs/outputs
+
+        Args:
+            inp_data: AtomicInput object
+            raise_error: If True, raise an error if the computation fails
+
+        Returns:
+            ProgramOutput object
+        """
         # Create protobuf message
-        job_input_msg = atomic_input_to_job_input(atomic_input)
+        job_input_msg = prog_inp_to_job_inp(inp_data)
 
         try:
             # Send message to server; retry until accepted
@@ -171,100 +174,63 @@ class TCProtobufClient:
             if raise_error:
                 raise e
             else:
-                return FailedOperation(
-                    input_data=atomic_input,
-                    error={
-                        "error_type": "terachem_server_error",
-                        "error_message": (
-                            f"The TeraChem server at '{self.host}:{self.port}' crashed "
-                            "during the calculation. This is likely due to bad inputs. "
-                            "If you are confident your inputs are correct, perhaps a bug "
-                            "in TeraChem caused your calculation to fail. If using "
-                            f"TCFrontEndClient check .error.extras['stdout'] to "
-                            "see the tc.out file."
-                        ),
-                        "extras": {},  # Since ComputeError has default None for extras
-                    },
+                return ProgramOutput(
+                    input_data=inp_data,
+                    success=False,
+                    traceback=traceback.format_exc(),
+                    results={},
+                    provenance=Provenance(
+                        program=self.program,
+                    ),
                 )
         else:
             return self.job_output_to_atomic_result(
-                atomic_input=atomic_input, job_output=job_output
+                inp_data=inp_data, job_output=job_output
             )
 
     def job_output_to_atomic_result(
         self,
         *,
-        atomic_input: AtomicInput,
+        inp_data: ProgramInput,
         job_output: pb.JobOutput,
-    ) -> AtomicResult:
-        """Convert JobOutput to AtomicResult"""
+    ) -> ProgramOutput:
+        """Convert JobOutput to ProgramOutput"""
         # Convert job_output to python types
-        # NOTE: Required so that AtomicResult is JSON serializable. Protobuf types are not.
+        # NOTE: Required so that ProgramOutput is JSON serializable. Protobuf types are not.
         jo_dict = MessageToDict(job_output, preserving_proto_field_name=True)
 
-        if atomic_input.driver.upper() == "ENERGY":
-            # Select first element in list (ground state); may need to modify for excited
-            # states
-            return_result: Union[float, List[float]] = jo_dict["energy"][0]
-
-        elif atomic_input.driver.upper() == "GRADIENT":
-            return_result = jo_dict["gradient"]
-
-        else:
-            raise ValueError(
-                f"Unsupported driver: {atomic_input.driver.upper()}, supported drivers "
-                f"include: {SUPPORTED_DRIVERS}"
-            )
-
-        # Prepare AtomicInput to be base input for AtomicResult
-        atomic_input_dict = atomic_input.dict()
-        atomic_input_dict.pop("provenance", None)
-
-        # Create AtomicResult as superset of AtomicInput values
-        atomic_result = AtomicResult(
-            **atomic_input_dict,
-            # Create new provenance object
-            provenance=Provenance(
-                creator=self.creator,
-                version="",
-                routine=f"tcpb.{self.__class__.__name__}.compute",
-            ),
-            return_result=return_result,
-            properties=to_atomic_result_properties(job_output),
-            # NOTE: Wavefunction will only be added if atomic_input.protocols.wavefunction != 'none'
-            wavefunction=to_wavefunction_properties(job_output, atomic_input),
+        # Create ProgramOutput
+        prog_output: ProgramOutput = ProgramOutput(
+            input_data=inp_data,
             success=True,
+            provenance=Provenance(
+                program=self.program, scratch_dir=jo_dict.get("job_dir")
+            ),
+            results=to_single_point_results(job_output),
         )
         # And extend extras to include values additional to input extras
-        atomic_result.extras.update(
+        prog_output.results.extras.update(
             {
-                settings.extras_qcvars_kwarg: {
-                    "charges": jo_dict.get("charges"),
-                    "spins": jo_dict.get("spins"),
-                    "meyer_bond_order": jo_dict.get("bond_order"),
-                    "orb_size": jo_dict.get("orb_size"),
-                    "excited_state_energies": jo_dict.get("energy"),
-                    "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
-                    "compressed_bond_order": jo_dict.get("compressed_bond_order"),
-                    "compressed_hessian": jo_dict.get("compressed_hessian"),
-                    "compressed_ao_data": jo_dict.get("compressed_ao_data"),
-                    "compressed_primitive_data": jo_dict.get(
-                        "compressed_primitive_data"
-                    ),
-                    "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
-                    "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
-                },
-                settings.extras_job_kwarg: {
-                    "job_dir": jo_dict.get("job_dir"),
-                    "job_scr_dir": jo_dict.get("job_scr_dir"),
-                    "server_job_id": jo_dict.get("server_job_id"),
-                    "orb1afile": jo_dict.get("orb1afile"),
-                    "orb1bfile": jo_dict.get("orb1bfile"),
-                },
+                "charges": jo_dict.get("charges"),
+                "spins": jo_dict.get("spins"),
+                "meyer_bond_order": jo_dict.get("bond_order"),
+                "orb_size": jo_dict.get("orb_size"),
+                "excited_state_energies": jo_dict.get("energy"),
+                "cis_transition_dipoles": jo_dict.get("cis_transition_dipoles"),
+                "compressed_bond_order": jo_dict.get("compressed_bond_order"),
+                "compressed_hessian": jo_dict.get("compressed_hessian"),
+                "compressed_ao_data": jo_dict.get("compressed_ao_data"),
+                "compressed_primitive_data": jo_dict.get("compressed_primitive_data"),
+                "compressed_mo_vector": jo_dict.get("compressed_mo_vector"),
+                "imd_mmatom_gradient": jo_dict.get("imd_mmatom_gradient"),
+                "job_dir_scr": jo_dict.get("job_scr_dir"),
+                "server_job_id": jo_dict.get("server_job_id"),
+                "orb1afile": jo_dict.get("orb1afile"),
+                "orb1bfile": jo_dict.get("orb1bfile"),
             }
         )
 
-        return atomic_result
+        return prog_output
 
     def send_job_async(self, jobType="energy", geom=None, unitType="bohr", **kwargs):
         """Pack and send the current JobInput to the TeraChem Protobuf server asynchronously.
@@ -314,11 +280,6 @@ class TCProtobufClient:
 
     def _set_status(self, status_msg: pb.Status):
         """Sets status on self if job is accepted"""
-        warnings.warn(
-            "The status returned from the TCPB Server may be off by one. The status "
-            "returned actually contains values for the previous job initially, then "
-            "gets updated."
-        )
         self.curr_job_dir = status_msg.job_dir
         self.curr_job_scr_dir = status_msg.job_scr_dir
         self.curr_job_id = status_msg.server_job_id
@@ -959,7 +920,7 @@ class TCFrontEndClient(TCProtobufClient):
     file retrieved after a computation.
     """
 
-    creator = "terachem_fe"
+    program = "terachem-fe"
 
     def __init__(
         self,
@@ -999,7 +960,7 @@ class TCFrontEndClient(TCProtobufClient):
     def ls(self, path: str = "/") -> List[Dict[str, str]]:
         """List directories on TeraChem Server
 
-        Parmeters:
+        Parameters:
             path: Optional filepath.
         """
         if not path.endswith("/"):
@@ -1009,9 +970,9 @@ class TCFrontEndClient(TCProtobufClient):
         return req.json()
 
     def get(self, path: str) -> bytes:
-        """Retreive file from TeraChem Server
+        """Retrieve file from TeraChem Server
 
-        Parmameters:
+        Parameters:
             path: Full filepath to the file to download. Does not begin with '/'.
 
         Returns:
@@ -1035,7 +996,7 @@ class TCFrontEndClient(TCProtobufClient):
         req = self._request(
             "PUT", f"{self.uploads_prefix}/{uuid}-{filename}", content=content
         )
-        return str(req.url.path)[1:]  # remove intial '/'
+        return str(req.url.path)[1:]  # remove initial '/'
 
     def delete(self, path_or_filename: str) -> None:
         """Delete a directory or file from the TeraChem Server"""
@@ -1047,16 +1008,18 @@ class TCFrontEndClient(TCProtobufClient):
 
     def compute(
         self,
-        atomic_input: AtomicInput,
+        inp_data: ProgramInput,
         raise_error: bool = False,
-    ) -> Union[AtomicResult, FailedOperation]:
-        """Top level method for performing computations with QCSchema inputs/outputs
+        collect_stdout: bool = False,
+        collect_files: bool = False,
+        rm_scratch_dir: bool = True,
+        **kwargs,
+    ) -> ProgramOutput:
+        """Top level method for performing computations with qcio inputs/outputs
 
-        This method should be seen as an implementation of the QCEngine
-        ProgramHarness.compute() method.
 
         NOTE: Configuration parameters for controlling TCFrontEndClient behavior are
-            found in AtomicInput.extras['tcfe:keywords'] and include:
+            found in ProgramInput.extras['tcfe:keywords'] and include:
                 1. 'c0' | 'ca0 and cb0': Binary files to use as an initial guess
                     wavefunction
                 2. 'scratch_messy': bool If True client will not delete files on server
@@ -1066,159 +1029,128 @@ class TCFrontEndClient(TCProtobufClient):
                 4. 'native_files': list[str] of filenames that will be downloaded after
                     a computation
 
-        Parameters:
-            atomic_input: AtomicInput object specifying the computation
+        Args:
+            prog_input: ProgramInput object
+            collect_stdout: bool, if True, will collect tc.out and place in ProgramOutput
+            collect_files: bool, if True, will collect all files in the scratch directory.
+            rm_scratch_dir: bool, if True, will remove the scratch directory after computation
+            raise_error: bool, if True, will raise an error if the computation fails
         """
+
         # Do pre-compute work
-        atomic_input = self._pre_compute_tasks(atomic_input)
+        inp_data = self._pre_compute_tasks(inp_data)
         # Send calculation to TCPBS
-        result = super().compute(atomic_input, raise_error=raise_error)
+        result = super().compute(inp_data, raise_error=raise_error)
 
         # Do post-compute work
-        result = self._post_compute_tasks(result)
+        result = self._post_compute_tasks(
+            result,
+            collect_stdout=collect_stdout,
+            collect_files=collect_files,
+            rm_scratch_dir=rm_scratch_dir,
+        )
         return result
 
-    def _pre_compute_tasks(self, atomic_input: AtomicInput) -> AtomicInput:
-        """Tasks to be performed prior to submitting computation to TeraChem PBS
+    def _pre_compute_tasks(self, inp_data: ProgramInput) -> ProgramInput:
+        """Upload wavefunction files and modify the keywords for TeraChem."""
 
-        Currently this involves:
-            1. If binary data found in AtomicInput.extras['tcfe:keywords']['c0|ca0/cb0']
-                it is uploaded to the server and the path is set as the `guess` value
-                in AtomicInput.keywords
-        """
-        tcfe_keywords = atomic_input.extras.get(settings.tcfe_keywords, {})
+        pi_dict = inp_data.model_dump()
 
-        _validate_tcfe_keywords(tcfe_keywords)
+        # Upload file data if provided
+        if inp_data.files:
+            if "c0" in inp_data.files:
+                assert isinstance(inp_data.files["c0"], bytes)
+                path = self.put("c0", inp_data.files["c0"])
 
-        ai_dict = atomic_input.dict()
-
-        # Upload c0|ca0/cb0 (wavefunction) data if provided
-        if any(
-            key in {TCFEKeywords.c0, TCFEKeywords.ca0, TCFEKeywords.cb0}
-            for key in tcfe_keywords.keys()
-        ):
-
-            if TCFEKeywords.c0 in tcfe_keywords:
-                path = self.put(TCFEKeywords.c0, tcfe_keywords[TCFEKeywords.c0])
-
-            else:
-                # ca0 and cb0 both exist
-                ca0_path = self.put(TCFEKeywords.ca0, tcfe_keywords[TCFEKeywords.ca0])
-                cb0_path = self.put(TCFEKeywords.cb0, tcfe_keywords[TCFEKeywords.cb0])
+            elif "ca0" in inp_data.files and "cb0" in inp_data.files:
+                assert isinstance(inp_data.files["ca0"], bytes)
+                assert isinstance(inp_data.files["cb0"], bytes)
+                ca0_path = self.put("ca0", inp_data.files["ca0"])
+                cb0_path = self.put("cb0", inp_data.files["cb0"])
                 path = f"{ca0_path} {cb0_path}"  # TC wants two, space separated paths
 
-            # 'keywords' will exist because AtomicInput defaults it to {} if empty
-            ai_dict["keywords"]["guess"] = path
+            else:
+                raise ValueError("Provided files not recognized by TCFrontEndClient")
 
-        return AtomicInput(**ai_dict)
+            pi_dict["keywords"]["guess"] = path
+
+        return ProgramInput(**pi_dict)
 
     def _post_compute_tasks(
-        self, result: Union[AtomicResult, FailedOperation]
-    ) -> Union[AtomicResult, FailedOperation]:
+        self,
+        prog_output: ProgramOutput,
+        collect_stdout: bool = True,
+        collect_files: bool = False,
+        rm_scratch_dir: bool = True,
+    ) -> ProgramOutput:
         """Tasks to be performed after receiving a result from Terachem PBS
 
         Currently this involves:
-            1. Getting tc.out if stdout was requested via stdout = True
+            1. Getting tc.out if stdout was requested or if the computation failed
             2. Returning c0/ca0/cb0 files if requested via native_files = 'all'
             3. Deleting the files on the server unless scratch_messy = True
             4. Deleting uploaded files on the server unless uploads_messy = True
         """
-        # AtomicInput at different locations for AtomicResult and FailedOperation
-        if isinstance(result, AtomicResult):
-            inp_data: AtomicInput = result
-            job_dir = inp_data.extras[settings.extras_job_kwarg]["job_dir"]
-        else:
-            # FailedOperation
-            inp_data = result.input_data
-            # Hacking job_dir since Server currently sends wrong values initially and
-            # may crash before returning correct values
-            # https://github.com/mtzgroup/terachem/issues/138
-            if self.curr_job_dir:
-                # self.curr_job_dir will be off by one.
-                # Example string: server_2023-02-04-01.12.09/job_1
-                split = self.curr_job_dir.split("_")
-                real_job_num = int(split[-1]) + 1
-                split[-1] = str(real_job_num)
-                job_dir = "_".join(split)
-            else:
-                # If no curr_job_dir set that means this was the first job run by the
-                # TeraChem server and it does not return job_dir correctly.
-                job_dir = "/no/job/dir"
 
-        tcfe_keywords = inp_data.extras.get(settings.tcfe_keywords, {})
+        # Collect files
+        if collect_files:
+            self._collect_files(prog_output)
 
-        # dict for modifying attributes
-        result_dict = result.dict()
-        # Retrieve tc.out if requested
-        if inp_data.protocols.stdout:
+        po_dict = prog_output.model_dump()
+
+        # Add stdout
+        if collect_stdout or prog_output.success is False:
             try:
-                stdout = self.get(f"{job_dir}/tc.out").decode()
+                stdout = self.get(
+                    f"{prog_output.provenance.scratch_dir}/tc.out"
+                ).decode()
             except httpx.HTTPStatusError:
-                stdout = (
-                    "stdout could not be collected due to a bug in the TeraChem server "
-                    "which returns incorrect directory information. Log complaints and "
-                    "ask for a fix here: https://github.com/mtzgroup/terachem/issues/138"
-                )
+                stdout = "stdout could not be collected."
 
-            if result.success:
-                result_dict["stdout"] = stdout
-            else:
-                # FailedOperation
-                result_dict["error"]["extras"] = {"stdout": stdout}
+            po_dict["stdout"] = stdout
 
-        # Retrieve native_files
-        if result.success and result.protocols.native_files in {
-            NativeFilesProtocolEnum.all
-        }:
-            self._collect_files(result_dict)
-
-        # Cleanup uploads
-        if self.uploads_prefix in inp_data.keywords.get(
-            "guess", ""
-        ) and not tcfe_keywords.get(TCFEKeywords.uploads_messy):
-            # Files were uploaded and put in "guess" keyword; also no request to maintain files
-            for path in result.keywords["guess"].split():
+        # Delete uploads if not requested to keep
+        if (
+            self.uploads_prefix in prog_output.input_data.keywords.get("guess", "")
+            and rm_scratch_dir
+        ):
+            for path in prog_output.input_data.keywords["guess"].split():
                 self._try_delete(path)
 
-        # Cleanup Scratch Directory
-        if not tcfe_keywords.get(TCFEKeywords.scratch_messy):
-            self._try_delete(f"{job_dir}/")
+        # Delete scratch directory
+        if rm_scratch_dir:
+            self._try_delete(f"{prog_output.provenance.scratch_dir}/")
 
-        # Fix QCElemental mistake on .input_data not being AtomicInput
-        if isinstance(result, FailedOperation):
-            result_dict["input_data"] = AtomicInput(**result_dict["input_data"])
+        return prog_output.__class__(**po_dict)
 
-        return result.__class__(**result_dict)
-
-    def _collect_files(self, result_dict: Dict[str, Any]) -> None:
+    def _collect_files(self, prog_output: ProgramOutput) -> None:
         """Collects requested native_files.
 
         Parameters:
-            result_dict: Dictionary representation of an AtomicResult
+            prog_output: ProgramOutput object
 
         Returns:
             None: Modified result dictionary in place
         """
-        ar_native_files_key = (
-            "native_files"  # to match QCElemental AtomicResult.native_files
-        )
-        tcfe_config = result_dict["extras"].get(settings.tcfe_keywords, {})
-        scr_dir = result_dict["extras"][settings.extras_job_kwarg]["job_scr_dir"]
 
-        # Assume no native_files added previously
-        result_dict[ar_native_files_key] = {}
+        scr_dir = prog_output.provenance.scratch_dir
+        assert isinstance(scr_dir, str)
 
-        requested_files = tcfe_config.get(TCFEKeywords.native_files)  # tcfe input key
+        filenames = [
+            file_desc["name"]
+            for file_desc in self.ls(scr_dir)
+            if file_desc["type"] == "file"
+        ]
 
-        if not requested_files:
-            # Specific files not requested, return all
-            requested_files = [
-                file_desc["name"]
-                for file_desc in self.ls(scr_dir)
+        filenames.extend(
+            [
+                f"scr/{file_desc['name']}"
+                for file_desc in self.ls(f"{scr_dir}/scr")
                 if file_desc["type"] == "file"
             ]
+        )
 
-        for filename in requested_files:
+        for filename in filenames:
             data: Union[str, bytes]
             try:
                 b_data: bytes = self.get(f"{scr_dir}/{filename}")
@@ -1230,4 +1162,4 @@ class TCFrontEndClient(TCProtobufClient):
                 # File is binary
                 data = b_data
 
-            result_dict[ar_native_files_key][filename] = data
+            prog_output.results.files[filename] = data
