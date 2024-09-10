@@ -1,17 +1,10 @@
-import numpy as np
-import qcelemental as qcel
 from google.protobuf.internal.containers import RepeatedScalarFieldContainer
-from qcelemental.models import AtomicInput, Molecule
+from qcio import ProgramInput
 
 from tcpb import TCProtobufClient as TCPBClient
 
 from .answers import cisno_casci
 from .conftest import _round
-
-base_options = {
-    "method": "hf",
-    "basis": "6-31g**",
-}
 
 cisno_options = {
     # Base options
@@ -40,50 +33,41 @@ fields_to_check = [
     "orb_energies",
     "orb_occupations",
     "cas_transition_dipole",
-    "bond_order",
 ]
 
 
 def test_cisno_casci(settings, ethylene):
-
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
         # Add in Ethylene atoms
-        base_options["atoms"] = ethylene["atoms"]
+        base_options = {
+            "method": "hf",
+            "basis": "6-31g**",
+        }
+        base_options["atoms"] = ethylene.symbols
         options = dict(base_options, **cisno_options)
         results = TC.compute_job_sync(
-            "energy", ethylene["geometry"], "angstrom", **options
+            "energy", ethylene.geometry.flatten(), "bohr", **options
         )
 
-        for field in fields_to_check:
-            assert _round(results[field]) == _round(cisno_casci.correct_answer[field])
+    for field in fields_to_check:
+        assert _round(results[field]) == _round(cisno_casci.correct_answer[field])
 
 
 def test_cisno_casci_atomic_input(settings, ethylene, job_output):
-    # Construct Geometry in bohr
-    geom_angstrom = qcel.Datum("geometry", "angstrom", np.array(ethylene["geometry"]))
-    geom_bohr = geom_angstrom.to_units("bohr")
-
-    # Construct Molecule object
-    m_ethylene = Molecule.from_data(
-        {
-            "symbols": ethylene["atoms"],
-            "geometry": geom_bohr,
-            "molecular_multiplicity": cisno_options["spinmult"],
-            "molecular_charge": cisno_options["charge"],
-        }
-    )
-
-    # Construct AtomicInput
-    atomic_input = AtomicInput(
-        molecule=m_ethylene,
-        driver="energy",
-        model=base_options,
+    # Construct ProgramInput
+    prog_inp = ProgramInput(
+        structure=ethylene,
+        calctype="energy",
+        model={
+            "method": "hf",
+            "basis": "6-31g**",
+        },
         keywords=cisno_options,
     )
 
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
         # Add in Ethylene atoms
-        results = TC.compute(atomic_input)
+        results = TC.compute(prog_inp)
 
     # compare only relevant attributes (computed values)
     attrs_to_compare = []

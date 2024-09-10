@@ -7,7 +7,6 @@ from .conftest import _round
 
 
 def test_ci_overlap(settings, ethylene):
-
     # Ethylene system
     atoms = ["C", "C", "H", "H", "H", "H"]
     geom = [
@@ -92,7 +91,6 @@ def test_ci_overlap(settings, ethylene):
             "orb_energies",
             "orb_occupations",
             "ci_overlap",
-            "bond_order",
         ]
         for field in fields_to_check:
             assert _round(results[field]) == _round(ci_overlap.correct_answer[field])

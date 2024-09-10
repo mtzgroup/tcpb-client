@@ -11,7 +11,6 @@ from .conftest import _round
     "vastly different results than previously. See https://github.com/mtzgroup/terachem/issues/139"
 )
 def test_fomo_casci(settings, ethylene):
-
     with TCPBClient(host=settings["tcpb_host"], port=settings["tcpb_port"]) as TC:
         options = {
             "method": "hf",

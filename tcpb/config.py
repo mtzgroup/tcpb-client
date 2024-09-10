@@ -1,6 +1,6 @@
-from enum import Enum
+from __future__ import annotations
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -9,21 +9,8 @@ class Settings(BaseSettings):
     Do not instantiate directly, use settings object on module
     """
 
-    extras_qcvars_kwarg: str = "qcvars"
-    extras_job_kwarg: str = "job_extras"
     tcfe_extras: str = "tcfe"
     tcfe_keywords: str = "tcfe:keywords"
 
 
 settings = Settings()
-
-
-class TCFEKeywords(str, Enum):
-    """Supported keywords for the TCFrontEndClient"""
-
-    c0 = "c0"
-    ca0 = "ca0"
-    cb0 = "cb0"
-    scratch_messy = "scratch_messy"
-    uploads_messy = "uploads_messy"
-    native_files = "native_files"

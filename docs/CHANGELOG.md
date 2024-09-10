@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Added
+
+- GitHub workflows for basic code quality.
+- `release.py` script.
+
+### Changed
+
+- Changed build system from `flit` to `poetry` to standardize with other `MtzGroup` lab projects.
+- 🚨 Updated minimum Python version from `3.7` -> `3.9`.
+- Updated package dependencies.
+- Updated devops system. Removed `black`, `isort`, `flake8` in favor of latest version of `ruff`.
+- Updated documentation dependencies.
+
+### Removed
+
+- Checks for `bond_order` in the tests as this value is no longer returned by default by the TeraChem server.
+- `TCFEKeywords` checks. Just passing arguments to the `TCFEClient.compute()` function now.
+
 ## [0.13.2]
 
 ### Fixed

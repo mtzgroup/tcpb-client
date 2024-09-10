@@ -2,7 +2,7 @@
 # Basic energy calculation
 import sys
 
-from qcelemental.models import AtomicInput, Molecule
+from qcio import ProgramInput, Structure
 
 from tcpb import TCProtobufClient as TCPBClient
 
@@ -11,23 +11,18 @@ if len(sys.argv) != 3:
     exit(1)
 
 
-# Water system
-atoms = ["O", "H", "H"]
-geom = [0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 1.5]  # in bohr
-
-molecule = Molecule(symbols=atoms, geometry=geom)
-atomic_input = AtomicInput(
-    molecule=molecule,
-    model={
-        "method": "b3lyp",
-        "basis": "6-31g",
-    },
-    driver="energy",
-    protocols={"wavefunction": "all"},
+structure = Structure(
+    symbols=["O", "H", "H"],
+    geometry=[[0.0, 0.0, 0.0], [0.0, 1.5, 0.0], [0.0, 0.0, 1.5]],
+)
+prog_inp = ProgramInput(
+    calctype="energy",  # type: ignore
+    structure=structure,
+    model={"method": "b3lyp", "basis": "6-31g"},  # type: ignore
 )
 
 with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
-    result = client.compute(atomic_input)
+    prog_output = client.compute(prog_inp)
 
-print(result)
-print(result.return_result)
+print(prog_output)
+print(prog_output.results.energy)

@@ -2,43 +2,32 @@
 # Basic energy calculation
 import sys
 
-from qcelemental.models import AtomicInput, Molecule
+from qcio import ProgramInput, Structure
 
 from tcpb import TCFrontEndClient
-from tcpb.config import TCFEKeywords, settings
 
 if len(sys.argv) != 3:
     print(f"Usage: {sys.argv[0]} host port")
     exit(1)
 
 
-# Water system
-atoms = ["O", "H", "H"]
-geom = [0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 1.5]  # in bohr
-
-molecule = Molecule(symbols=atoms, geometry=geom)
-atomic_input = AtomicInput(
-    molecule=molecule,
-    model={
-        "method": "b3lyp",
-        "basis": "6-31g",
-    },
-    driver="energy",
+structure = Structure(
+    symbols=["O", "H", "H"], geometry=[0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 1.5]
+)
+atomic_input = ProgramInput(
+    structure=structure,
+    model={"method": "b3lyp", "basis": "6-31g"},  # type: ignore
+    calctype="energy",  # type: ignore
     keywords={"restricted": False},
-    # TCFrontEndClient can collect stdout
-    # TCFrontEnd can also collect native_files produced by TeraCHem from the computation
-    protocols={"wavefunction": "all", "stdout": True, "native_files": "all"},
-    # TCFrontEndClient will delete scratch unless scratch_messy: True
-    extras={settings.tcfe_keywords: {TCFEKeywords.scratch_messy: False}},
 )
 
 with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
-    result = client.compute(atomic_input)
+    # Collect stdout and native files
+    prog_output = client.compute(atomic_input, collect_stdout=True, collect_files=True)
 
 # NOTE: Addition of stdout field possible with TCFrontendClient
-print(result.stdout)
-print(result)
-print(result.return_result)
-print(result.extras["job_extras"])
+print(prog_output.stdout)
+print(prog_output)
+print(prog_output.return_result)
 # native_files will contain orb1a/b files in binary form
-print(result.native_files.keys())
+print(prog_output.files.keys())

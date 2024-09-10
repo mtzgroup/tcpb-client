@@ -1933,7 +1933,7 @@ Status = _reflection.GeneratedProtocolMessageType(
     (_message.Message,),
     {
         "DESCRIPTOR": _STATUS,
-        "__module__": "terachem_server_pb2"
+        "__module__": "terachem_server_pb2",
         # @@protoc_insertion_point(class_scope:terachem_server.Status)
     },
 )
@@ -1944,7 +1944,7 @@ Mol = _reflection.GeneratedProtocolMessageType(
     (_message.Message,),
     {
         "DESCRIPTOR": _MOL,
-        "__module__": "terachem_server_pb2"
+        "__module__": "terachem_server_pb2",
         # @@protoc_insertion_point(class_scope:terachem_server.Mol)
     },
 )
@@ -1955,7 +1955,7 @@ JobInput = _reflection.GeneratedProtocolMessageType(
     (_message.Message,),
     {
         "DESCRIPTOR": _JOBINPUT,
-        "__module__": "terachem_server_pb2"
+        "__module__": "terachem_server_pb2",
         # @@protoc_insertion_point(class_scope:terachem_server.JobInput)
     },
 )
@@ -1966,7 +1966,7 @@ JobOutput = _reflection.GeneratedProtocolMessageType(
     (_message.Message,),
     {
         "DESCRIPTOR": _JOBOUTPUT,
-        "__module__": "terachem_server_pb2"
+        "__module__": "terachem_server_pb2",
         # @@protoc_insertion_point(class_scope:terachem_server.JobOutput)
     },
 )

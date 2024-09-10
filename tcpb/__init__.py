@@ -1,5 +1,7 @@
 """Protobuf client for TeraChem server mode"""
 
+from importlib import metadata
+
 from .clients import TCFrontEndClient, TCProtobufClient  # noqa
 
-__version__ = "0.13.2"
+__version__ = metadata.version(__name__)
