@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.14.0] - 2024-09-10
+
 ### Added
 
 - GitHub workflows for basic code quality.
@@ -179,7 +181,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.13.2...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.14.0...HEAD
+[0.14.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.0
 [0.13.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.2
 [0.13.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.1
 [0.13.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.0
