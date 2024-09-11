@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Added
+
+- Environment variable control for:
+  - `TCPB_HOST`
+  - `TCPB_PORT`
+  - `TCPB_FRONTEND_HOST`
+  - `TCPB_FRONTEND_CLIENT`
+
+### Changed
+
+- Collect `stdout` and files by default if using `TCPBFrontendClient`
+- Renamed `kwarg` to `compute` `raise_error` -> `raise_exc` to match `qcop`.
+- Default behavior for `TCPBFrontendClient` is now to collect stdout and files.
+- `program_output` appended to `exc.program_output`.
+- `TCPBFrontendClient` collects stdout and files even if a calculation fails.
+
+### Removed
+
+- Old devops files in root directory for mypy, flake8, conda, etc.
+
 ## [0.14.0] - 2024-09-10
 
 ### Added

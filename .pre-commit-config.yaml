@@ -24,8 +24,7 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          [tokenize-rt==3.2.0, pydantic>=2.0.0, types-protobuf]
-        pass_filenames: false
+          [tokenize-rt==3.2.0, pydantic>=2.0.0, types-protobuf, types-toml]
   - repo: https://github.com/crate-ci/typos
     rev: v1.23.6
     hooks:
