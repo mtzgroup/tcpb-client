@@ -10,8 +10,15 @@
         <meta name="author" content="Colton Hicks">
       
       
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../CONTRIBUTING/">
+      
+      
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
     
     
       
@@ -19,13 +26,17 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2d9f7617.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.35f28582.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
-        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
+      
+
+
     
+    
+      
     
     
       
@@ -41,10 +52,11 @@
     
       <link rel="stylesheet" href="../css/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
+    
     
     
   </head>
@@ -59,9 +71,6 @@
     
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-green" data-md-color-accent="cyan">
   
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -86,11 +95,12 @@
     <a href=".." title="tcpb-client" class="md-header__button md-logo" aria-label="tcpb-client" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,23 +119,82 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
-          
-          
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="light-green" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
-          
-        
-      </form>
+      
+        <form class="md-header__option" data-md-component="palette">
+  
     
     
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="light-green" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="light-green" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     
     
       <div class="md-header__source">
-        <a href="https://github.com/mtzgroup/tcpb-client/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/mtzgroup/tcpb-client" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -142,6 +211,120 @@
       
         
           
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  tcpb-client
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CONTRIBUTING/" class="md-tabs__link">
+        
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../clients/" class="md-tabs__link">
+        
+  
+    
+  
+  clients.py
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../random_observations/" class="md-tabs__link">
+        
+  
+    
+  
+  Random Observations
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Examples/basic_energy/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -155,22 +338,25 @@
                     
 
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="tcpb-client" class="md-nav__button md-logo" aria-label="tcpb-client" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     tcpb-client
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/mtzgroup/tcpb-client/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/mtzgroup/tcpb-client" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -182,14 +368,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
-        tcpb-client
+        
+  
+  <span class="md-ellipsis">
+    tcpb-client
+  </span>
+  
+
       </a>
     </li>
   
@@ -197,33 +388,46 @@
     
       
       
-      
-
   
   
     
   
   
+  
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Changelog
+          
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Changelog
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
       </a>
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="Page contents">
   
   
   
@@ -232,28 +436,220 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Page contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#unreleased" class="md-nav__link">
-    unreleased
+    <span class="md-ellipsis">
+      unreleased
+    </span>
   </a>
+  
+    <nav class="md-nav" aria-label="unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.0 - 2024-09-10
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.14.0 - 2024-09-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.12.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.12.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#0110" class="md-nav__link">
-    0.11.0
+    <span class="md-ellipsis">
+      0.11.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.11.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
-    Changed
+  <a href="#changed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -265,15 +661,19 @@
       
         <li class="md-nav__item">
   <a href="#0101" class="md-nav__link">
-    0.10.1
+    <span class="md-ellipsis">
+      0.10.1
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.10.1">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_1" class="md-nav__link">
-    Changed
+  <a href="#changed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -285,22 +685,28 @@
       
         <li class="md-nav__item">
   <a href="#0100" class="md-nav__link">
-    0.10.0
+    <span class="md-ellipsis">
+      0.10.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.10.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
-    Added
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_2" class="md-nav__link">
-    Changed
+  <a href="#changed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -312,29 +718,37 @@
       
         <li class="md-nav__item">
   <a href="#090" class="md-nav__link">
-    0.9.0
+    <span class="md-ellipsis">
+      0.9.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.9.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" class="md-nav__link">
-    Added
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_3" class="md-nav__link">
-    Changed
+  <a href="#changed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
-    Removed
+  <a href="#removed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -346,29 +760,37 @@
       
         <li class="md-nav__item">
   <a href="#081" class="md-nav__link">
-    0.8.1
+    <span class="md-ellipsis">
+      0.8.1
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.8.1">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_2" class="md-nav__link">
-    Added
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_4" class="md-nav__link">
-    Changed
+  <a href="#changed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
-    Removed
+  <a href="#removed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -380,29 +802,37 @@
       
         <li class="md-nav__item">
   <a href="#080-2021-05-26" class="md-nav__link">
-    0.8.0 - 2021-05-26
+    <span class="md-ellipsis">
+      0.8.0 - 2021-05-26
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.8.0 - 2021-05-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_3" class="md-nav__link">
-    Added
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_5" class="md-nav__link">
-    Changed
+  <a href="#changed_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_2" class="md-nav__link">
-    Removed
+  <a href="#removed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -414,15 +844,19 @@
       
         <li class="md-nav__item">
   <a href="#072-2021-03-10" class="md-nav__link">
-    0.7.2 - 2021-03-10
+    <span class="md-ellipsis">
+      0.7.2 - 2021-03-10
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.2 - 2021-03-10">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_6" class="md-nav__link">
-    Changed
+  <a href="#changed_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -434,15 +868,19 @@
       
         <li class="md-nav__item">
   <a href="#071-2021-03-10" class="md-nav__link">
-    0.7.1 - 2021-03-10
+    <span class="md-ellipsis">
+      0.7.1 - 2021-03-10
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.1 - 2021-03-10">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_4" class="md-nav__link">
-    Added
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
@@ -454,29 +892,37 @@
       
         <li class="md-nav__item">
   <a href="#070-2021-02-26" class="md-nav__link">
-    0.7.0 - 2021-02-26
+    <span class="md-ellipsis">
+      0.7.0 - 2021-02-26
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.0 - 2021-02-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_5" class="md-nav__link">
-    Added
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_7" class="md-nav__link">
-    Changed
+  <a href="#changed_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_3" class="md-nav__link">
-    Removed
+  <a href="#removed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -488,15 +934,19 @@
       
         <li class="md-nav__item">
   <a href="#r060-2021-02-25" class="md-nav__link">
-    r0.6.0 - 2021-02-25
+    <span class="md-ellipsis">
+      r0.6.0 - 2021-02-25
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="r0.6.0 - 2021-02-25">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_8" class="md-nav__link">
-    Changed
+  <a href="#changed_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -508,15 +958,19 @@
       
         <li class="md-nav__item">
   <a href="#05x-long-long-ago" class="md-nav__link">
-    0.5.x - Long long ago
+    <span class="md-ellipsis">
+      0.5.x - Long long ago
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.5.x - Long long ago">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_6" class="md-nav__link">
-    Added
+  <a href="#added_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
@@ -536,14 +990,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../CONTRIBUTING/" class="md-nav__link">
-        Contributing
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
       </a>
     </li>
   
@@ -551,14 +1010,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../clients/" class="md-nav__link">
-        clients.py
+        
+  
+  <span class="md-ellipsis">
+    clients.py
+  </span>
+  
+
       </a>
     </li>
   
@@ -566,29 +1030,19 @@
     
       
       
-      
-
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../keywords/" class="md-nav__link">
-        Keywords
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../random_observations/" class="md-nav__link">
-        Random Observations
+        
+  
+  <span class="md-ellipsis">
+    Random Observations
+  </span>
+  
+
       </a>
     </li>
   
@@ -596,160 +1050,236 @@
     
       
       
-      
-
+  
   
   
   
     
+    
+    
+      
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" data-md-state="indeterminate" type="checkbox" id="__nav_7" checked>
-      
-      
-      
-      
-        <label class="md-nav__link" for="__nav_7">
-          Examples
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="Examples" data-md-level="1">
-        <label class="md-nav__title" for="__nav_7">
-          <span class="md-nav__icon md-icon"></span>
-          Examples
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
           
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/basic_energy/" class="md-nav__link">
-        Basic Energy
+        
+  
+  <span class="md-ellipsis">
+    Basic Energy
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/ci_overlap/" class="md-nav__link">
-        CI Overlap
+        
+  
+  <span class="md-ellipsis">
+    CI Overlap
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/cisno_casci%20copy/" class="md-nav__link">
-        FOMO CASCI
+        
+  
+  <span class="md-ellipsis">
+    FOMO CASCI
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/cisno_casci/" class="md-nav__link">
-        CISNO CASCI
+        
+  
+  <span class="md-ellipsis">
+    CISNO CASCI
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/frontend/" class="md-nav__link">
-        TCFrontEndClient
+        
+  
+  <span class="md-ellipsis">
+    TCFrontEndClient
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/frontend_guess_reuse/" class="md-nav__link">
-        Frontend Guess Reuse
+        
+  
+  <span class="md-ellipsis">
+    Frontend Guess Reuse
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/guess_reuse/" class="md-nav__link">
-        Guess Reuse
+        
+  
+  <span class="md-ellipsis">
+    Guess Reuse
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/sa_casscf/" class="md-nav__link">
-        SA CASSCF
+        
+  
+  <span class="md-ellipsis">
+    SA CASSCF
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../Examples/tddft/" class="md-nav__link">
-        TDDFT
+        
+  
+  <span class="md-ellipsis">
+    TDDFT
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -767,7 +1297,9 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="Page contents">
   
   
   
@@ -776,28 +1308,220 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Page contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#unreleased" class="md-nav__link">
-    unreleased
+    <span class="md-ellipsis">
+      unreleased
+    </span>
   </a>
+  
+    <nav class="md-nav" aria-label="unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.0 - 2024-09-10
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.14.0 - 2024-09-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.13.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.12.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.12.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#0110" class="md-nav__link">
-    0.11.0
+    <span class="md-ellipsis">
+      0.11.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.11.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
-    Changed
+  <a href="#changed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -809,15 +1533,19 @@
       
         <li class="md-nav__item">
   <a href="#0101" class="md-nav__link">
-    0.10.1
+    <span class="md-ellipsis">
+      0.10.1
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.10.1">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_1" class="md-nav__link">
-    Changed
+  <a href="#changed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -829,22 +1557,28 @@
       
         <li class="md-nav__item">
   <a href="#0100" class="md-nav__link">
-    0.10.0
+    <span class="md-ellipsis">
+      0.10.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.10.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
-    Added
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_2" class="md-nav__link">
-    Changed
+  <a href="#changed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -856,29 +1590,37 @@
       
         <li class="md-nav__item">
   <a href="#090" class="md-nav__link">
-    0.9.0
+    <span class="md-ellipsis">
+      0.9.0
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.9.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" class="md-nav__link">
-    Added
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_3" class="md-nav__link">
-    Changed
+  <a href="#changed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
-    Removed
+  <a href="#removed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -890,29 +1632,37 @@
       
         <li class="md-nav__item">
   <a href="#081" class="md-nav__link">
-    0.8.1
+    <span class="md-ellipsis">
+      0.8.1
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.8.1">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_2" class="md-nav__link">
-    Added
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_4" class="md-nav__link">
-    Changed
+  <a href="#changed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
-    Removed
+  <a href="#removed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -924,29 +1674,37 @@
       
         <li class="md-nav__item">
   <a href="#080-2021-05-26" class="md-nav__link">
-    0.8.0 - 2021-05-26
+    <span class="md-ellipsis">
+      0.8.0 - 2021-05-26
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.8.0 - 2021-05-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_3" class="md-nav__link">
-    Added
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_5" class="md-nav__link">
-    Changed
+  <a href="#changed_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_2" class="md-nav__link">
-    Removed
+  <a href="#removed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -958,15 +1716,19 @@
       
         <li class="md-nav__item">
   <a href="#072-2021-03-10" class="md-nav__link">
-    0.7.2 - 2021-03-10
+    <span class="md-ellipsis">
+      0.7.2 - 2021-03-10
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.2 - 2021-03-10">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_6" class="md-nav__link">
-    Changed
+  <a href="#changed_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -978,15 +1740,19 @@
       
         <li class="md-nav__item">
   <a href="#071-2021-03-10" class="md-nav__link">
-    0.7.1 - 2021-03-10
+    <span class="md-ellipsis">
+      0.7.1 - 2021-03-10
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.1 - 2021-03-10">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_4" class="md-nav__link">
-    Added
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
@@ -998,29 +1764,37 @@
       
         <li class="md-nav__item">
   <a href="#070-2021-02-26" class="md-nav__link">
-    0.7.0 - 2021-02-26
+    <span class="md-ellipsis">
+      0.7.0 - 2021-02-26
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.7.0 - 2021-02-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_5" class="md-nav__link">
-    Added
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_7" class="md-nav__link">
-    Changed
+  <a href="#changed_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_3" class="md-nav__link">
-    Removed
+  <a href="#removed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed
+    </span>
   </a>
   
 </li>
@@ -1032,15 +1806,19 @@
       
         <li class="md-nav__item">
   <a href="#r060-2021-02-25" class="md-nav__link">
-    r0.6.0 - 2021-02-25
+    <span class="md-ellipsis">
+      r0.6.0 - 2021-02-25
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="r0.6.0 - 2021-02-25">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#changed_8" class="md-nav__link">
-    Changed
+  <a href="#changed_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
   </a>
   
 </li>
@@ -1052,15 +1830,19 @@
       
         <li class="md-nav__item">
   <a href="#05x-long-long-ago" class="md-nav__link">
-    0.5.x - Long long ago
+    <span class="md-ellipsis">
+      0.5.x - Long long ago
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="0.5.x - Long long ago">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_6" class="md-nav__link">
-    Added
+  <a href="#added_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
   </a>
   
 </li>
@@ -1078,43 +1860,104 @@
               </div>
             
           
-          <div class="md-content" data-md-component="content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
-<a href="https://github.com/mtzgroup/tcpb-client/edit/develop/docs/CHANGELOG.md" title="Edit this page" class="md-content__button md-icon">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-</a>
+                  
+
+  
+  
 
 
-
-<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">🔗</a></h1>
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/mtzgroup/tcpb-client/compare/0.11.0...HEAD">unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">🔗</a></h2>
-<h2 id="0110"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0">0.11.0</a><a class="headerlink" href="#0110" title="Permanent link">🔗</a></h2>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">🔗</a></h3>
+<h2 id="unreleased"><a href="https://github.com/mtzgroup/tcpb-client/compare/0.14.0...HEAD">unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Environment variable control for:</li>
+<li><code>TCPB_HOST</code></li>
+<li><code>TCPB_PORT</code></li>
+<li><code>TCPB_FRONTEND_HOST</code></li>
+<li><code>TCPB_FRONTEND_CLIENT</code></li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Collect <code>stdout</code> and files by default if using <code>TCPBFrontendClient</code></li>
+<li>Renamed <code>kwarg</code> to <code>compute</code> <code>raise_error</code> -&gt; <code>raise_exc</code> to match <code>qcop</code>.</li>
+<li>Default behavior for <code>TCPBFrontendClient</code> is now to collect stdout and files.</li>
+<li><code>program_output</code> appended to <code>exc.program_output</code>.</li>
+<li><code>TCPBFrontendClient</code> collects stdout and files even if a calculation fails.</li>
+</ul>
+<h2 id="0140-2024-09-10"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.0">0.14.0</a> - 2024-09-10<a class="headerlink" href="#0140-2024-09-10" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>GitHub workflows for basic code quality.</li>
+<li><code>release.py</code> script.</li>
+</ul>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Changed build system from <code>flit</code> to <code>poetry</code> to standardize with other <code>MtzGroup</code> lab projects.</li>
+<li>🚨 Updated minimum Python version from <code>3.7</code> -&gt; <code>3.9</code>.</li>
+<li>Updated package dependencies.</li>
+<li>Updated devops system. Removed <code>black</code>, <code>isort</code>, <code>flake8</code> in favor of latest version of <code>ruff</code>.</li>
+<li>Updated documentation dependencies.</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Checks for <code>bond_order</code> in the tests as this value is no longer returned by default by the TeraChem server.</li>
+<li><code>TCFEKeywords</code> checks. Just passing arguments to the <code>TCFEClient.compute()</code> function now.</li>
+</ul>
+<h2 id="0132"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.2">0.13.2</a><a class="headerlink" href="#0132" title="Permanent link">&para;</a></h2>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/mtzgroup/tcpb-client/pull/40">Bugfix by Christopher Myers</a> to correct for loop handing CIS states.</li>
+</ul>
+<h2 id="0131"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.1">0.13.1</a><a class="headerlink" href="#0131" title="Permanent link">&para;</a></h2>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Pegged pydantic version &lt;2.0.</li>
+</ul>
+<h2 id="0130"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.0">0.13.0</a><a class="headerlink" href="#0130" title="Permanent link">&para;</a></h2>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Moved the <code>stdout</code> upon crashing of TeraChem server from <code>FailedOperation.extras</code> to <code>FailedOperation.error.extras</code>. This circumvents https://github.com/MolSSI/QCEngine/issues/397 and is probably a better place for the error data anyways.</li>
+</ul>
+<h2 id="0121"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.1">0.12.1</a><a class="headerlink" href="#0121" title="Permanent link">&para;</a></h2>
+<h3 id="changed_4">Changed<a class="headerlink" href="#changed_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Hacked in a solution for the TeraChem server being off-by-one on the job directory so that we can collect stdout files when the server crashes. It's still impossible to collect stdout if its the first job (and a failed job) run by the server due to the server returning <code>-1</code> for the <code>job_dir</code> on the <code>status</code> message. Henry will look into fixing the server as per https://github.com/mtzgroup/terachem/issues/138.</li>
+</ul>
+<h2 id="0120"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.0">0.12.0</a><a class="headerlink" href="#0120" title="Permanent link">&para;</a></h2>
+<h3 id="changed_5">Changed<a class="headerlink" href="#changed_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Bump support from python 3.6 -&gt; 3.7 (3.6 has end-of-life'd)</li>
+<li>Peg <code>protobuf</code> to <code>3.20.1</code> since newer versions do not support our outdated <code>_pb2.py</code> protobuf files.</li>
+</ul>
+<h2 id="0110"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0">0.11.0</a><a class="headerlink" href="#0110" title="Permanent link">&para;</a></h2>
+<h3 id="changed_6">Changed<a class="headerlink" href="#changed_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Return <code>FailedOperation</code> instead of raising exceptions in <code>.compute()</code> methods.</li>
 <li>Use <code>TCFEKeywords</code> enums throughout code.</li>
 <li>Collect <code>tc.out</code>, if possible, when computation fails.</li>
 </ul>
-<h2 id="0101"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1">0.10.1</a><a class="headerlink" href="#0101" title="Permanent link">🔗</a></h2>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">🔗</a></h3>
+<h2 id="0101"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1">0.10.1</a><a class="headerlink" href="#0101" title="Permanent link">&para;</a></h2>
+<h3 id="changed_7">Changed<a class="headerlink" href="#changed_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Moved <code>job_output_to_atomic_result</code> to be method on client objects so that <code>AtomicResult.provenance</code> can be dynamically set correctly depending on which client is used.</li>
 </ul>
-<h2 id="0100"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0">0.10.0</a><a class="headerlink" href="#0100" title="Permanent link">🔗</a></h2>
-<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">🔗</a></h3>
+<h2 id="0100"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0">0.10.0</a><a class="headerlink" href="#0100" title="Permanent link">&para;</a></h2>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Documentation and <code>mkdocs</code> website on GitHub pages. Docs available <a href="https://mtzgroup.github.io/tcpb-client/">here</a></li>
 </ul>
-<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">🔗</a></h3>
+<h3 id="changed_8">Changed<a class="headerlink" href="#changed_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Renamed <code>AtomicInput.extras['tcfe:config']</code> -&gt; <code>AtomicInput.extras['tcfe:keywords']</code></li>
 </ul>
-<h2 id="090"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0">0.9.0</a><a class="headerlink" href="#090" title="Permanent link">🔗</a></h2>
-<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">🔗</a></h3>
+<h2 id="090"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0">0.9.0</a><a class="headerlink" href="#090" title="Permanent link">&para;</a></h2>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Configuration parameters for controlling <code>TCFrontEndClient</code> behavior:</p>
@@ -1126,16 +1969,16 @@
 <p>Tests for <code>TCFrontEndClient</code> file put/get behaviors.</p>
 </li>
 </ul>
-<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">🔗</a></h3>
+<h3 id="changed_9">Changed<a class="headerlink" href="#changed_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Refactored <code>TCFrontEndClient</code></li>
 </ul>
-<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">🔗</a></h3>
+<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Construction of molden file from protocol buffer outputs. Molden files can now be requested directly from the Frontend client.</li>
 </ul>
-<h2 id="081"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1">0.8.1</a><a class="headerlink" href="#081" title="Permanent link">🔗</a></h2>
-<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">🔗</a></h3>
+<h2 id="081"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1">0.8.1</a><a class="headerlink" href="#081" title="Permanent link">&para;</a></h2>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p><code>TCFrontEndClient</code> to enable access to the files written by TeraChem and upload input files for TeraChem, in particular <code>c0</code> files as initial wavefunction guesses.</p>
@@ -1154,109 +1997,96 @@
 </li>
 <li>Client also supports <a href="https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/qcelemental/models/results.py#L538">AtomicResultProtocols</a> <code>stdout</code> and <code>native_files</code>.</li>
 </ul>
-<h3 id="changed_4">Changed<a class="headerlink" href="#changed_4" title="Permanent link">🔗</a></h3>
+<h3 id="changed_10">Changed<a class="headerlink" href="#changed_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>qcelemental</code> required version bumped from <code>&gt;=0.17.0</code> to <code>&gt;=0.24.0</code> to support <code>native_files</code> field for returning files. See <a href="https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/docs/source/changelog.rst#0240--2021-11-18">qcelemental note</a>. Note I am breaking the convention and returning binary data as well since I have more control over file access via the <code>TCFrontEndClient</code> than anticipated in the <code>qcelemental</code>/<code>qcengine</code> specification. Additionally I need the binary <code>c0</code> file to use as initial guesses for TeraChem computations.</li>
 </ul>
-<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">🔗</a></h3>
-<h2 id="080-2021-05-26"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0">0.8.0</a> - 2021-05-26<a class="headerlink" href="#080-2021-05-26" title="Permanent link">🔗</a></h2>
-<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">🔗</a></h3>
+<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
+<h2 id="080-2021-05-26"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0">0.8.0</a> - 2021-05-26<a class="headerlink" href="#080-2021-05-26" title="Permanent link">&para;</a></h2>
+<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Many IMD values to the <code>result.extra['qcvars']</code> dict</li>
 <li><code>result.wavefunction</code> now contains <code>WavefunctionProperties</code></li>
 </ul>
-<h3 id="changed_5">Changed<a class="headerlink" href="#changed_5" title="Permanent link">🔗</a></h3>
+<h3 id="changed_11">Changed<a class="headerlink" href="#changed_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>result.extras['qcvars']['bond_order']</code> -&gt; <code>result.extras['qcvars']['meyer_bond_order']</code></li>
 <li>Many values in <code>result.extras['qcvars']</code> moved to <code>result.extras['job_extras']</code> if they didn't pertain to quantum chemistry values.</li>
 <li><code>result.extras['qcvars']['orb{a,b}_{energies,occupations}']</code> moved to <code>result.wavefunction</code>. Note these will only be returned if <code>AtomicInput.protocols.wavefunction = "all"</code>.</li>
 </ul>
-<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">🔗</a></h3>
+<h3 id="removed_3">Removed<a class="headerlink" href="#removed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Removed unused documentation setup. Can add documentation with <code>mkdocs</code> later if needed.</li>
 </ul>
-<h2 id="072-2021-03-10"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2">0.7.2</a> - 2021-03-10<a class="headerlink" href="#072-2021-03-10" title="Permanent link">🔗</a></h2>
-<h3 id="changed_6">Changed<a class="headerlink" href="#changed_6" title="Permanent link">🔗</a></h3>
+<h2 id="072-2021-03-10"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2">0.7.2</a> - 2021-03-10<a class="headerlink" href="#072-2021-03-10" title="Permanent link">&para;</a></h2>
+<h3 id="changed_12">Changed<a class="headerlink" href="#changed_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Learned that AtomicResult is supposed to be a full superset of AtomicInput used to generate the result. Changed <code>utils.job_output_to_atomic_result()</code> to reflect this reality.</li>
 </ul>
-<h2 id="071-2021-03-10"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1">0.7.1</a> - 2021-03-10<a class="headerlink" href="#071-2021-03-10" title="Permanent link">🔗</a></h2>
-<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">🔗</a></h3>
+<h2 id="071-2021-03-10"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1">0.7.1</a> - 2021-03-10<a class="headerlink" href="#071-2021-03-10" title="Permanent link">&para;</a></h2>
+<h3 id="added_6">Added<a class="headerlink" href="#added_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>imd_orbital_type</code> specific keyword extraction to support creation of molden files.</li>
 </ul>
-<h2 id="070-2021-02-26"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0">0.7.0</a> - 2021-02-26<a class="headerlink" href="#070-2021-02-26" title="Permanent link">🔗</a></h2>
-<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">🔗</a></h3>
+<h2 id="070-2021-02-26"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0">0.7.0</a> - 2021-02-26<a class="headerlink" href="#070-2021-02-26" title="Permanent link">&para;</a></h2>
+<h3 id="added_7">Added<a class="headerlink" href="#added_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>TCCloud.compute(atomic_input: AtomicInput) -&gt; AtomicResult</code> top level method to create MolSSI QCSchema compliant interface.</li>
 <li><code>pyproject.toml</code></li>
 <li>more examples in <code>/examples</code> that leverage the new QCSchema interface</li>
 <li><code>utils.py</code> that contains basic utilities for transforming inputs/outputs to <code>QCSchema</code> format.</li>
 </ul>
-<h3 id="changed_7">Changed<a class="headerlink" href="#changed_7" title="Permanent link">🔗</a></h3>
+<h3 id="changed_13">Changed<a class="headerlink" href="#changed_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Using <code>flit</code> instead of <code>setuptools</code> for packaging.</li>
 <li>Compatible with only python 3.6+ (adding type annotations)</li>
 </ul>
-<h3 id="removed_3">Removed<a class="headerlink" href="#removed_3" title="Permanent link">🔗</a></h3>
+<h3 id="removed_4">Removed<a class="headerlink" href="#removed_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>setup.py</code></li>
 <li>Unused and broken test files including non functional mock server.</li>
 </ul>
-<h2 id="r060-2021-02-25"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/r0.6.0">r0.6.0</a> - 2021-02-25<a class="headerlink" href="#r060-2021-02-25" title="Permanent link">🔗</a></h2>
-<h3 id="changed_8">Changed<a class="headerlink" href="#changed_8" title="Permanent link">🔗</a></h3>
+<h2 id="r060-2021-02-25"><a href="https://github.com/mtzgroup/tcpb-client/releases/tag/r0.6.0">r0.6.0</a> - 2021-02-25<a class="headerlink" href="#r060-2021-02-25" title="Permanent link">&para;</a></h2>
+<h3 id="changed_14">Changed<a class="headerlink" href="#changed_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added Henry's molden file constructor function.</li>
 </ul>
-<h2 id="05x-long-long-ago">0.5.x - Long long ago<a class="headerlink" href="#05x-long-long-ago" title="Permanent link">🔗</a></h2>
-<h3 id="added_6">Added<a class="headerlink" href="#added_6" title="Permanent link">🔗</a></h3>
+<h2 id="05x-long-long-ago">0.5.x - Long long ago<a class="headerlink" href="#05x-long-long-ago" title="Permanent link">&para;</a></h2>
+<h3 id="added_8">Added<a class="headerlink" href="#added_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>All of Stefan's original code.</li>
 </ul>
 
-              
-            </article>
-          </div>
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
         
       </main>
       
         <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: tcpb-client" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              tcpb-client
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../CONTRIBUTING/" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Contributing
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -1278,10 +2108,14 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["search.suggest", "search.highlight", "navigation.instant", "navigation.expand"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
     
     
-      <script src="../assets/javascripts/bundle.467223ff.min.js"></script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.sections", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56dfad97.min.js"></script>
       
     
   </body>
