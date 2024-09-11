@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.14.1] - 2024-09-11
+
 ### Added
 
 - Environment variable control for:
@@ -201,7 +203,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.14.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.14.1...HEAD
+[0.14.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.1
 [0.14.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.0
 [0.13.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.2
 [0.13.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.1
