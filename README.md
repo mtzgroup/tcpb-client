@@ -1,6 +1,10 @@
 # Python TeraChem Protocol Buffer (TCPB) Client
 
-[![PyPI version](https://badge.fury.io/py/tcpb.svg)](https://pypi.org/project/tcpb/)
+[![image](https://img.shields.io/pypi/v/tcpb.svg)](https://pypi.python.org/pypi/tcpb)
+[![image](https://img.shields.io/pypi/l/tcpb.svg)](https://pypi.python.org/pypi/tcpb)
+[![image](https://img.shields.io/pypi/pyversions/tcpb.svg)](https://pypi.python.org/pypi/tcpb)
+[![Actions status](https://github.com/mtzgroup/tcpb-client/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/mtzgroup/tcpb-client/actions)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
 
 See the [documentation](https://mtzgroup.github.io/tcpb-client/)
 
@@ -10,7 +14,7 @@ Client uses C-style sockets for communication and Protocol Buffers for data seri
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.9+
 
 ## Installation
 

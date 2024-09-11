@@ -50,7 +50,7 @@ def test_post_compute_tasks_removes_job_dir_by_default(prog_output, mocker):
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()
-    client._post_compute_tasks(prog_output, collect_stdout=False)
+    client._post_compute_tasks(prog_output, collect_stdout=False, collect_files=False)
 
     spy.assert_called_once_with("DELETE", f"{prog_output.provenance.scratch_dir}/")
 
@@ -59,7 +59,7 @@ def test_post_compute_tasks_retains_job_dir_is_scratch_messy(prog_output, mocker
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()
-    client._post_compute_tasks(prog_output, collect_stdout=False, rm_scratch_dir=False)
+    client._post_compute_tasks(prog_output, collect_stdout=False, rm_scratch_dir=False, collect_files=False)
 
     spy.assert_not_called()
 
@@ -79,7 +79,7 @@ def test_post_compute_tasks_guess_not_removed_if_not_in_uploads_dir(
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()
-    client._post_compute_tasks(prog_output, collect_stdout=False, rm_scratch_dir=False)
+    client._post_compute_tasks(prog_output, collect_stdout=False, rm_scratch_dir=False, collect_files=False)
 
     spy.assert_not_called()
 
@@ -93,7 +93,7 @@ def test_post_compute_tasks_cleans_uploads_single_c0(prog_output, mocker):
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()
-    client._post_compute_tasks(prog_output, collect_stdout=False)
+    client._post_compute_tasks(prog_output, collect_stdout=False, collect_files=False)
 
     spy.assert_any_call("DELETE", path)
 
@@ -109,7 +109,7 @@ def test_post_compute_tasks_cleans_uploads_ca0_cb0(prog_output, mocker):
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()
-    client._post_compute_tasks(prog_output, collect_stdout=False)
+    client._post_compute_tasks(prog_output, collect_stdout=False, collect_files=False)
 
     assert spy.call_count == 3  # once for the whole scratch dir, once for each file
     spy.assert_any_call("DELETE", patha)
@@ -128,7 +128,7 @@ def test_post_compute_tasks_retrieves_stdout(prog_output, mocker):
     spy.return_value = stdout
 
     client = TCFrontEndClient()
-    post_compute_result = client._post_compute_tasks(prog_output)
+    post_compute_result = client._post_compute_tasks(prog_output, collect_files=False, rm_scratch_dir=False)
 
     spy.assert_called_with(f"{prog_output.provenance.scratch_dir}/tc.out")
 
@@ -150,7 +150,7 @@ def test_post_compute_tasks_retrieves_stdout_failed_operation(prog_output, mocke
 
     client = TCFrontEndClient()
     post_compute_result = client._post_compute_tasks(
-        failed_prog_output, rm_scratch_dir=False, collect_stdout=False
+        failed_prog_output, rm_scratch_dir=False, collect_stdout=False, collect_files=False
     )
     spy.assert_called_with("/tmp/tc.out")
 

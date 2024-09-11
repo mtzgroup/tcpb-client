@@ -1,5 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
+from typing import Optional
+
+from qcio import ProgramOutput
+
 """Exception handling for tcpb package
 
 See https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
@@ -8,6 +12,10 @@ See https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
 
 class TCPBError(Exception):
     """Base error for package"""
+
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+        self.program_output: Optional[ProgramOutput] = None
 
 
 class ServerError(TCPBError):

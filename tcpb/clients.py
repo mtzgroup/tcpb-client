@@ -32,6 +32,7 @@ from tcpb.utils import (  # job_output_to_atomic_result,
 
 # Import the Protobuf messages generated from the .proto file
 from . import terachem_server_pb2 as pb
+from .config import settings
 from .exceptions import ServerError
 
 logger = logging.getLogger(__name__)
@@ -45,7 +46,11 @@ class TCProtobufClient:
     program = "terachem-pbs"
 
     def __init__(
-        self, host: str = "127.0.0.1", port: int = 11111, debug=False, trace=False
+        self,
+        host: str = settings.tcpb_host,
+        port: int = settings.tcpb_port,
+        debug=False,
+        trace=False,
     ):
         """Initialize a TCProtobufClient object.
 
@@ -141,48 +146,54 @@ class TCProtobufClient:
         return not status.busy
 
     def compute(
-        self, inp_data: ProgramInput, raise_error: bool = False, **kwargs
+        self, inp_data: ProgramInput, raise_exc: bool = True, **kwargs
     ) -> ProgramOutput:
         """Top level method for performing computations with QCSchema inputs/outputs
 
         Args:
             inp_data: AtomicInput object
-            raise_error: If True, raise an error if the computation fails
+            raise_exc: If True, raise an error if the computation fails
 
         Returns:
             ProgramOutput object
         """
         # Create protobuf message
         job_input_msg = prog_inp_to_job_inp(inp_data)
-
         try:
             # Send message to server; retry until accepted
-            self._send_msg(pb.JOBINPUT, job_input_msg)
-            status = self._recv_msg(pb.STATUS)
-            self._set_status(status)
-            while not status.accepted:
-                print("JobInput not accepted. Retrying...")
-                sleep(0.5)
+            accepted = False
+            retries = 0
+            while not accepted:
                 self._send_msg(pb.JOBINPUT, job_input_msg)
                 status = self._recv_msg(pb.STATUS)
+                self._set_status(status)
+                accepted = status.accepted
+                if not accepted:
+                    retries += 1
+                    if retries > 10:
+                        raise ServerError("Server is busy and not accepting jobs", self)
+                    sleep(0.5)
             while not self.check_job_complete():
-                sleep(0.5)
-
+                sleep(0.25)
             # Collect output from server
             job_output = self._recv_msg(pb.JOBOUTPUT)
         except ServerError as e:
-            if raise_error:
+            # Server likely crashed due to calculation failing
+            prog_output: ProgramOutput = ProgramOutput(
+                input_data=inp_data,
+                success=False,
+                traceback=traceback.format_exc(),
+                results={},
+                provenance=Provenance(
+                    program=self.program,
+                    scratch_dir=self.curr_job_dir,
+                ),
+            )
+            e.program_output = prog_output
+            if raise_exc:
                 raise e
             else:
-                return ProgramOutput(
-                    input_data=inp_data,
-                    success=False,
-                    traceback=traceback.format_exc(),
-                    results={},
-                    provenance=Provenance(
-                        program=self.program,
-                    ),
-                )
+                return prog_output
         else:
             return self.job_output_to_atomic_result(
                 inp_data=inp_data, job_output=job_output
@@ -924,15 +935,15 @@ class TCFrontEndClient(TCProtobufClient):
 
     def __init__(
         self,
-        host: str = "127.0.0.1",
-        port: int = 11111,
-        frontend_port: int = 8080,
-        frontend_host: Optional[str] = None,
+        host: str = settings.tcpb_host,
+        port: int = settings.tcpb_port,
+        frontend_host: str = settings.tcpb_frontend_host,
+        frontend_port: int = settings.tcpb_frontend_port,
         uploads_prefix: str = "uploads",
         debug=False,
         trace=False,
     ):
-        self.frontend_host = frontend_host or host
+        self.frontend_host = frontend_host
         self.frontend_port = frontend_port
         self.uploads_prefix = uploads_prefix
 
@@ -1009,9 +1020,9 @@ class TCFrontEndClient(TCProtobufClient):
     def compute(
         self,
         inp_data: ProgramInput,
-        raise_error: bool = False,
-        collect_stdout: bool = False,
-        collect_files: bool = False,
+        raise_exc: bool = True,
+        collect_stdout: bool = True,
+        collect_files: bool = True,
         rm_scratch_dir: bool = True,
         **kwargs,
     ) -> ProgramOutput:
@@ -1034,22 +1045,32 @@ class TCFrontEndClient(TCProtobufClient):
             collect_stdout: bool, if True, will collect tc.out and place in ProgramOutput
             collect_files: bool, if True, will collect all files in the scratch directory.
             rm_scratch_dir: bool, if True, will remove the scratch directory after computation
-            raise_error: bool, if True, will raise an error if the computation fails
+            raise_exc: bool, if True, will raise an error if the computation fails
         """
 
         # Do pre-compute work
         inp_data = self._pre_compute_tasks(inp_data)
-        # Send calculation to TCPBS
-        result = super().compute(inp_data, raise_error=raise_error)
+        # Send calculation to TC-PBS
+        try:
+            prog_output = super().compute(inp_data)
+        except ServerError as e:
+            exc = e
+            assert isinstance(e.program_output, ProgramOutput)  # type check
+            prog_output = e.program_output
 
         # Do post-compute work
-        result = self._post_compute_tasks(
-            result,
+        prog_output = self._post_compute_tasks(
+            prog_output,
             collect_stdout=collect_stdout,
             collect_files=collect_files,
             rm_scratch_dir=rm_scratch_dir,
         )
-        return result
+        if raise_exc and prog_output.success is False:
+            # Append updated program_output with stdout/files to exception
+            exc.program_output = prog_output
+            raise exc
+
+        return prog_output
 
     def _pre_compute_tasks(self, inp_data: ProgramInput) -> ProgramInput:
         """Upload wavefunction files and modify the keywords for TeraChem."""
@@ -1080,17 +1101,10 @@ class TCFrontEndClient(TCProtobufClient):
         self,
         prog_output: ProgramOutput,
         collect_stdout: bool = True,
-        collect_files: bool = False,
+        collect_files: bool = True,
         rm_scratch_dir: bool = True,
     ) -> ProgramOutput:
-        """Tasks to be performed after receiving a result from Terachem PBS
-
-        Currently this involves:
-            1. Getting tc.out if stdout was requested or if the computation failed
-            2. Returning c0/ca0/cb0 files if requested via native_files = 'all'
-            3. Deleting the files on the server unless scratch_messy = True
-            4. Deleting uploaded files on the server unless uploads_messy = True
-        """
+        """Tasks to be performed after receiving a result from Terachem PBS"""
 
         # Collect files
         if collect_files:
@@ -1134,32 +1148,33 @@ class TCFrontEndClient(TCProtobufClient):
         """
 
         scr_dir = prog_output.provenance.scratch_dir
-        assert isinstance(scr_dir, str)
 
-        filenames = [
-            file_desc["name"]
-            for file_desc in self.ls(scr_dir)
-            if file_desc["type"] == "file"
-        ]
-
-        filenames.extend(
-            [
-                f"scr/{file_desc['name']}"
-                for file_desc in self.ls(f"{scr_dir}/scr")
+        if scr_dir:  # may be None if the job failed
+            scr_dir = str(scr_dir)
+            filenames = [
+                file_desc["name"]
+                for file_desc in self.ls(scr_dir)
                 if file_desc["type"] == "file"
             ]
-        )
 
-        for filename in filenames:
-            data: Union[str, bytes]
-            try:
-                b_data: bytes = self.get(f"{scr_dir}/{filename}")
-            except httpx.HTTPStatusError:
-                b_data = f"Could not find file: {filename}".encode()
-            try:
-                data = b_data.decode()
-            except UnicodeDecodeError:
-                # File is binary
-                data = b_data
+            filenames.extend(
+                [
+                    f"scr/{file_desc['name']}"
+                    for file_desc in self.ls(f"{scr_dir}/scr")
+                    if file_desc["type"] == "file"
+                ]
+            )
 
-            prog_output.results.files[filename] = data
+            for filename in filenames:
+                data: Union[str, bytes]
+                try:
+                    b_data: bytes = self.get(f"{scr_dir}/{filename}")
+                except httpx.HTTPStatusError:
+                    b_data = f"Could not find file: {filename}".encode()
+                try:
+                    data = b_data.decode()
+                except UnicodeDecodeError:
+                    # File is binary
+                    data = b_data
+
+                prog_output.results.files[filename] = data
