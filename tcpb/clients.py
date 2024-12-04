@@ -317,7 +317,6 @@ class TCProtobufClient:
         Returns:
             bool: True if job is completed, False otherwise
         """
-        print("Checking jobs status...")
         if self.debug:
             logging.info("in debug mode - assume check_job_complete is True")
             return True
