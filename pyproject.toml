@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "tcpb"
-version = "0.14.1"
+version = "0.14.2"
 description = "A Python client for TeraChem's protocol buffer API."
 readme = "README.md"
 license = "MIT"
