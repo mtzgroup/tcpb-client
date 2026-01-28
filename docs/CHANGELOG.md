@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Changed
+
+- 🚨 Minimum Python version from 3.9 -> 3.10.
+- 🚨 qcio minimum changed from 0.11.9 -> 0.16.2
+
+### Added
+
+- `qcconst` dependency.
+
 ## [0.14.3] - 2025-02-07
 
 ### Changed
@@ -120,7 +129,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Configuration parameters for controlling `TCFrontEndClient` behavior:
-
   1. `native_files`: list[str] - List of natives files to collect. If none passed, all files will be collected.
 
 - Tests for `TCFrontEndClient` file put/get behaviors.
@@ -138,7 +146,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particular `c0` files as initial wavefunction guesses.
-
   - Configuration parameters for controlling `TCFrontEndClient` behavior are
     found in `AtomicInput.extras['tcfe:config']` and include:
     1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess

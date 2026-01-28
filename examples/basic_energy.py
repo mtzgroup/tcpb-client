@@ -25,4 +25,4 @@ with TCPBClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
     prog_output = client.compute(prog_inp)
 
 print(prog_output)
-print(prog_output.results.energy)
+print(prog_output.data.energy)

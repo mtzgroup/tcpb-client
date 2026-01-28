@@ -16,6 +16,7 @@ import logging
 import socket
 import struct
 import traceback
+from pathlib import Path
 from time import sleep
 from typing import Dict, List, Optional, Union
 from uuid import uuid4
@@ -27,7 +28,7 @@ from qcio import ProgramInput, ProgramOutput, Provenance
 
 from tcpb.utils import (  # job_output_to_atomic_result,
     prog_inp_to_job_inp,
-    to_single_point_results,
+    to_single_point_data,
 )
 
 # Import the Protobuf messages generated from the .proto file
@@ -183,10 +184,10 @@ class TCProtobufClient:
                 input_data=inp_data,
                 success=False,
                 traceback=traceback.format_exc(),
-                results={},
+                data={},
                 provenance=Provenance(
                     program=self.program,
-                    scratch_dir=self.curr_job_dir,
+                    scratch_dir=Path(self.curr_job_dir) if self.curr_job_dir else None,
                 ),
             )
             e.program_output = prog_output
@@ -195,11 +196,11 @@ class TCProtobufClient:
             else:
                 return prog_output
         else:
-            return self.job_output_to_atomic_result(
+            return self.job_output_to_program_output(
                 inp_data=inp_data, job_output=job_output
             )
 
-    def job_output_to_atomic_result(
+    def job_output_to_program_output(
         self,
         *,
         inp_data: ProgramInput,
@@ -217,10 +218,10 @@ class TCProtobufClient:
             provenance=Provenance(
                 program=self.program, scratch_dir=jo_dict.get("job_dir")
             ),
-            results=to_single_point_results(job_output),
+            data=to_single_point_data(job_output),
         )
         # And extend extras to include values additional to input extras
-        prog_output.results.extras.update(
+        prog_output.data.extras.update(
             {
                 "charges": jo_dict.get("charges"),
                 "spins": jo_dict.get("spins"),
@@ -1020,7 +1021,7 @@ class TCFrontEndClient(TCProtobufClient):
         self,
         inp_data: ProgramInput,
         raise_exc: bool = True,
-        collect_stdout: bool = True,
+        collect_logs: bool = True,
         collect_files: bool = True,
         rm_scratch_dir: bool = True,
         **kwargs,
@@ -1041,7 +1042,7 @@ class TCFrontEndClient(TCProtobufClient):
 
         Args:
             prog_input: ProgramInput object
-            collect_stdout: bool, if True, will collect tc.out and place in ProgramOutput
+            collect_logs: bool, if True, will collect tc.out and place in ProgramOutput
             collect_files: bool, if True, will collect all files in the scratch directory.
             rm_scratch_dir: bool, if True, will remove the scratch directory after computation
             raise_exc: bool, if True, will raise an error if the computation fails
@@ -1060,12 +1061,12 @@ class TCFrontEndClient(TCProtobufClient):
         # Do post-compute work
         prog_output = self._post_compute_tasks(
             prog_output,
-            collect_stdout=collect_stdout,
+            collect_logs=collect_logs,
             collect_files=collect_files,
             rm_scratch_dir=rm_scratch_dir,
         )
         if raise_exc and prog_output.success is False:
-            # Append updated program_output with stdout/files to exception
+            # Append updated program_output with logs/files to exception
             exc.program_output = prog_output
             raise exc
 
@@ -1099,7 +1100,7 @@ class TCFrontEndClient(TCProtobufClient):
     def _post_compute_tasks(
         self,
         prog_output: ProgramOutput,
-        collect_stdout: bool = True,
+        collect_logs: bool = True,
         collect_files: bool = True,
         rm_scratch_dir: bool = True,
     ) -> ProgramOutput:
@@ -1111,16 +1112,14 @@ class TCFrontEndClient(TCProtobufClient):
 
         po_dict = prog_output.model_dump()
 
-        # Add stdout
-        if collect_stdout or prog_output.success is False:
+        # Add logs
+        if collect_logs or prog_output.success is False:
             try:
-                stdout = self.get(
-                    f"{prog_output.provenance.scratch_dir}/tc.out"
-                ).decode()
+                logs = self.get(f"{prog_output.provenance.scratch_dir}/tc.out").decode()
             except httpx.HTTPStatusError:
-                stdout = "stdout could not be collected."
+                logs = "logs could not be collected."
 
-            po_dict["stdout"] = stdout
+            po_dict["logs"] = logs
 
         # Delete uploads if not requested to keep
         if (
@@ -1146,7 +1145,9 @@ class TCFrontEndClient(TCProtobufClient):
             None: Modified result dictionary in place
         """
 
-        scr_dir = prog_output.provenance.scratch_dir
+        scr_dir = (
+            str(prog_output.provenance.scratch_dir) if prog_output.success else None
+        )
 
         if scr_dir:  # may be None if the job failed
             scr_dir = str(scr_dir)
@@ -1176,4 +1177,4 @@ class TCFrontEndClient(TCProtobufClient):
                     # File is binary
                     data = b_data
 
-                prog_output.results.files[filename] = data
+                prog_output.data.files[filename] = data
