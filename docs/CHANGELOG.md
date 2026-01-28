@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.15.0] - 2026-01-28
+
 ### Changed
 
 - 🚨 Minimum Python version from 3.9 -> 3.10.
@@ -222,7 +224,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.14.3...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.15.0...HEAD
+[0.15.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.15.0
 [0.14.3]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.3
 [0.14.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.2
 [0.14.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.1
