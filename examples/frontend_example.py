@@ -22,11 +22,11 @@ atomic_input = ProgramInput(
 )
 
 with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
-    # Collect stdout and native files
-    prog_output = client.compute(atomic_input, collect_stdout=True, collect_files=True)
+    # Collect logs and native files
+    prog_output = client.compute(atomic_input, collect_logs=True, collect_files=True)
 
-# NOTE: Addition of stdout field possible with TCFrontendClient
-print(prog_output.stdout)
+# NOTE: Addition of logs field possible with TCFrontendClient
+print(prog_output.logs)
 print(prog_output)
 print(prog_output.return_result)
 # native_files will contain orb1a/b files in binary form

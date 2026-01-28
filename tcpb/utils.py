@@ -2,7 +2,8 @@ from copy import deepcopy
 
 import numpy as np
 from google.protobuf.json_format import MessageToDict
-from qcio import ProgramInput, SinglePointResults, Structure, Wavefunction, constants
+from qcconst import constants
+from qcio import ProgramInput, SinglePointData, Structure, Wavefunction
 
 from . import terachem_server_pb2 as pb
 
@@ -81,9 +82,9 @@ def mol_to_structure(mol: pb.Mol) -> Structure:
     )
 
 
-def to_single_point_results(job_output: pb.JobOutput) -> SinglePointResults:
-    """Create SinglePointResults from JobOutput protobuf message"""
-    return SinglePointResults(
+def to_single_point_data(job_output: pb.JobOutput) -> SinglePointData:
+    """Create SinglePointData from JobOutput protobuf message"""
+    return SinglePointData(
         energy=job_output.energy[0],
         gradient=np.array(job_output.gradient),
         scf_dipole_moment=job_output.dipoles[

@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import numpy as np
-from qcio import ProgramInput, ProgramOutput, constants
+from qcconst import constants
+from qcio import ProgramInput, ProgramOutput
 
 from tcpb import terachem_server_pb2 as pb
 from tcpb.clients import TCFrontEndClient, TCProtobufClient
@@ -66,7 +67,7 @@ def test_prog_input_to_job_input_cisco_casci_similarity(ethylene):
 
 def test_job_output_to_prog_output(prog_input, job_output):
     client = TCProtobufClient()
-    prog_output = client.job_output_to_atomic_result(
+    prog_output = client.job_output_to_program_output(
         inp_data=prog_input, job_output=job_output
     )
     assert isinstance(prog_output, ProgramOutput)
@@ -91,14 +92,14 @@ def test_job_output_to_prog_output(prog_input, job_output):
 
 def test_job_output_to_prog_output_correctly_sets_provenance(prog_input, job_output):
     pb_client = TCProtobufClient()
-    prog_output = pb_client.job_output_to_atomic_result(
+    prog_output = pb_client.job_output_to_program_output(
         inp_data=prog_input, job_output=job_output
     )
     assert isinstance(prog_output, ProgramOutput)
     assert prog_output.provenance.program == pb_client.program
 
     fe_client = TCFrontEndClient()
-    prog_output = fe_client.job_output_to_atomic_result(
+    prog_output = fe_client.job_output_to_program_output(
         inp_data=prog_input, job_output=job_output
     )
     assert isinstance(prog_output, ProgramOutput)

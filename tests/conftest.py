@@ -3,7 +3,8 @@ from typing import Collection, Union
 
 import numpy as np
 import pytest
-from qcio import Model, ProgramInput, ProgramOutput, Structure, constants
+from qcconst import constants
+from qcio import Model, ProgramInput, ProgramOutput, Structure
 
 from tcpb import terachem_server_pb2 as pb
 

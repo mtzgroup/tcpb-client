@@ -26,10 +26,10 @@ with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
     prog_output = client.compute(prog_inp, collect_files=True)
 
 prog_inp_2 = prog_inp.model_dump()
-prog_inp_2["files"]["c0"] = prog_output.results.files["scr/c0"]
+prog_inp_2["files"]["c0"] = prog_output.data.files["scr/c0"]
 
 with TCFrontEndClient(host=sys.argv[1], port=int(sys.argv[2])) as client:
     prog_output_2 = client.compute(ProgramInput(**prog_inp_2))
 
-print(prog_output.stdout)
-print(prog_output_2.stdout)
+print(prog_output.logs)
+print(prog_output_2.logs)
