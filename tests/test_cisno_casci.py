@@ -1,5 +1,5 @@
 from google.protobuf.internal.containers import RepeatedScalarFieldContainer
-from qcio import ProgramInput
+from qcdata import ProgramInput
 
 from tcpb import TCProtobufClient as TCPBClient
 

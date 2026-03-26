@@ -166,9 +166,7 @@ def test_post_compute_tasks_retrieves_logs_failed_operation(prog_output, mocker)
     assert post_compute_result.logs == logs.decode()
 
 
-def test_post_compute_tasks_does_not_retrieve_logs_or_native_files(
-    prog_output, mocker
-):
+def test_post_compute_tasks_does_not_retrieve_logs_or_native_files(prog_output, mocker):
     spy = mocker.patch("tcpb.TCFrontEndClient._request")
 
     client = TCFrontEndClient()

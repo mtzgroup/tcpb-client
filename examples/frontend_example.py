@@ -2,7 +2,7 @@
 # Basic energy calculation
 import sys
 
-from qcio import ProgramInput, Structure
+from qcdata import ProgramInput, Structure
 
 from tcpb import TCFrontEndClient
 

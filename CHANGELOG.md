@@ -1,1 +1,261 @@
-See [CHANGELOG.md in docs](docs/CHANGELOG.md)
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [unreleased]
+
+### Changed
+
+- 🚨 Migrated schema imports from `qcio` to `qcdata` and updated to `ProgramOutput` usage from `Results`. [#48](https://github.com/mtzgroup/tcpb-client/pull/48)
+- Modernized packaging and release tooling: switched to `hatchling`, adopted a `src/tcpb` layout, replaced `Poetry` workflows with `uv`. [#48](https://github.com/mtzgroup/tcpb-client/pull/48)
+- Updated GitHub Actions and pre-commit tooling to current `uv`-based workflows and newer `ruff`, `mypy`, `pre-commit`, `coverage`, and `pytest-cov` versions. [#48](https://github.com/mtzgroup/tcpb-client/pull/48)
+
+## [0.15.0] - 2026-01-28
+
+### Changed
+
+- 🚨 Minimum Python version from 3.9 -> 3.10.
+- 🚨 qcdata minimum changed from 0.11.9 -> 0.16.2
+
+### Added
+
+- `qcconst` dependency.
+
+## [0.14.3] - 2025-02-07
+
+### Changed
+
+- Loosened dependency specifications for `numpy`, `httpx` and `qcdata`.
+
+## [0.14.2] - 2024-12-03
+
+### Removed
+
+- `Checking jobs status...` print statement in order to have cleaner logs.
+
+## [0.14.1] - 2024-09-11
+
+### Added
+
+- Environment variable control for:
+  - `TCPB_HOST`
+  - `TCPB_PORT`
+  - `TCPB_FRONTEND_HOST`
+  - `TCPB_FRONTEND_CLIENT`
+
+### Changed
+
+- Collect `stdout` and files by default if using `TCPBFrontendClient`
+- Renamed `kwarg` to `compute` `raise_error` -> `raise_exc` to match `qcop`.
+- Default behavior for `TCPBFrontendClient` is now to collect stdout and files.
+- `program_output` appended to `exc.program_output`.
+- `TCPBFrontendClient` collects stdout and files even if a calculation fails.
+
+### Removed
+
+- Old devops files in root directory for mypy, flake8, conda, etc.
+
+## [0.14.0] - 2024-09-10
+
+### Added
+
+- GitHub workflows for basic code quality.
+- `release.py` script.
+
+### Changed
+
+- Changed build system from `flit` to `uv` to standardize with other `MtzGroup` lab projects.
+- 🚨 Updated minimum Python version from `3.7` -> `3.9`.
+- Updated package dependencies.
+- Updated devops system. Removed `black`, `isort`, `flake8` in favor of latest version of `ruff`.
+- Updated documentation dependencies.
+
+### Removed
+
+- Checks for `bond_order` in the tests as this value is no longer returned by default by the TeraChem server.
+- `TCFEKeywords` checks. Just passing arguments to the `TCFEClient.compute()` function now.
+
+## [0.13.2]
+
+### Fixed
+
+- [Bugfix by Christopher Myers](https://github.com/mtzgroup/tcpb-client/pull/40) to correct for loop handing CIS states.
+
+## [0.13.1]
+
+### Changed
+
+- Pegged pydantic version <2.0.
+
+## [0.13.0]
+
+### Changed
+
+- Moved the `stdout` upon crashing of TeraChem server from `FailedOperation.extras` to `FailedOperation.error.extras`. This circumvents https://github.com/MolSSI/QCEngine/issues/397 and is probably a better place for the error data anyways.
+
+## [0.12.1]
+
+### Changed
+
+- Hacked in a solution for the TeraChem server being off-by-one on the job directory so that we can collect stdout files when the server crashes. It's still impossible to collect stdout if its the first job (and a failed job) run by the server due to the server returning `-1` for the `job_dir` on the `status` message. Henry will look into fixing the server as per https://github.com/mtzgroup/terachem/issues/138.
+
+## [0.12.0]
+
+### Changed
+
+- Bump support from python 3.6 -> 3.7 (3.6 has end-of-life'd)
+- Peg `protobuf` to `3.20.1` since newer versions do not support our outdated `_pb2.py` protobuf files.
+
+## [0.11.0]
+
+### Changed
+
+- Return `FailedOperation` instead of raising exceptions in `.compute()` methods.
+- Use `TCFEKeywords` enums throughout code.
+- Collect `tc.out`, if possible, when computation fails.
+
+## [0.10.1]
+
+### Changed
+
+- Moved `job_output_to_atomic_result` to be method on client objects so that `AtomicResult.provenance` can be dynamically set correctly depending on which client is used.
+
+## [0.10.0]
+
+### Added
+
+- Documentation and `mkdocs` website on GitHub pages. Docs available [here](https://mtzgroup.github.io/tcpb-client/)
+
+### Changed
+
+- Renamed `AtomicInput.extras['tcfe:config']` -> `AtomicInput.extras['tcfe:keywords']`
+
+## [0.9.0]
+
+### Added
+
+- Configuration parameters for controlling `TCFrontEndClient` behavior:
+  1. `native_files`: list[str] - List of natives files to collect. If none passed, all files will be collected.
+
+- Tests for `TCFrontEndClient` file put/get behaviors.
+
+### Changed
+
+- Refactored `TCFrontEndClient`
+
+### Removed
+
+- Construction of molden file from protocol buffer outputs. Molden files can now be requested directly from the Frontend client.
+
+## [0.8.1]
+
+### Added
+
+- `TCFrontEndClient` to enable access to the files written by TeraChem and upload input files for TeraChem, in particular `c0` files as initial wavefunction guesses.
+  - Configuration parameters for controlling `TCFrontEndClient` behavior are
+    found in `AtomicInput.extras['tcfe:config']` and include:
+    1. `c0` | `ca0` and `cb0`: `bytes` - Binary files to use as an initial guess
+       wavefunction
+    2. `scratch_messy`: `bool` - If `True` client will not delete files on server
+       after a computation
+    3. `uploads_messy`: `bool` - If `True` client will not delete uploaded c0
+       file(s) after a computation
+  - Client also supports [AtomicResultProtocols](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/qcelemental/models/results.py#L538) `stdout` and `native_files`.
+
+### Changed
+
+- `qcelemental` required version bumped from `>=0.17.0` to `>=0.24.0` to support `native_files` field for returning files. See [qcelemental note](https://github.com/MolSSI/QCElemental/blob/cabec4a7d1095b656320f2c842f0e132149e4bd1/docs/source/changelog.rst#0240--2021-11-18). Note I am breaking the convention and returning binary data as well since I have more control over file access via the `TCFrontEndClient` than anticipated in the `qcelemental`/`qcengine` specification. Additionally I need the binary `c0` file to use as initial guesses for TeraChem computations.
+
+### Removed
+
+## [0.8.0] - 2021-05-26
+
+### Added
+
+- Many IMD values to the `result.extra['qcvars']` dict
+- `result.wavefunction` now contains `WavefunctionProperties`
+
+### Changed
+
+- `result.extras['qcvars']['bond_order']` -> `result.extras['qcvars']['meyer_bond_order']`
+- Many values in `result.extras['qcvars']` moved to `result.extras['job_extras']` if they didn't pertain to quantum chemistry values.
+- `result.extras['qcvars']['orb{a,b}_{energies,occupations}']` moved to `result.wavefunction`. Note these will only be returned if `AtomicInput.protocols.wavefunction = "all"`.
+
+### Removed
+
+- Removed unused documentation setup. Can add documentation with `mkdocs` later if needed.
+
+## [0.7.2] - 2021-03-10
+
+### Changed
+
+- Learned that AtomicResult is supposed to be a full superset of AtomicInput used to generate the result. Changed `utils.job_output_to_atomic_result()` to reflect this reality.
+
+## [0.7.1] - 2021-03-10
+
+### Added
+
+- `imd_orbital_type` specific keyword extraction to support creation of molden files.
+
+## [0.7.0] - 2021-02-26
+
+### Added
+
+- `TCCloud.compute(atomic_input: AtomicInput) -> AtomicResult` top level method to create MolSSI QCSchema compliant interface.
+- `pyproject.toml`
+- more examples in `/examples` that leverage the new QCSchema interface
+- `utils.py` that contains basic utilities for transforming inputs/outputs to `QCSchema` format.
+
+### Changed
+
+- Using `flit` instead of `setuptools` for packaging.
+- Compatible with only python 3.6+ (adding type annotations)
+
+### Removed
+
+- `setup.py`
+- Unused and broken test files including non functional mock server.
+
+## [r0.6.0] - 2021-02-25
+
+### Changed
+
+- Added Henry's molden file constructor function.
+
+## 0.5.x - Long long ago
+
+### Added
+
+- All of Stefan's original code.
+
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.15.0...HEAD
+[0.15.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.15.0
+[0.14.3]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.3
+[0.14.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.2
+[0.14.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.1
+[0.14.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.0
+[0.13.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.2
+[0.13.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.1
+[0.13.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.13.0
+[0.12.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.1
+[0.12.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.12.0
+[0.11.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.11.0
+[0.10.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.1
+[0.10.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.10.0
+[0.9.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.9.0
+[0.8.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.1
+[0.8.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.8.0
+[0.7.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.2
+[0.7.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.1
+[0.7.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.7.0
+[r0.6.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.6.0
+[r0.5.3]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.5.3
+[r0.5.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.5.2
+[r0.5.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.5.1
+[r0.5.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.5.0
+[r0.4.1]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.4.1
+[r0.4.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.4.0
+[r0.3.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.3.0
+[r0.2.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/r0.2.0

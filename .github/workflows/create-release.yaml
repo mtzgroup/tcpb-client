@@ -20,7 +20,7 @@ jobs:
         id: extract_notes
         run: |
           VERSION=${{ github.ref_name }}
-          sed -n "/## \\[$VERSION\\]/,/## \\[/p" docs/CHANGELOG.md | sed '$d' | sed "s/## \\[$VERSION\\]/## $VERSION/" > RELEASE_NOTES.md
+          sed -n "/## \\[$VERSION\\]/,/## \\[/p" CHANGELOG.md | sed '$d' | sed "s/## \\[$VERSION\\]/## $VERSION/" > RELEASE_NOTES.md
 
       - name: Create GitHub Release
         id: create_release

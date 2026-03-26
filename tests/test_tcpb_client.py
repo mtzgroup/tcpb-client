@@ -1,4 +1,4 @@
-from qcio import ProgramOutput
+from qcdata import ProgramOutput
 
 from tcpb.clients import TCProtobufClient
 from tcpb.exceptions import ServerError

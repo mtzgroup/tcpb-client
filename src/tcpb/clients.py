@@ -24,7 +24,7 @@ from uuid import uuid4
 import httpx
 import numpy as np
 from google.protobuf.json_format import MessageToDict
-from qcio import ProgramInput, ProgramOutput, Provenance
+from qcdata import ProgramInput, ProgramOutput, Provenance
 
 from tcpb.utils import (  # job_output_to_atomic_result,
     prog_inp_to_job_inp,
@@ -152,7 +152,7 @@ class TCProtobufClient:
         """Top level method for performing computations with QCSchema inputs/outputs
 
         Args:
-            inp_data: AtomicInput object
+            inp_data: ProgramInput object
             raise_exc: If True, raise an error if the computation fails
 
         Returns:
@@ -1026,7 +1026,7 @@ class TCFrontEndClient(TCProtobufClient):
         rm_scratch_dir: bool = True,
         **kwargs,
     ) -> ProgramOutput:
-        """Top level method for performing computations with qcio inputs/outputs
+        """Top level method for performing computations with qcdata inputs/outputs
 
 
         NOTE: Configuration parameters for controlling TCFrontEndClient behavior are
