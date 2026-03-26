@@ -34,8 +34,12 @@ def test_wavefunction(settings, prog_input):
     assert prog_output.data.wavefunction is not None
     assert isinstance(prog_output.data.wavefunction.scf_eigenvalues_a, np.ndarray)
     assert isinstance(prog_output.data.wavefunction.scf_occupations_a, np.ndarray)
-    np.testing.assert_equal(prog_output.data.wavefunction.scf_eigenvalues_b, np.array([]))
-    np.testing.assert_equal(prog_output.data.wavefunction.scf_occupations_b, np.array([]))
+    np.testing.assert_equal(
+        prog_output.data.wavefunction.scf_eigenvalues_b, np.array([])
+    )
+    np.testing.assert_equal(
+        prog_output.data.wavefunction.scf_occupations_b, np.array([])
+    )
 
     prog_input.keywords["restricted"] = False
     with TCPBClient(settings["tcpb_host"], settings["tcpb_port"]) as TC:

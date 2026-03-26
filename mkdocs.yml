@@ -87,4 +87,4 @@ markdown_extensions:
       base_path: docs
 
 watch:
-  - tcpb
+  - src/tcpb

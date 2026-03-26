@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 from qcconst import constants
-from qcio import ProgramInput, ProgramOutput
+from qcdata import ProgramInput, ProgramOutput
 
 from tcpb import terachem_server_pb2 as pb
 from tcpb.clients import TCFrontEndClient, TCProtobufClient

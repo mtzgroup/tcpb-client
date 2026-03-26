@@ -3,7 +3,7 @@ from copy import deepcopy
 import numpy as np
 from google.protobuf.json_format import MessageToDict
 from qcconst import constants
-from qcio import ProgramInput, SinglePointData, Structure, Wavefunction
+from qcdata import ProgramInput, SinglePointData, Structure, Wavefunction
 
 from . import terachem_server_pb2 as pb
 
@@ -65,7 +65,7 @@ def mol_to_structure(mol: pb.Mol) -> Structure:
 
     Note:
         Should not use for returning AtomicResults objects because the AtomicResult
-        object should be a direct superset of the AtomicInput that created it (and
+        object should be a direct superset of the ProgramInput that created it (and
         already contains the Structure submitted by the user)
     """
     if mol.units == pb.Mol.UnitType.ANGSTROM:

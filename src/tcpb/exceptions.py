@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 from typing import Optional
 
-from qcio import ProgramOutput
+from qcdata import ProgramOutput
 
 """Exception handling for tcpb package
 

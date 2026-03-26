@@ -4,7 +4,7 @@ from typing import Collection, Union
 import numpy as np
 import pytest
 from qcconst import constants
-from qcio import Model, ProgramInput, ProgramOutput, Structure
+from qcdata import Model, ProgramInput, ProgramOutput, Structure
 
 from tcpb import terachem_server_pb2 as pb
 
@@ -70,7 +70,7 @@ def prog_output(prog_input):
     result = ProgramOutput(
         input_data=prog_input,
         success=True,
-        results={"energy": 123.123},
+        data={"energy": 123.123},
         provenance={"program": "terachem-pbs", "scratch_dir": "/tmp"},
     )
     return result
