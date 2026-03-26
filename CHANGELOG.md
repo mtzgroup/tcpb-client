@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.16.0] - 2026-03-26
+
 ### Changed
 
 - 🚨 Migrated schema imports from `qcio` to `qcdata` and updated to `ProgramOutput` usage from `Results`. [#48](https://github.com/mtzgroup/tcpb-client/pull/48)
@@ -230,7 +232,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - All of Stefan's original code.
 
-[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.15.0...HEAD
+[unreleased]: https://github.com/mtzgroup/tcpb-client/compare/0.16.0...HEAD
+[0.16.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.16.0
 [0.15.0]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.15.0
 [0.14.3]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.3
 [0.14.2]: https://github.com/mtzgroup/tcpb-client/releases/tag/0.14.2
